@@ -1,20 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFramework>net8.0-windows</TargetFramework>
         <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-        <OutputType>Library</OutputType>
-        <RootNamespace>MJcommon</RootNamespace>
+        <OutputType>Exe</OutputType>
         <SourceAnalysisOverrideSettingsFile>C:\Documents and Settings\murray\Application Data\ICSharpCode/SharpDevelop3.0\Settings.SourceAnalysis</SourceAnalysisOverrideSettingsFile>
         <NoStdLib>False</NoStdLib>
         <StartWorkingDirectory>..\bin\</StartWorkingDirectory>
+        <StartArguments>-day1 2018_07_28 -runtimes -rawtimes -paxtimes -classtimes -conecounts -rookie -set1only -title "July 28m 2018 event at Fort Macleod" -path c:\autox\2018\events</StartArguments>
+        <NoWin32Manifest>False</NoWin32Manifest>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <AssemblyTitle>mjcommon</AssemblyTitle>
-        <Product>mjcommon</Product>
-        <Copyright>Copyright 2011</Copyright>
-        <AssemblyVersion>1.0.%2a</AssemblyVersion>
+        <UseWindowsForms>true</UseWindowsForms>
+        <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
-        <RegisterForComInterop>False</RegisterForComInterop>
+        <RegisterForComInterop>True</RegisterForComInterop>
         <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
         <BaseAddress>4194304</BaseAddress>
         <FileAlignment>4096</FileAlignment>
@@ -36,12 +35,12 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="CsvHelper" Version="32.0.3" />
-        <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
-        <PackageReference Include="System.IO.Ports" Version="8.0.0" />
-        <PackageReference Include="System.Management" Version="8.0.0" />
+        <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     </ItemGroup>
     <ItemGroup>
-        <Folder Include="Properties\" />
+        <Compile Remove="overalls.cs" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\mjcommon\mjcommon.csproj" />
     </ItemGroup>
 </Project>
