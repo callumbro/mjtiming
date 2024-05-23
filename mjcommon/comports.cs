@@ -1,15 +1,12 @@
 ﻿// Lots of work to get the COM port list in friendly form
-using System.Management;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO.Ports;
+using System.Management;
 
 namespace RaceBeam
 {
     internal static class ProcessConnection
     {
-
         public static ConnectionOptions ProcessConnectionOptions()
         {
             var options = new ConnectionOptions();
@@ -26,9 +23,9 @@ namespace RaceBeam
             connectScope.Options = options;
             connectScope.Connect();
             return connectScope;
-
         }
     }
+
     public class COMPortInfo
     {
         public string Name;
@@ -36,11 +33,11 @@ namespace RaceBeam
 
         public static List<COMPortInfo> GetCOMPortsInfo()
         {
-        	// Should be able to use this instead of the WMI query
-			// string[] ports = SerialPort.GetPortNames();
-			// However, it appears to not have any description available
+            // Should be able to use this instead of the WMI query
+            // string[] ports = SerialPort.GetPortNames();
+            // However, it appears to not have any description available
 
-        	var comPortInfoList = new List<COMPortInfo>();
+            var comPortInfoList = new List<COMPortInfo>();
             ConnectionOptions options = ProcessConnection.ProcessConnectionOptions();
             ManagementScope connectionScope = ProcessConnection.ConnectionScope(Environment.MachineName, options, @"\root\CIMV2");
 

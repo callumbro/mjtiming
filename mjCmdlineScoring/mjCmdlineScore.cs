@@ -29,9 +29,9 @@ namespace RaceBeam
         {
             // parse command line arguments
             // default to 1 day scoring, today's date
-            var argblock = new scoreArgs
+            var argblock = new ScoreArgs
             {
-                eventFolder = "."  // default to current folder
+                EventFolder = "."  // default to current folder
             };
 
             for (int i = 0; i < args.Length; i++)
@@ -43,75 +43,75 @@ namespace RaceBeam
                 else if (args[i] == "-day1")
                 {
                     i += 1;
-                    argblock.day1 = args[i];
+                    argblock.Day1 = args[i];
                 }
                 else if (args[i] == "-day2")
                 {
                     i += 1;
-                    argblock.day2 = args[i];
+                    argblock.Day2 = args[i];
                 }
                 else if (args[i] == "-classfile")
                 {
                     i += 1;
-                    argblock.classFile = args[i];
+                    argblock.ClassFile = args[i];
                 }
                 else if (args[i] == "-title")
                 {
                     i += 1;
-                    argblock.title = args[i];
+                    argblock.Title = args[i];
                 }
                 else if (args[i] == "-path")
                 {
                     i += 1;
-                    argblock.eventFolder = args[i];
+                    argblock.EventFolder = args[i];
                 }
                 else if (args[i] == "-oneday")
                 {
-                    argblock.bestSingleRun = true;  // for backwards compatibility
+                    argblock.BestSingleRun = true;  // for backwards compatibility
                 }
                 else if (args[i] == "-set1only")
                 {
-                    argblock.set1Only = true;
+                    argblock.Set1Only = true;
                 }
                 else if (args[i] == "-set2only")
                 {
-                    argblock.set2Only = true;
+                    argblock.Set2Only = true;
                 }
                 else if (args[i] == "-set1plusset2")
                 {
-                    argblock.set1PlusSet2 = true;
+                    argblock.Set1PlusSet2 = true;
                 }
                 else if (args[i] == "-bestsinglerun")
                 {
-                    argblock.bestSingleRun = true;
+                    argblock.BestSingleRun = true;
                 }
                 else if (args[i] == "-runtimes")
                 {
-                    argblock.showRunTimes = true;
+                    argblock.ShowRunTimes = true;
                 }
                 else if (args[i] == "-rawtimes")
                 {
-                    argblock.showRawTimes = true;
+                    argblock.ShowRawTimes = true;
                 }
                 else if (args[i] == "-paxtimes")
                 {
-                    argblock.showPaxTimes = true;
+                    argblock.ShowPaxTimes = true;
                 }
                 else if (args[i] == "-rookie")
                 {
-                    argblock.showRookie = true;
+                    argblock.ShowRookie = true;
                 }
                 else if (args[i] == "-classtimes")
                 {
-                    argblock.showClassTimes = true;
+                    argblock.ShowClassTimes = true;
                 }
                 else if (args[i] == "-teams")
                 {
-                    argblock.showTeams = true;
+                    argblock.ShowTeams = true;
                 }
                 else if (args[i] == "-conecounts")
                 {
-                    argblock.showConeCounts = true;
+                    argblock.ShowConeCounts = true;
                 }
                 else if (args[i] == "-eventname")
                 {
@@ -120,15 +120,15 @@ namespace RaceBeam
                 else if (args[i] == "-maxofficialruns")
                 {
                     i += 1;
-                    if (int.TryParse(args[i], out argblock.maxOfficialRuns) == false)
+                    if (!int.TryParse(args[i], out argblock.MaxOfficialRuns))
                     {
-                        argblock.maxOfficialRuns = 999;
+                        argblock.MaxOfficialRuns = 999;
                     }
                 }
                 else if (args[i] == "-out")
                 {
                     i += 1;
-                    argblock.outFile = args[i];
+                    argblock.OutFile = args[i];
                 }
                 else
                 {
@@ -136,28 +136,28 @@ namespace RaceBeam
                 }
             }
             string results;
-            if (argblock.title != "")
+            if (argblock.Title != "")
             {
-                results = argblock.title + "\r\n";
+                results = argblock.Title + "\r\n";
             }
             else
             {
-                if (argblock.day2 == "")
+                if (argblock.Day2 == "")
                 {
-                    results = "Scores for event of " + argblock.day1 + "\r\n";
+                    results = "Scores for event of " + argblock.Day1 + "\r\n";
                 }
                 else
                 {
-                    results = "Scores for two day event of " + argblock.day1 + "and " + argblock.day2 + "\r\n\r\n";
+                    results = "Scores for two day event of " + argblock.Day1 + "and " + argblock.Day2 + "\r\n\r\n";
                 }
             }
-            argblock.writeCSV = true;
-            results += textScores.textScore(argblock);
+            argblock.WriteCSV = true;
+            results += TextScores.TextScore(argblock);
 
-            if (!string.IsNullOrEmpty(argblock.outFile))
+            if (!string.IsNullOrEmpty(argblock.OutFile))
             {
-                File.WriteAllText(argblock.outFile, results);
-                Console.WriteLine("Results written to %s", argblock.outFile);
+                File.WriteAllText(argblock.OutFile, results);
+                Console.WriteLine("Results written to %s", argblock.OutFile);
             }
             else
             {

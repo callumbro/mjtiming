@@ -28,7 +28,7 @@ namespace RaceBeam
             return headers;
         }
         // Return a list of keys
-        public List<string> getKeys()
+        public List<string> GetKeys()
         {
             var list = new List<string>(_data.Keys);
             return list;
@@ -55,6 +55,7 @@ namespace RaceBeam
                 return "";
             }
         }
+
         /// <summary>
         /// Returns number of keyed elements (lines in CSV file)
         /// </summary>
@@ -135,7 +136,7 @@ namespace RaceBeam
                             continue;
                         }
 
-                        if ((csvRowData.Count < 3) || ((csvRowData.Count == 3) && (string.IsNullOrEmpty(csvRowData[2]) == true)))
+                        if ((csvRowData.Count < 3) || ((csvRowData.Count == 3) && string.IsNullOrEmpty(csvRowData[2])))
                         {
                             // didn't work -- skip this line
                             continue;

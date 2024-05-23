@@ -32,7 +32,7 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
-        <Compile Update="timingGrid.cs">
+        <Compile Update="TimingGrid.cs">
             <SubType>Component</SubType>
         </Compile>
     </ItemGroup>
