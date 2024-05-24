@@ -114,7 +114,7 @@ namespace RaceBeam
             }
             return results;
         }
-        // ---------------------------------------------------------------------------
+
         public static string TextScoreSplit(
             ScoreArgs myArgs,
             out string runtimes,
@@ -155,7 +155,13 @@ namespace RaceBeam
             }
 
             // Do some scoring calcs
-            err = ScoreCalcs.DoScore(args, out scores, out teamScores, out stats, out sortedClassList);
+            err = ScoreCalcs
+                .DoScore(
+                    args,
+                    out scores,
+                    out teamScores,
+                    out stats,
+                    out sortedClassList);
 
             if (!string.IsNullOrEmpty(err))
             {
@@ -244,8 +250,12 @@ namespace RaceBeam
             }
             return "";
         }
-        // ---------------------------------------------------------------------------
-        // Times > DNFvalue denote a DNS
+
+        /// <summary>
+        /// Times > DNFvalue denote a DNS
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
         public static string TimeOrDNS(double time)
         {
             if (time >= ScoreCalcs.DNFvalue)
@@ -258,7 +268,7 @@ namespace RaceBeam
                 return string.Format("{0,8:#.000}", time);
             }
         }
-        // ---------------------------------------------------------------------------
+
         public static string RawTimes(ScoreArgs args)
         {
             string results = "";
@@ -340,8 +350,12 @@ namespace RaceBeam
                 return results;
             }
         }
-        // ---------------------------------------------------------------------------
-        // Return a printable text string for PAX data
+
+        /// <summary>
+        /// Return a printable text string for PAX data
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static string PaxTimes(ScoreArgs args)
         {
             string results = "";
@@ -427,8 +441,12 @@ namespace RaceBeam
                 return results;
             }
         }
-        // ---------------------------------------------------------------------------
-        // print out times, groups by Group, ordered within group by PAX time
+
+        /// <summary>
+        /// print out times, groups by Group, ordered within group by PAX time
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static string ClassTimes(ScoreArgs args)
         {
             string results = "";
@@ -600,10 +618,14 @@ namespace RaceBeam
                 return results;
             }
         }
-        // ---------------------------------------------------------------------------
-        // Team scores
-        // We group rAW and PAX if given in the driver's group filed
-        // If the group is something else, then we ignore the group and show the team for both raw and pax
+
+        /// <summary>
+        /// Team scores
+        /// We group RAW and PAX if given in the driver's group filed
+        /// If the group is something else, then we ignore the group and show the team for both raw and pax
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static string Teams(ScoreArgs args)
         {
             string results = "";
@@ -709,8 +731,12 @@ namespace RaceBeam
             }
             return results;
         }
-        // ---------------------------------------------------------------------------
-        // Return a printable text string for cone counts
+
+        /// <summary>
+        /// Return a printable text string for cone counts
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static string ConeCounts(ScoreArgs args)
         {
             string results = "";
@@ -768,7 +794,7 @@ namespace RaceBeam
             }
             return results;
         }
-        // ---------------------------------------------------------------------------
+
         public static string PrintSet(ScoreCalcs.SingleSetData setData, int dayNumber, int setNumber)
         {
             string results = string.Format("{0,19}Day {1,1} Set {2,1}", " ", dayNumber, setNumber);
@@ -828,7 +854,7 @@ namespace RaceBeam
             results += string.Format("\r\n");
             return results;
         }
-        // ---------------------------------------------------------------------------
+
         public static int GetLeadingInt(string input)
         {
             int i = 0;
@@ -842,8 +868,12 @@ namespace RaceBeam
             }
             return value;
         }
-        // ---------------------------------------------------------------------------
-        // print out run data
+
+        /// <summary>
+        /// print out run data
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static string RunTimes(ScoreArgs args)
         {
             string results = "";

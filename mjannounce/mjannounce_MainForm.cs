@@ -13,6 +13,7 @@ using System.IO;
 using System.Net;
 using System.Security.Principal;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace RaceBeam
@@ -25,7 +26,7 @@ namespace RaceBeam
         private string timingFolder;
         private string mjFolder;
         private string today;
-        private readonly RaceBeam.CSVData configData = new RaceBeam.CSVData();
+        private readonly CSVData configData = new CSVData();
         string configFilename = "";
         private readonly object lockObject = new object();
 
@@ -34,17 +35,15 @@ namespace RaceBeam
         private string paxTimes;
         private string rawTimes;
         private string coneCounts;
-        private string classtimes;
-        private string teamtimes;
+        private string classTimes;
+        private string teamTimes;
         private string statistics;
         private int queryCount = 0;
         private string compare_results = "";
         private string prev_results = "";
-        const string head = "<HTML><HEAD><BODY>";
-        const string pre = "<pre>";
-        const string post = "</pre></HEAD></BODY></HTML>";
-        const string links = "<li> <a href=\"/runs\">Runs</a> </li> <li> <a href=\"/pax\">PAX</a> </li> <li> <a href=\"/raw\">RAW</a> </li> <li> <a href=\"/classes\">Classes</a> </li> <li> <a href=\"/cones\">Cones</a> </li>";
-        string style = "";
+        private string template = "";
+        private string style = "";
+        private readonly static string links = "<ul>@@{runs}@@@@{raw}@@@@{classes}@@@@{pax}@@@@{team}@@@@{cones}@@</ul>";
 
         HttpListener listener = null;
 
@@ -55,9 +54,10 @@ namespace RaceBeam
             //
             InitializeComponent();
 
-            Load_config();
+            LoadConfig();
         }
-        public void Load_config()
+
+        public void LoadConfig()
         {
             mjFolder = Process.GetCurrentProcess().MainModule.FileName;
             mjFolder = Path.GetDirectoryName(mjFolder);
@@ -67,13 +67,13 @@ namespace RaceBeam
 
             if (!File.Exists(configFilename))
             {
-                System.Windows.Forms.MessageBox.Show("Unable to find config file: " + configFilename);
+                MessageBox.Show("Unable to find config file: " + configFilename);
                 Environment.Exit(0);
             }
             string err = configData.LoadData(configFilename, ',', "Parameter");
             if (err != "")
             {
-                System.Windows.Forms.MessageBox.Show("Unable to load config file: " + err, "MJTiming");
+                MessageBox.Show("Unable to load config file: " + err, "MJTiming");
                 Environment.Exit(0);
             }
             // set some scoring defaults
@@ -93,7 +93,7 @@ namespace RaceBeam
             timingFolder = configData.GetField("eventDataFolder", "Value");
             if (timingFolder == "")
             {
-                System.Windows.Forms.MessageBox.Show("Timing data folder not defined in config file");
+                MessageBox.Show("Timing data folder not defined in config file");
                 Environment.Exit(0);
             }
             // Copy over webstyles file if one doesn't exist
@@ -154,7 +154,7 @@ namespace RaceBeam
             var principal = new WindowsPrincipal(identity);
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
-        // ----------------------------------------------------------------------
+
         public delegate void InvokeshowCount(string msg);
         public void ShowCount(string msg)
         {
@@ -168,7 +168,7 @@ namespace RaceBeam
             queryCountBox.Text = queryCount.ToString();
 
         }
-        // ----------------------------------------------------------------------
+
         void WebserverButtonClick(object sender, EventArgs e)
         {
             if (webserverButton.Text.Contains("Start"))
@@ -196,7 +196,7 @@ namespace RaceBeam
 
             }
         }
-        //------------------------------------------------------------------------
+
         void GenScores()
         {
             if (this.InvokeRequired)
@@ -227,10 +227,10 @@ namespace RaceBeam
                     args.ShowClassTimes = true;
                 else if (item.Contains("PAX Times"))
                     args.ShowPaxTimes = true;
-                else if (item.Contains("Cone"))
-                    args.ShowConeCounts = true;
                 else if (item.Contains("Team"))
                     args.ShowTeams = true;
+                else if (item.Contains("Cone"))
+                    args.ShowConeCounts = true;
             }
 
             if (bestRunRadioButton.Checked)
@@ -253,18 +253,23 @@ namespace RaceBeam
             string results = "";
             lock (lockObject)
             {
-                TextScores.TextScoreSplit(args,
-                                          out runTimes,
-                                          out rawTimes, out paxTimes,
-                                          out classtimes, out teamtimes,
-                                          out coneCounts, out statistics);
+                TextScores
+                    .TextScoreSplit(
+                        args,
+                        out runTimes,
+                        out rawTimes,
+                        out paxTimes,
+                        out classTimes,
+                        out teamTimes,
+                        out coneCounts,
+                        out statistics);
 
                 if (args.ShowRunTimes) results += separator + runTimes;
                 if (args.ShowRawTimes) results += separator + rawTimes;
                 if (args.ShowPaxTimes) results += separator + paxTimes;
-                if (args.ShowClassTimes) results += separator + classtimes;
+                if (args.ShowClassTimes) results += separator + classTimes;
                 if (args.ShowConeCounts) results += separator + coneCounts;
-                if (args.ShowTeams) results += separator + teamtimes;
+                if (args.ShowTeams) results += separator + teamTimes;
                 compare_results = results;
                 if (!string.IsNullOrEmpty(statistics))
                     results += separator + statistics;
@@ -274,17 +279,19 @@ namespace RaceBeam
             // We get triggered when the timing file is zeroed out for the next save,
             // so we need to check for reducing size as well as changing content
             if ((compare_results != prev_results) &&
-                (compare_results.Length >= prev_results.Length)
-               )
+                (compare_results.Length >= prev_results.Length))
             {
                 prev_results = compare_results;
                 scoresTextBox.Clear();
                 scoresTextBox.AppendText(results);
                 scoresTextBox.SelectionStart = 0;
                 scoresTextBox.ScrollToCaret();
+
+                // TODO: Send generated html files to webserver, via ftp?.
+
             }
         }
-        //------------------------------------------------------------------------
+
         public void StartWebserver()
         {
             if (listener != null)
@@ -304,38 +311,21 @@ namespace RaceBeam
                 IgnoreWriteExceptions = true
             };
 
-            // read in style from a file in the config folder
-            string folder = Process.GetCurrentProcess().MainModule.FileName;
+            // read in web formatting files from the pages folder
+            string folder = Environment.ProcessPath;
             folder = Path.GetDirectoryName(folder);
-            folder += "\\..";
-            string styleFilename = folder + "\\config\\_webStyle.txt";
-            string line;
-
-            style = "";
-            try
-            {
-                var file = new System.IO.StreamReader(
-                    File.Open(styleFilename, FileMode.Open,
-                              FileAccess.Read,
-                              FileShare.ReadWrite));
-
-                while ((line = file.ReadLine()) != null)
-                {
-                    line = line.Trim();
-                    style += line;
-                }
-            }
-            catch
-            {
-                style = "<STYLE>BODY	{font-family: Lucida Console; font-size: 100%; background-color: #C0F7FE }</STYLE>";
-            }
+            string styleFilename = folder + "\\Pages\\style.css";
+            string templateFilename = folder + "\\Pages\\template.html";
+            style = File.ReadAllText(styleFilename);
+            template = File.ReadAllText(templateFilename);
+            template = template.Replace("@@{style}@@", style);
 
             listener.Prefixes.Add("http://+:80/");
             listener.Start();
 
             listener.BeginGetContext(new AsyncCallback(OnRequestReceive), listener);
         }
-        //------------------------------------------------------------------------
+
         private void OnRequestReceive(IAsyncResult result)
         {
             var webListener = (HttpListener)result.AsyncState;
@@ -352,43 +342,70 @@ namespace RaceBeam
                 string request = context.Request.RawUrl;
                 if (request == "/")
                 {
-                    response = head + style + pre + links + post;
+                    string currentLinks = links;
+                    foreach (string item in scoringList.CheckedItems)
+                    {
+                        if (item.Contains("Run Times"))
+                            currentLinks = currentLinks.Replace("@@{runs}@@", "<li><a href=\"Runs\">Runs</a></li>");
+                        else if (item.Contains("Raw Times"))
+                            currentLinks = currentLinks.Replace("@@{raw}@@", "<li><a href=\"Raw\">Raw</a></li>");
+                        else if (item.Contains("PAX Times"))
+                            currentLinks = currentLinks.Replace("@@{pax}@@", "<li><a href=\"Pax\">PAX</a></li>");
+                        else if (item.Contains("Class Times"))
+                            currentLinks = currentLinks.Replace("@@{classes}@@", "<li><a href=\"Classes\">Classes</a></li>");
+                        else if (item.Contains("Cone"))
+                            currentLinks = currentLinks.Replace("@@{cones}@@", "<li><a href=\"Cones\">Cones</a></li>");
+                        else if (item.Contains("Team"))
+                            currentLinks = currentLinks.Replace("@@{team}@@", "<li><a href=\"Team\">Team</a></li>");
+                    }
+                    response = template.Replace("@@{content}@@", currentLinks);
                 }
-                else if (request == "/runs")
+                else if (request == "/Runs")
                 {
                     lock (lockObject)
                     {
-                        response = head + style + pre + runTimes + post;
+                        response = template.Replace("@@{content}@@", "<pre>" + runTimes + "</pre>");
                     }
                 }
-                else if (request == "/raw")
+                else if (request == "/Raw")
                 {
                     lock (lockObject)
                     {
-                        response = head + style + pre + rawTimes + post;
+                        response = template.Replace("@@{content}@@", "<pre>" + rawTimes + "</pre>");
                     }
                 }
-                else if (request == "/pax")
+                else if (request == "/Pax")
                 {
                     lock (lockObject)
                     {
-                        response = head + style + pre + paxTimes + post;
+                        response = template.Replace("@@{content}@@", "<pre>" + paxTimes + "</pre>");
                     }
                 }
-                else if (request == "/cones")
+                else if (request == "/Classes")
                 {
                     lock (lockObject)
                     {
-                        response = head + style + pre + coneCounts + post;
+                        response = template.Replace("@@{content}@@", "<pre>" + classTimes + "</pre>");
                     }
                 }
-                else if (request == "/classes")
+                else if (request == "/Team")
                 {
                     lock (lockObject)
                     {
-                        response = head + style + pre + classtimes + post;
+                        response = template.Replace("@@{content}@@", "<pre>" + teamTimes + "</pre>");
                     }
                 }
+                else if (request == "/Cones")
+                {
+                    lock (lockObject)
+                    {
+                        response = template.Replace("@@{content}@@", "<pre>" + coneCounts + "</pre>");
+                    }
+                }
+
+                // Replace any remaining placeholders
+                response = Regex.Replace(response, @"@@{\w*}@@", "");
+
                 byte[] byteArr = Encoding.ASCII.GetBytes(response);
                 context.Response.OutputStream.Write(byteArr, 0, byteArr.Length);
                 context.Response.Close();
@@ -400,9 +417,8 @@ namespace RaceBeam
             }
             // ---> start listening for another request
             webListener.BeginGetContext(new AsyncCallback(OnRequestReceive), webListener);
-
         }
-        //------------------------------------------------------------------------
+
         public void StopWebserver()
         {
             try
@@ -418,6 +434,5 @@ namespace RaceBeam
 
             }
         }
-        //------------------------------------------------------------------------
     }
 }
