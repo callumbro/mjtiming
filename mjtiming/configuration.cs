@@ -13,11 +13,10 @@ namespace RaceBeam
         public string mjFolder;
         public CSVData configData = new CSVData();
         string configFilename = "";
-        public void load_config()
+        public void LoadConfig()
         {
             mjFolder = Process.GetCurrentProcess().MainModule.FileName;
             mjFolder = Path.GetDirectoryName(mjFolder);
-            mjFolder += "\\..";
             configFilename = mjFolder + "\\config\\configData.csv";
             configFolder = Path.GetDirectoryName(configFilename);
 
@@ -27,10 +26,6 @@ namespace RaceBeam
                 Directory.CreateDirectory(configFolder);
             }
             string templateFolder = mjFolder;
-#if DEBUG
-            // Need an extra folder up when debugging.
-            templateFolder += "\\..";
-#endif
             templateFolder += "\\config_templates";
             if (!File.Exists(configFilename))
             {
@@ -45,9 +40,9 @@ namespace RaceBeam
             {
                 File.Copy(templateFolder + "\\_classData.csv", configFolder + "\\_classData.csv", false);
             }
-            if (!File.Exists(configFolder + "\\_webStyle.txt"))
+            if (!File.Exists(configFolder + "\\_webStyle.css"))
             {
-                File.Copy(templateFolder + "\\_webStyle.txt", configFolder + "\\_webStyle.txt", false);
+                File.Copy(templateFolder + "\\_webStyle.css", configFolder + "\\_webStyle.css", false);
             }
             // Check for scoring style file
             if (!File.Exists(configFolder + "\\_scoreStyles.css"))
@@ -78,8 +73,8 @@ namespace RaceBeam
             configurationDataGridView.Columns["Value"].Width = 300;
             configurationDataGridView.Columns["Description"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             configurationDataGridView.Columns["Description"].MinimumWidth = 10;
-            configurationDataGridView.CellValidating += new DataGridViewCellValidatingEventHandler(Config_CellValidating);
-            configurationDataGridView.CellDoubleClick += new DataGridViewCellEventHandler(Config_CellContentClick);
+            configurationDataGridView.CellValidating += new DataGridViewCellValidatingEventHandler(ConfigCellValidating);
+            configurationDataGridView.CellDoubleClick += new DataGridViewCellEventHandler(ConfigCellContentClick);
             List<string> parameters = configData.GetKeys();
             foreach (string parm in parameters)
             {
@@ -106,8 +101,8 @@ namespace RaceBeam
                 MessageBox.Show("Timer port not defined in config file");
             }
         }
-        // ----------------------------------------------------------------------
-        public void Save_config()
+
+        public void SaveConfig()
         {
             try
             {
@@ -150,15 +145,15 @@ namespace RaceBeam
                 tw.Close();
                 // now re-load all the data
                 configurationDataGridView.Rows.Clear();
-                load_config();
+                LoadConfig();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message + ex.StackTrace);
             }
         }
-        // ----------------------------------------------------------------------
-        private void Config_CellContentClick(object sender, DataGridViewCellEventArgs e)
+
+        private void ConfigCellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
             string headerText = configurationDataGridView.Columns[e.ColumnIndex].HeaderText;
@@ -168,10 +163,14 @@ namespace RaceBeam
             }
             return;
         }
-        // ----------------------------------------------------------------------
-        // do not allow folder entries that do not exist
-        // Do not allow commas -- that's our separator
-        private void Config_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
+
+        /// <summary>
+        /// do not allow folder entries that do not exist
+        /// Do not allow commas -- that's our separator
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ConfigCellValidating(object sender, DataGridViewCellValidatingEventArgs e)
         {
             dataModified = true;  // may not be true, but could be true
             string headerText = configurationDataGridView.Columns[e.ColumnIndex].HeaderText;

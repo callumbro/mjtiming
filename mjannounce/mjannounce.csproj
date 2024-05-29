@@ -40,12 +40,4 @@
     <ItemGroup>
         <ProjectReference Include="..\mjcommon\mjcommon.csproj" />
     </ItemGroup>
-    <ItemGroup>
-      <None Update="Pages\template.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Pages\style.css">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
 </Project>

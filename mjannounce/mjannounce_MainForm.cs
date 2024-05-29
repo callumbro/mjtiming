@@ -41,7 +41,7 @@ namespace RaceBeam
         private int queryCount = 0;
         private string compare_results = "";
         private string prev_results = "";
-        private string template = "";
+        private string template = "<html><head><style type=\"text/css\">@@{style}@@</style></head><body><h3>M&J Solo Live Timing</h3><a href=\"/\">Home</a><div>@@{content}@@</div></body></html>";
         private string style = "";
         private readonly static string links = "<ul>@@{runs}@@@@{raw}@@@@{classes}@@@@{pax}@@@@{team}@@@@{cones}@@</ul>";
 
@@ -61,7 +61,6 @@ namespace RaceBeam
         {
             mjFolder = Process.GetCurrentProcess().MainModule.FileName;
             mjFolder = Path.GetDirectoryName(mjFolder);
-            mjFolder += "\\..";
             configFilename = mjFolder + "\\config\\configData.csv";
             scoresTextBox.Font = new Font(scoresTextBox.Font.FontFamily, 6);
 
@@ -97,10 +96,10 @@ namespace RaceBeam
                 Environment.Exit(0);
             }
             // Copy over webstyles file if one doesn't exist
-            string styleFile = mjFolder + "\\config\\_webStyle.txt";
+            string styleFile = mjFolder + "\\config\\_webStyle.css";
             if (!File.Exists(styleFile))
             {
-                string templateFile = mjFolder + "\\config_templates\\_webStyle.txt";
+                string templateFile = mjFolder + "\\config_templates\\_webStyle.css";
                 File.Copy(templateFile, styleFile, false);
             }
             DataFolderTextBox.Text = timingFolder;
@@ -314,10 +313,9 @@ namespace RaceBeam
             // read in web formatting files from the pages folder
             string folder = Environment.ProcessPath;
             folder = Path.GetDirectoryName(folder);
-            string styleFilename = folder + "\\Pages\\style.css";
-            string templateFilename = folder + "\\Pages\\template.html";
+            folder += "\\..";
+            string styleFilename = folder + "\\config\\_webStyle.css";
             style = File.ReadAllText(styleFilename);
-            template = File.ReadAllText(templateFilename);
             template = template.Replace("@@{style}@@", style);
 
             listener.Prefixes.Add("http://+:80/");

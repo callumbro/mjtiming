@@ -33,7 +33,7 @@ namespace RaceBeam
             // The InitializeComponent() call is required for Windows Forms designer support.
             //
             InitializeComponent();
-            load_config();
+            LoadConfig();
             InitClasses();
             timingData = new RunData(new logMsg(ShowMsg),
                                      configData.GetField("driverDataFile", "Value"),
@@ -628,7 +628,7 @@ namespace RaceBeam
                 timingData.StopSaveThread();
                 System.Threading.Thread.Sleep(500);
                 SaveRegData();
-                Save_config();
+                SaveConfig();
                 SaveClassData();
                 // delete driver data and timing data files if no timing data exists
                 //TODO don't delete anything until we can do it reliably!
@@ -747,7 +747,7 @@ namespace RaceBeam
             }
             else if (e.TabPage.Name == "configurationTabPage")
             {
-                Save_config();
+                SaveConfig();
                 LoadRegData();      // might have changed!
                 InitClasses();
             }

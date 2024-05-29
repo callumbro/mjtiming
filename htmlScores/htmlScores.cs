@@ -17,7 +17,7 @@ using System.IO;
 
 namespace RaceBeam  // this is required to get easy reference to the datatypes
 {
-    static class Htmlscore
+    static class HtmlScore
     {
         // returned list of all driver's score data
         public static Dictionary<string, ScoreCalcs.DriverScoreData> scores;
@@ -38,13 +38,13 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
 <th class=hdr1 colspan=""99"" nowrap align=""center"">%TABLENAME%</th>
 ";
         private const string htmlTableFooter = @"</table>";
-        // ---------------------------------------------------------------------------
+
         public static void Usage()
         {
             Console.WriteLine("Usage: htmlscore -day1 <day1 date> -day2 <day2 date> -bestsinglerun -set1only -set2only -runtimes -rawtimes -paxtimes -teams -conecounts -classtimes -xgrouptimes -rookie -maxofficialruns <# runs> -classfile <path to class.csv file> -title <string> -path <path to event data folder>");
             Environment.Exit(0);
         }
-        // ---------------------------------------------------------------------------
+
         public static void Main(string[] args)
         {
             // parse command line arguments
@@ -238,7 +238,7 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
             }
 
         }
-        // ---------------------------------------------------------------------------
+
         public static string RawTimes(ScoreArgs args)
         {
             string results = htmlTableHeader;
@@ -273,27 +273,28 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 {
                     driverName = driver.Value.FirstName + " " + driver.Value.LastName;
                 }
-                string line = string.Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,8:#.000}</td><td>{6,7:#0.000}</td>\r\n",
-                                            driver.Value.ScoreData.RAWrank,
-                                            driver.Value.Number,
-                                            driver.Value.CarClass,
-                                            driverName,
-                                            driver.Value.CarDescription,
-                                            driverRAW,
-                                            driver.Value.ScoreData.RAWscore
-                                           );
+                string line = string
+                    .Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,8:#.000}</td><td>{6,7:#0.000}</td>\r\n",
+                        driver.Value.ScoreData.RAWrank,
+                        driver.Value.Number,
+                        driver.Value.CarClass,
+                        driverName,
+                        driver.Value.CarDescription,
+                        driverRAW,
+                        driver.Value.ScoreData.RAWscore);
+
                 results += string.Format(line);
                 if (driver.Value.Rookie)
                 {
-                    line = string.Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,8:#.000}</td><td>{6,7:#0.000}</td>\r\n",
-                                         driver.Value.ScoreData.RAWrookieRank,
-                                         driver.Value.Number,
-                                         driver.Value.CarClass,
-                                         driverName,
-                                         driver.Value.CarDescription,
-                                         driverRAW,
-                                         driver.Value.ScoreData.RAWrookieScore
-                                        );
+                    line = string
+                        .Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,8:#.000}</td><td>{6,7:#0.000}</td>\r\n",
+                            driver.Value.ScoreData.RAWrookieRank,
+                            driver.Value.Number,
+                            driver.Value.CarClass,
+                            driverName,
+                            driver.Value.CarDescription,
+                            driverRAW,
+                            driver.Value.ScoreData.RAWrookieScore);
 
                     rookieResults += line;
                 }
@@ -309,8 +310,12 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 return results;
             }
         }
-        // ---------------------------------------------------------------------------
-        // Return a printable text string for PAX data
+
+        /// <summary>
+        /// Return a printable text string for PAX data
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static string PaxTimes(ScoreArgs args)
         {
             string results = htmlTableHeader;
@@ -338,30 +343,31 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 {
                     driverName = driver.Value.FirstName + " " + driver.Value.LastName;
                 }
-                results += string.Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,5:#.000}</td><td>{6,5:#.000}</td><td> {7,5:#.000}</td><td>{8,5:#0.000}</td>\r\n",
-                                         driver.Value.ScoreData.PAXrank,
-                                         driver.Value.Number,
-                                         driver.Value.CarClass,
-                                         driverName,
-                                         driver.Value.CarDescription,
-                                         driver.Value.ScoreData.BestRAW < ScoreCalcs.DNFvalue ? driver.Value.ScoreData.BestRAW.ToString("#.000") : "DNS",
-                                         driver.Value.Pax,
-                                         driver.Value.ScoreData.BestPAX < ScoreCalcs.DNFvalue ? driver.Value.ScoreData.BestPAX.ToString("#.000") : "DNS",
-                                         driver.Value.ScoreData.PAXscore
-                                        );
+                results += string
+                    .Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,5:#.000}</td><td>{6,5:#.000}</td><td> {7,5:#.000}</td><td>{8,5:#0.000}</td>\r\n",
+                        driver.Value.ScoreData.PAXrank,
+                        driver.Value.Number,
+                        driver.Value.CarClass,
+                        driverName,
+                        driver.Value.CarDescription,
+                        driver.Value.ScoreData.BestRAW < ScoreCalcs.DNFvalue ? driver.Value.ScoreData.BestRAW.ToString("#.000") : "DNS",
+                        driver.Value.Pax,
+                        driver.Value.ScoreData.BestPAX < ScoreCalcs.DNFvalue ? driver.Value.ScoreData.BestPAX.ToString("#.000") : "DNS",
+                        driver.Value.ScoreData.PAXscore);
+
                 if (driver.Value.Rookie)
                 {
-                    rookieResults += string.Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,5:#.000}</td><td>{6,5:#.000}</td><td>{7,5:#.000}</td><td>{8,5:#0.000}</td>\r\n",
-                                                   driver.Value.ScoreData.PAXRookieRank,
-                                                   driver.Value.Number,
-                                                   driver.Value.CarClass,
-                                                   driverName,
-                                                   driver.Value.CarDescription,
-                                                   driver.Value.ScoreData.BestRAW < ScoreCalcs.DNFvalue ? driver.Value.ScoreData.BestRAW.ToString("#.000") : "DNS",
-                                                   driver.Value.Pax,
-                                                   driver.Value.ScoreData.BestPAX < ScoreCalcs.DNFvalue ? driver.Value.ScoreData.BestPAX.ToString("#.000") : "DNS",
-                                                   driver.Value.ScoreData.PAXrookieScore
-                                                  );
+                    rookieResults += string
+                        .Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,5:#.000}</td><td>{6,5:#.000}</td><td>{7,5:#.000}</td><td>{8,5:#0.000}</td>\r\n",
+                            driver.Value.ScoreData.PAXRookieRank,
+                            driver.Value.Number,
+                            driver.Value.CarClass,
+                            driverName,
+                            driver.Value.CarDescription,
+                            driver.Value.ScoreData.BestRAW < ScoreCalcs.DNFvalue ? driver.Value.ScoreData.BestRAW.ToString("#.000") : "DNS",
+                            driver.Value.Pax,
+                            driver.Value.ScoreData.BestPAX < ScoreCalcs.DNFvalue ? driver.Value.ScoreData.BestPAX.ToString("#.000") : "DNS",
+                            driver.Value.ScoreData.PAXrookieScore);
                 }
             }
             if (args.ShowRookie)
@@ -373,7 +379,7 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 return results;
             }
         }
-        // ---------------------------------------------------------------------------
+
         public static int GetLeadingInt(string input)
         {
             var i = 0;
@@ -387,8 +393,12 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
             }
             return value;
         }
-        // ---------------------------------------------------------------------------
-        // print out run data
+
+        /// <summary>
+        /// print out run data
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static string RunTimes(ScoreArgs args)
         {
             string results = htmlTableHeader;
@@ -445,15 +455,16 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 {
                     driverName = driver.Value.FirstName + " " + driver.Value.LastName;
                 }
-                string line = string.Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,5}</td><td>{6,5}</td></tr>\r\n",
-                                            driver.Value.Number,
-                                            driver.Value.Member,
-                                            driver.Value.Rookie ? "Yes" : "No",
-                                            driver.Value.CarClass,
-                                            driverName,
-                                            driver.Value.CarDescription,
-                                            driver.Value.Sponsor
-                                           );
+                string line = string
+                    .Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,5}</td><td>{6,5}</td></tr>\r\n",
+                        driver.Value.Number,
+                        driver.Value.Member,
+                        driver.Value.Rookie ? "Yes" : "No",
+                        driver.Value.CarClass,
+                        driverName,
+                        driver.Value.CarDescription,
+                        driver.Value.Sponsor);
+
                 results += string.Format(line);
                 results += "<td colspan=\"1\"></td><td colspan=\"99\"><table width=\"100%\" cellpadding=\"2\" style=\"border-collapse: collapse\" border=\"1\" align=\"left\">";
                 if (day1NumSets >= 1)
@@ -514,7 +525,7 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
             results += "</table>";
             return results;
         }
-        // ---------------------------------------------------------------------------
+
         public static string PrintSet(ScoreArgs args, ScoreCalcs.SingleSetData setData, int dayNumber, int setNumber)
         {
             string results = string.Format("<tr><td class=\"hdr3\">Day {0,1} Set {1,1}</td>", dayNumber, setNumber);
@@ -574,8 +585,12 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
             results += string.Format("\r\n");
             return results;
         }
-        // ---------------------------------------------------------------------------
-        // print out times, groups by Group, ordered within group by PAX time
+
+        /// <summary>
+        /// print out times, groups by Group, ordered within group by PAX time
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static string ClassTimes(ScoreArgs args)
         {
             string results = htmlTableHeader;
@@ -679,44 +694,56 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                     string trophyIndicator = "T";
                     string rookieTrophyIndicator = "T";
                     if (grpPtr.GroupTrophy)
+                    {
                         trophyIndicator = "T";
+                    }
                     else
+                    {
                         trophyIndicator = "";
+                    }
+
                     if (grpPtr.GroupRookieTrophy)
+                    {
                         rookieTrophyIndicator = "T";
+                    }
                     else
+                    {
                         rookieTrophyIndicator = "";
+                    }
+
                     string driverName = driver.Value.FirstName + " " + driver.Value.LastName.Substring(0, 1);
                     if (showLastName)
                     {
                         driverName = driver.Value.FirstName + " " + driver.Value.LastName;
                     }
-                    results += string.Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,8:#.000}</td><td>{6,9:#.000}</td><td>{7,9:#.000}</td><td>{8,7:#0.000}</td>\r\n",
-                                             trophyIndicator + grpPtr.GroupRank,
-                                             driver.Value.Number,
-                                             driver.Value.CarClass,
-                                             driverName,
-                                             driver.Value.CarDescription,
-                                             driverRAW,
-                                             driver.Value.Pax,
-                                             driverPAX,
-                                             grpPtr.GroupScore
-                                            );
+                    results += string
+                        .Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,8:#.000}</td><td>{6,9:#.000}</td><td>{7,9:#.000}</td><td>{8,7:#0.000}</td>\r\n",
+                            trophyIndicator + grpPtr.GroupRank,
+                            driver.Value.Number,
+                            driver.Value.CarClass,
+                            driverName,
+                            driver.Value.CarDescription,
+                            driverRAW,
+                            driver.Value.Pax,
+                            driverPAX,
+                            grpPtr.GroupScore);
+
                     results += string.Format("\r\n");
 
                     if (driver.Value.Rookie)
                     {
-                        rookieResults += string.Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,8:#.000}</td><td>{6,9:#.000}</td><td>{7,9:#.000}</td><td>{8,7:#0.000}</td>\r\n",
-                                                       rookieTrophyIndicator + grpPtr.GroupRookieRank,
-                                                       driver.Value.Number,
-                                                       driver.Value.CarClass,
-                                                       driverName,
-                                                       driver.Value.CarDescription,
-                                                       driverRAW,
-                                                       driver.Value.Pax,
-                                                       driverPAX,
-                                                       grpPtr.GroupRookieScore
-                                                      );
+                        rookieResults += string
+                            .Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,8:#.000}</td><td>{6,9:#.000}</td><td>{7,9:#.000}</td><td>{8,7:#0.000}</td>\r\n",
+                                rookieTrophyIndicator + grpPtr.GroupRookieRank,
+                                driver.Value.Number,
+                                driver.Value.CarClass,
+                                driverName,
+                                driver.Value.CarDescription,
+                                driverRAW,
+                                driver.Value.Pax,
+                                driverPAX,
+                                grpPtr.GroupRookieScore);
+
                         rookieResults += string.Format("\r\n");
                     }
                 }
@@ -730,8 +757,12 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 return results;
             }
         }
-        // ---------------------------------------------------------------------------
-        // Return a printable text string for cone counts
+
+        /// <summary>
+        /// Return a printable text string for cone counts
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static string ConeCounts(ScoreArgs args)
         {
             string results = htmlTableHeader;
@@ -772,20 +803,25 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 {
                     driverName = driver.Value.FirstName + " " + driver.Value.LastName;
                 }
-                results += string.Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,35}</td><td>{3,4}</td></tr>\r\n",
-                                         rank,
-                                         driver.Value.Number,
-                                         driverName,
-                                         tcones.ToString()
-                                        );
+                results += string
+                    .Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,35}</td><td>{3,4}</td></tr>\r\n",
+                        rank,
+                        driver.Value.Number,
+                        driverName,
+                        tcones.ToString());
+
                 lastCount = tcones;
             }
             return results;
         }
-        // ---------------------------------------------------------------------------
-        // Team scores
-        // We group rAW and PAX if given in the driver's group filed
-        // If the group is something else, then we ignore the group and show the team for both raw and pax
+
+        /// <summary>
+        /// Team scores
+        /// We group RAW and PAX if given in the driver's group filed
+        /// If the group is something else, then we ignore the group and show the team for both raw and pax
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static string TeamTimes(ScoreArgs args)
         {
             if (args == null)
@@ -818,13 +854,14 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                     continue;
                 }
 
-                RAWresults += string.Format("\r\n<tr class=data><td class=hdr2>{0,4}</td><td>{1,6}</td><td>RAW:{2,8:#.000}</td><td>PAX:{3,8:#.000}</td><td>Cones: {4}</td></tr>\r\n",
-                                            rank.ToString(),
-                                            tm.Team,
-                                            TimeOrDNS(tm.RawTotal),
-                                            TimeOrDNS(tm.PaxTotal),
-                                            tm.ConeTotal
-                                           );
+                RAWresults += string
+                    .Format("\r\n<tr class=data><td class=hdr2>{0,4}</td><td>{1,6}</td><td>RAW:{2,8:#.000}</td><td>PAX:{3,8:#.000}</td><td>Cones: {4}</td></tr>\r\n",
+                        rank.ToString(),
+                        tm.Team,
+                        TimeOrDNS(tm.RawTotal),
+                        TimeOrDNS(tm.PaxTotal),
+                        tm.ConeTotal);
+
                 RAWresults += "<td colspan=\"1\"></td><td colspan=\"99\"><table width=\"100%\" cellpadding=\"2\" style=\"border-collapse: collapse\" border=\"1\" align=\"left\">";
                 rank += 1;
                 foreach (ScoreCalcs.DriverScoreData driver in tm.TeamDrivers)
@@ -834,12 +871,12 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                     {
                         driverName = driver.FirstName + " " + driver.LastName;
                     }
-                    RAWresults += string.Format("<tr class=data2><td>Driver {0,3}</td><td>{1,-14}</td><td>RAW:{2, 8:#.000}</td><td>PAX:{3, 8:#.000}</td></tr>\r\n",
-                                                driver.Number,
-                                                driverName,
-                                                TimeOrDNS(driver.ScoreData.BestRAW),
-                                                TimeOrDNS(driver.ScoreData.BestPAX)
-                                               );
+                    RAWresults += string
+                        .Format("<tr class=data2><td>Driver {0,3}</td><td>{1,-14}</td><td>RAW:{2, 8:#.000}</td><td>PAX:{3, 8:#.000}</td></tr>\r\n",
+                            driver.Number,
+                            driverName,
+                            TimeOrDNS(driver.ScoreData.BestRAW),
+                            TimeOrDNS(driver.ScoreData.BestPAX));
                 }
                 RAWresults += "</table>";
             }
@@ -864,13 +901,14 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                     continue;
                 }
 
-                PAXresults += string.Format("\r\n<tr class=data><td class=hdr2>{0,4}</td><td>{1,6}</td><td>RAW:{2,8:#.000}</td><td>PAX:{3,8:#.000}</td><td>Cones: {4}</td></tr>\r\n",
-                                            rank.ToString(),
-                                            tm.Team,
-                                            TimeOrDNS(tm.RawTotal),
-                                            TimeOrDNS(tm.PaxTotal),
-                                            tm.ConeTotal
-                                           );
+                PAXresults += string
+                    .Format("\r\n<tr class=data><td class=hdr2>{0,4}</td><td>{1,6}</td><td>RAW:{2,8:#.000}</td><td>PAX:{3,8:#.000}</td><td>Cones: {4}</td></tr>\r\n",
+                        rank.ToString(),
+                        tm.Team,
+                        TimeOrDNS(tm.RawTotal),
+                        TimeOrDNS(tm.PaxTotal),
+                        tm.ConeTotal);
+
                 PAXresults += "<td colspan=\"1\"></td><td colspan=\"99\"><table width=\"100%\" cellpadding=\"2\" style=\"border-collapse: collapse\" border=\"1\" align=\"left\">";
                 rank += 1;
                 foreach (ScoreCalcs.DriverScoreData driver in tm.TeamDrivers)
@@ -880,78 +918,86 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                     {
                         driverName = driver.FirstName + " " + driver.LastName;
                     }
-                    PAXresults += string.Format("<tr class=data2><td>Driver {0,3}</td><td>{1,-14}</td><td>RAW:{2, 8:#.000}</td><td>PAX:{3, 8:#.000}</td></tr>\r\n",
-                                                driver.Number,
-                                                driverName,
-                                                TimeOrDNS(driver.ScoreData.BestRAW),
-                                                TimeOrDNS(driver.ScoreData.BestPAX)
-                                               );
+                    PAXresults += string
+                        .Format("<tr class=data2><td>Driver {0,3}</td><td>{1,-14}</td><td>RAW:{2, 8:#.000}</td><td>PAX:{3, 8:#.000}</td></tr>\r\n",
+                            driver.Number,
+                            driverName,
+                            TimeOrDNS(driver.ScoreData.BestRAW),
+                            TimeOrDNS(driver.ScoreData.BestPAX));
                 }
                 PAXresults += "</table>";
             }
             PAXresults += "</table>";
             return RAWresults + PAXresults;
         }
-        // ---------------------------------------------------------------------------
-#pragma warning disable IDE0060 // Remove unused parameter
+
         public static string Statistics(ScoreArgs args)
-#pragma warning restore IDE0060 // Remove unused parameter
         {
             string results = htmlTableHeader;
             results = results.Replace("%TABLENAME%", "Statistics");
             if (stats.Day1.Set1NumberOfRuns > 0)
             {
-                results += string.Format("<tr class=data><td>Day1, Set1: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
-                                         stats.Day1.Set1TimeOfFirstRun,
-                                         stats.Day1.Set1TimeOfLastRun,
-                                         stats.Day1.Set1NumberOfRuns,
-                                         stats.Day1.Set1TotalTime / stats.Day1.Set1NumberOfRuns);
+                results += string
+                    .Format("<tr class=data><td>Day1, Set1: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
+                        stats.Day1.Set1TimeOfFirstRun,
+                        stats.Day1.Set1TimeOfLastRun,
+                        stats.Day1.Set1NumberOfRuns,
+                        stats.Day1.Set1TotalTime / stats.Day1.Set1NumberOfRuns);
             }
             if (stats.Day1.Set2NumberOfRuns > 0)
             {
-                results += string.Format("<tr class=data><td>Day1, Set2: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
-                                         stats.Day1.Set2TimeOfFirstRun,
-                                         stats.Day1.Set2TimeOfLastRun,
-                                         stats.Day1.Set2NumberOfRuns,
-                                         stats.Day1.Set2TotalTime / stats.Day1.Set2NumberOfRuns);
+                results += string
+                    .Format("<tr class=data><td>Day1, Set2: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
+                        stats.Day1.Set2TimeOfFirstRun,
+                        stats.Day1.Set2TimeOfLastRun,
+                        stats.Day1.Set2NumberOfRuns,
+                        stats.Day1.Set2TotalTime / stats.Day1.Set2NumberOfRuns);
             }
             if (stats.Day1.Set3NumberOfRuns > 0)
             {
-                results += string.Format("<tr class=data><td>Day1, Fun runs: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
-                                         stats.Day1.Set3TimeOfFirstRun,
-                                         stats.Day1.Set3TimeOfLastRun,
-                                         stats.Day1.Set3NumberOfRuns,
-                                         stats.Day1.Set3TotalTime / stats.Day1.Set3NumberOfRuns);
+                results += string
+                    .Format("<tr class=data><td>Day1, Fun runs: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
+                        stats.Day1.Set3TimeOfFirstRun,
+                        stats.Day1.Set3TimeOfLastRun,
+                        stats.Day1.Set3NumberOfRuns,
+                        stats.Day1.Set3TotalTime / stats.Day1.Set3NumberOfRuns);
             }
             // Day 2 if we have one
             if (stats.Day2.Set1NumberOfRuns > 0)
             {
-                results += string.Format("<tr class=data><td>Day2, Set1: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
-                                         stats.Day2.Set1TimeOfFirstRun,
-                                         stats.Day2.Set1TimeOfLastRun,
-                                         stats.Day2.Set1NumberOfRuns,
-                                         stats.Day2.Set1TotalTime / stats.Day2.Set1NumberOfRuns);
+                results += string
+                    .Format("<tr class=data><td>Day2, Set1: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
+                        stats.Day2.Set1TimeOfFirstRun,
+                        stats.Day2.Set1TimeOfLastRun,
+                        stats.Day2.Set1NumberOfRuns,
+                        stats.Day2.Set1TotalTime / stats.Day2.Set1NumberOfRuns);
             }
             if (stats.Day2.Set2NumberOfRuns > 0)
             {
-                results += string.Format("<tr class=data><td>Day2, Set2: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
-                                         stats.Day2.Set2TimeOfFirstRun,
-                                         stats.Day2.Set2TimeOfLastRun,
-                                         stats.Day2.Set2NumberOfRuns,
-                                         stats.Day2.Set2TotalTime / stats.Day2.Set2NumberOfRuns);
+                results += string
+                    .Format("<tr class=data><td>Day2, Set2: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
+                        stats.Day2.Set2TimeOfFirstRun,
+                        stats.Day2.Set2TimeOfLastRun,
+                        stats.Day2.Set2NumberOfRuns,
+                        stats.Day2.Set2TotalTime / stats.Day2.Set2NumberOfRuns);
             }
             if (stats.Day2.Set3NumberOfRuns > 0)
             {
-                results += string.Format("<tr class=data><td>Day2, Fun runs: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
-                                         stats.Day2.Set3TimeOfFirstRun,
-                                         stats.Day2.Set3TimeOfLastRun,
-                                         stats.Day2.Set3NumberOfRuns,
-                                         stats.Day2.Set3TotalTime / stats.Day2.Set3NumberOfRuns);
+                results += string
+                    .Format("<tr class=data><td>Day2, Fun runs: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
+                        stats.Day2.Set3TimeOfFirstRun,
+                        stats.Day2.Set3TimeOfLastRun,
+                        stats.Day2.Set3NumberOfRuns,
+                        stats.Day2.Set3TotalTime / stats.Day2.Set3NumberOfRuns);
             }
             return results;
         }
-        // ---------------------------------------------------------------------------
-        // Times > DNFvalue denote a DNS
+
+        /// <summary>
+        /// Times > DNFvalue denote a DNS
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
         public static string TimeOrDNS(double time)
         {
             if (time >= ScoreCalcs.DNFvalue)
@@ -964,6 +1010,5 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 return string.Format("{0,8:#.000}", time);
             }
         }
-        // ---------------------------------------------------------------------------
     }
 }
