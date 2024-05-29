@@ -33,71 +33,71 @@ using System.IO;
 
 namespace RaceBeam
 {
-    public class ScoreArgs
+    public class scoreArgs
     {
-        public string ConfigFolder;     // If blank, we use <current dir>\..\config
-        public string EventFolder;      // If blank, we use config-->eventFolder
-        public string ClassFile;        // If blank, we use config-->classFile
-        public string Day1;
-        public string Day2;
-        public int MaxOfficialRuns;
-        public bool Set1Only;
-        public bool Set2Only;
-        public bool Set1PlusSet2;
-        public bool BestSingleRun;
-        public bool ShowRunTimes;
-        public bool ShowRawTimes;
-        public bool ShowPaxTimes;
-        public bool ShowClassTimes;
-        public bool ShowConeCounts;
-        public bool ShowTeams;
-        public bool ShowRookie;         // Applies to raw/pax/class
-        public bool WriteCSV;
-        public string Title;
-        public string OutFile;
-        public ScoreArgs()
+        public string configFolder;     // If blank, we use <current dir>\..\config
+        public string eventFolder;      // If blank, we use config-->eventFolder
+        public string classFile;        // If blank, we use config-->classFile
+        public string day1;
+        public string day2;
+        public int maxOfficialRuns;
+        public bool set1Only;
+        public bool set2Only;
+        public bool set1PlusSet2;
+        public bool bestSingleRun;
+        public bool showRunTimes;
+        public bool showRawTimes;
+        public bool showPaxTimes;
+        public bool showClassTimes;
+        public bool showConeCounts;
+        public bool showTeams;
+        public bool showRookie;         // Applies to raw/pax/class
+        public bool writeCSV;
+        public string title;
+        public string outFile;
+        public scoreArgs()
         {
-            EventFolder = "";
-            ConfigFolder = "";
-            ClassFile = "";
-            Day1 = "";
-            Day2 = "";
-            MaxOfficialRuns = 99;
-            Set1Only = false;
-            Set2Only = false;
-            Set1PlusSet2 = false;
-            BestSingleRun = false;
-            ShowRunTimes = false;
-            ShowRawTimes = false;
-            ShowPaxTimes = false;
-            ShowClassTimes = false;
-            ShowConeCounts = false;
-            ShowTeams = false;
-            ShowRookie = false;
-            WriteCSV = false;
-            Title = "";
-            OutFile = string.Empty;
+            eventFolder = "";
+            configFolder = "";
+            classFile = "";
+            day1 = "";
+            day2 = "";
+            maxOfficialRuns = 99;
+            set1Only = false;
+            set2Only = false;
+            set1PlusSet2 = false;
+            bestSingleRun = false;
+            showRunTimes = false;
+            showRawTimes = false;
+            showPaxTimes = false;
+            showClassTimes = false;
+            showConeCounts = false;
+            showTeams = false;
+            showRookie = false;
+            writeCSV = false;
+            title = "";
+            outFile = string.Empty;
         }
         // copy constructor
-        public ScoreArgs(ScoreArgs src)
+        public scoreArgs(scoreArgs src)
         {
-            Day1 = src.Day1;
-            Day2 = src.Day2;
-            MaxOfficialRuns = src.MaxOfficialRuns;
-            Set1Only = src.Set1Only;
-            Set2Only = src.Set2Only;
-            Set1PlusSet2 = src.Set1PlusSet2;
-            BestSingleRun = src.BestSingleRun;
-            ShowRunTimes = src.ShowRunTimes;
-            ShowRawTimes = src.ShowRawTimes;
-            ShowPaxTimes = src.ShowPaxTimes;
-            ShowClassTimes = src.ShowClassTimes;
-            ShowConeCounts = src.ShowConeCounts;
-            ShowTeams = src.ShowTeams;
-            ShowRookie = src.ShowRookie;
-            WriteCSV = src.WriteCSV;
-            EventFolder = src.EventFolder;
-            Title = src.Title;
+            day1 = src.day1;
+            day2 = src.day2;
+            maxOfficialRuns = src.maxOfficialRuns;
+            set1Only = src.set1Only;
+            set2Only = src.set2Only;
+            set1PlusSet2 = src.set1PlusSet2;
+            bestSingleRun = src.bestSingleRun;
+            showRunTimes = src.showRunTimes;
+            showRawTimes = src.showRawTimes;
+            showPaxTimes = src.showPaxTimes;
+            showClassTimes = src.showClassTimes;
+            showConeCounts = src.showConeCounts;
+            showTeams = src.showTeams;
+            showRookie = src.showRookie;
+            writeCSV = src.writeCSV;
+            eventFolder = src.eventFolder;
+            title = src.title;
         }
     }
 
@@ -105,7 +105,7 @@ namespace RaceBeam
     /// <summary>
     /// Perform all of the scoring functions and return a string which can be printed out to a text file or displayed in a window.
     /// </summary>
-    public static class ScoreCalcs
+    public static class scoreCalcs
     {
         #region Public Static Members
 
@@ -116,44 +116,44 @@ namespace RaceBeam
         #region Public Classes
 
         // All the info about a single run
-        public class SingleRunData
+        public class singleRunData
         {
-            public int RunNumber;
-            public double Time;
-            public string Penalty;
-            public double AdjustedRawTime;      // 1000 for DNF
+            public int runNumber;
+            public double time;
+            public string penalty;
+            public double adjustedRawTime;      // 1000 for DNF
             public double PAXtime;          // 1000 for DNF
-            public int ConeCount;
-            public string StartTime;
-            public string StopTime;
+            public int coneCount;
+            public string startTime;
+            public string stopTime;
         }
         // All the run data for a single set
-        public class SingleSetData
+        public class singleSetData
         {
-            public double BestRAW = DNFvalue;
-            public double BestPAX = DNFvalue;
-            public double BestSUM = DNFvalue;
-            public int Cones = 0;
-            public SingleRunData BestRun;
-            public List<SingleRunData> Runs = new List<SingleRunData>();
+            public double bestRAW = DNFvalue;
+            public double bestPAX = DNFvalue;
+            public double bestSUM = DNFvalue;
+            public int cones = 0;
+            public singleRunData bestRun;
+            public List<singleRunData> runs = new List<singleRunData>();
         }
-        public class Groupscore
+        public class groupscore
         {
-            public string GroupName;
-            public int GroupRank;
-            public int GroupRookieRank;
-            public double GroupScore;
-            public double GroupRookieScore;
-            public bool GroupTrophy;
-            public bool GroupRookieTrophy;
+            public string groupName;
+            public int groupRank;
+            public int groupRookieRank;
+            public double groupScore;
+            public double groupRookieScore;
+            public bool groupTrophy;
+            public bool groupRookieTrophy;
         }
         // Calculated score data for one type of score (PAX, RAW, class, etc)
-        public class ScoreDataClass
+        public class scoreDataClass
         {
-            public double BestFTD = DNFvalue;   // best raw time, any day, any set
-            public double BestRAW;
-            public double BestPAX;
-            public double BestSUM;
+            public double bestFTD = DNFvalue;   // best raw time, any day, any set
+            public double bestRAW;
+            public double bestPAX;
+            public double bestSUM;
 
 
             public double FTDpax;       // used for match scoring
@@ -176,30 +176,30 @@ namespace RaceBeam
             public double RookieRAWtoFirst;
 
             // For Group and XGroup (multiple groups here, with ones inXgroup separated by a ';')
-            public List<Groupscore> GroupScores = new List<Groupscore>();
+            public List<groupscore> groupScores = new List<groupscore>();
         }
 
         // Everything we know and calculate about a single driver
-        public class DriverScoreData
+        public class driverScoreData
         {
-            public string Number;
-            public string FirstName;
-            public string LastName;
-            public string CarDescription;
-            public string Member;
-            public bool Rookie;
-            public string CarGroup;         // Primary group
-            public string CarGroupDescription;
-            public string CarXGroup;            // Xtra group
-            public string CarXGroupDescription;
-            public int MaxOfficialRuns; // we use this to limit max runs that count for this driver
-            public string CarClass;
-            public string Team;
-            public double Pax;
-            public string Sponsor;
-            public PaxInfo ClassInfo;
+            public string number;
+            public string firstName;
+            public string lastName;
+            public string carDescription;
+            public string member;
+            public bool rookie;
+            public string carGroup;         // Primary group
+            public string carGroupDescription;
+            public string carXGroup;            // Xtra group
+            public string carXGroupDescription;
+            public int maxOfficialRuns; // we use this to limit max runs that count for this driver
+            public string carClass;
+            public string team;
+            public double pax;
+            public string sponsor;
+            public paxInfo ClassInfo;
 
-            public int ConeCount = 0;       // Total for all sets, all days
+            public int coneCount = 0;       // Total for all sets, all days
 
             public string Day1Set1Info = "";    // Run info packed into a string
             public string Day1Set2Info = "";
@@ -208,83 +208,83 @@ namespace RaceBeam
             public string Day2Set2Info = "";
             public string Day2Set3Info = "";
 
-            public SingleSetData Day1Set1 = new SingleSetData();
-            public SingleSetData Day1Set2 = new SingleSetData();
-            public SingleSetData Day1Set3 = new SingleSetData();
-            public SingleSetData Day2Set1 = new SingleSetData();
-            public SingleSetData Day2Set2 = new SingleSetData();
-            public SingleSetData Day2Set3 = new SingleSetData();
-            public ScoreDataClass ScoreData = new ScoreDataClass();
+            public singleSetData Day1Set1 = new singleSetData();
+            public singleSetData Day1Set2 = new singleSetData();
+            public singleSetData Day1Set3 = new singleSetData();
+            public singleSetData Day2Set1 = new singleSetData();
+            public singleSetData Day2Set2 = new singleSetData();
+            public singleSetData Day2Set3 = new singleSetData();
+            public scoreDataClass scoreData = new scoreDataClass();
         }
 
-        public class PaxInfo
+        public class paxInfo
         {
-            public string CarClass;
-            public string Pax;
-            public string Description;
-            public string Group;
-            public string DisplayOrder;
+            public string carClass;
+            public string pax;
+            public string description;
+            public string group;
+            public string displayOrder;
         }
-        public class TeamData
+        public class teamData
         {
-            public string Team;
-            public string TeamType;
-            public double RawTotal;
-            public int RawRank;
-            public double RawScore;
-            public double PaxTotal;
-            public int PaxRank;
-            public double PaxScore;
-            public int ConeTotal;
-            public int DriversTotalled;
-            public List<DriverScoreData> TeamDrivers;
-            public TeamData()
+            public string team;
+            public string teamType;
+            public double rawTotal;
+            public int rawRank;
+            public double rawScore;
+            public double paxTotal;
+            public int paxRank;
+            public double paxScore;
+            public int coneTotal;
+            public int driversTotalled;
+            public List<driverScoreData> teamDrivers;
+            public teamData()
             {
-                Team = "";
-                TeamType = "";
-                RawTotal = 0.0;
-                RawScore = 0.0;
-                PaxTotal = 0.0;
-                PaxScore = 0.0;
-                ConeTotal = 0;
-                DriversTotalled = 0;
-                TeamDrivers = new List<DriverScoreData>();
+                team = "";
+                teamType = "";
+                rawTotal = 0.0;
+                rawScore = 0.0;
+                paxTotal = 0.0;
+                paxScore = 0.0;
+                coneTotal = 0;
+                driversTotalled = 0;
+                teamDrivers = new List<driverScoreData>();
             }
         }
-        public class DailyStats
+        public class dailyStats
         {
-            public string Set1TimeOfFirstRun = "";
-            public string Set1TimeOfLastRun = "";
-            public int Set1NumberOfRuns = 0;
-            public double Set1TotalTime = 0.0;
-            public string Set2TimeOfFirstRun = "";
-            public string Set2TimeOfLastRun = "";
-            public int Set2NumberOfRuns = 0;
-            public double Set2TotalTime = 0.0;
-            public string Set3TimeOfFirstRun = "";
-            public string Set3TimeOfLastRun = "";
-            public int Set3NumberOfRuns = 0;
-            public double Set3TotalTime = 0.0;
-            public DailyStats()
+            public string set1TimeOfFirstRun = "";
+            public string set1TimeOfLastRun = "";
+            public int set1NumberOfRuns = 0;
+            public double set1TotalTime = 0.0;
+            public string set2TimeOfFirstRun = "";
+            public string set2TimeOfLastRun = "";
+            public int set2NumberOfRuns = 0;
+            public double set2TotalTime = 0.0;
+            public string set3TimeOfFirstRun = "";
+            public string set3TimeOfLastRun = "";
+            public int set3NumberOfRuns = 0;
+            public double set3TotalTime = 0.0;
+            public dailyStats()
             {
-                Set1NumberOfRuns = 0;
-                Set1TimeOfFirstRun = "";
-                Set1TimeOfLastRun = "";
-                Set1TotalTime = 0.0;
-                Set2NumberOfRuns = 0;
-                Set2TimeOfFirstRun = "";
-                Set2TimeOfLastRun = "";
-                Set2TotalTime = 0.0;
-                Set3NumberOfRuns = 0;
-                Set3TimeOfFirstRun = "";
-                Set3TimeOfLastRun = "";
-                Set3TotalTime = 0.0;
+                set1NumberOfRuns = 0;
+                set1TimeOfFirstRun = "";
+                set1TimeOfLastRun = "";
+                set1TotalTime = 0.0;
+                set2NumberOfRuns = 0;
+                set2TimeOfFirstRun = "";
+                set2TimeOfLastRun = "";
+                set2TotalTime = 0.0;
+                set3NumberOfRuns = 0;
+                set3TimeOfFirstRun = "";
+                set3TimeOfLastRun = "";
+                set3TotalTime = 0.0;
             }
         }
-        public class StatsDataClass
+        public class statsDataClass
         {
-            public DailyStats Day1 = new DailyStats();
-            public DailyStats Day2 = new DailyStats();
+            public dailyStats day1 = new dailyStats();
+            public dailyStats day2 = new dailyStats();
         }
 
         #endregion
@@ -297,9 +297,9 @@ namespace RaceBeam
         private static CSVData classData = new CSVData();
         private static CSVData configData = new CSVData();
 
-        private static Dictionary<string, DriverScoreData> scores = new Dictionary<string, DriverScoreData>();
-        private static SortedDictionary<int, PaxInfo> sortedClassList = null;
-        private static StatsDataClass stats = new StatsDataClass();
+        private static Dictionary<string, driverScoreData> scores = new Dictionary<string, driverScoreData>();
+        private static SortedDictionary<int, paxInfo> sortedClassList = null;
+        private static statsDataClass stats = new statsDataClass();
 
         private static string driverDataFile = "";
         private static string classDataFile = "";
@@ -312,12 +312,12 @@ namespace RaceBeam
 
         #region Public Static Methods
 
-        public static string DoScore(
-            ScoreArgs args,
-            out Dictionary<string, DriverScoreData> driverScoreData,
-            out List<TeamData> teamScoreData,
-            out StatsDataClass statistics,
-            out SortedDictionary<int, PaxInfo> sortedClassDict)
+        public static string doScore(
+            scoreArgs args,
+            out Dictionary<string, driverScoreData> driverScoreData,
+            out List<teamData> teamScoreData,
+            out statsDataClass statistics,
+            out SortedDictionary<int, paxInfo> sortedClassDict)
         {
             driverScoreData = null; // assume things go bad
             teamScoreData = null;
@@ -329,11 +329,11 @@ namespace RaceBeam
             timingDataDay2 = new CSVData();
             classData = new CSVData();
             configData = new CSVData();
-            scores = new Dictionary<string, DriverScoreData>();
+            scores = new Dictionary<string, driverScoreData>();
             driverDataFile = "";
             classDataFile = "";
             timingFileName = "";
-            string configFolder = args.ConfigFolder;
+            string configFolder = args.configFolder;
             string configFilename = "";
             if (string.IsNullOrEmpty(configFolder))
             {
@@ -366,9 +366,9 @@ namespace RaceBeam
             {
                 return ("Class data file not defined in config file");
             }
-            if (!string.IsNullOrEmpty(args.ClassFile))
+            if (string.IsNullOrEmpty(args.classFile) == false)
             {
-                classDataFile = args.ClassFile;
+                classDataFile = args.classFile;
             }
 
             string eventFolder = configData.GetField("eventDataFolder", "Value");
@@ -376,11 +376,11 @@ namespace RaceBeam
             {
                 return ("Timing data folder not defined in config file");
             }
-            if (!string.IsNullOrEmpty(args.EventFolder))
+            if (string.IsNullOrEmpty(args.eventFolder) == false)
             {
-                eventFolder = args.EventFolder;
+                eventFolder = args.eventFolder;
             }
-            timingFileName = eventFolder + "\\" + args.Day1 + "_timingData.csv";
+            timingFileName = eventFolder + "\\" + args.day1 + "_timingData.csv";
 
             // Read in timing data
             err = timingDataDay1.LoadData(timingFileName, ',', "index");
@@ -389,9 +389,9 @@ namespace RaceBeam
                 return (timingFileName + ": " + err);
             }
             // If day 2 data given, then read it in too
-            if (args.Day2 != "")
+            if (args.day2 != "")
             {
-                string filename = eventFolder + "\\" + args.Day2 + "_timingData.csv";
+                string filename = eventFolder + "\\" + args.day2 + "_timingData.csv";
                 err = timingDataDay2.LoadData(filename, ',', "index");
                 if (err != "")
                 {
@@ -400,12 +400,12 @@ namespace RaceBeam
             }
 
             // Make a copy of the driverData file if we haven't already
-            string eventDriverDataFile = eventFolder + "\\" + args.Day1 + "_driverData.csv";
+            string eventDriverDataFile = eventFolder + "\\" + args.day1 + "_driverData.csv";
             try
             {
                 // Update copy of driver DataFile if we are working on today's data
                 string today = DateTime.Now.ToString("yyyy_MM_dd");
-                if ((configData.GetField("eventDataFolder", "Value") == eventFolder) && (today == args.Day1))
+                if ((configData.GetField("eventDataFolder", "Value") == eventFolder) && (today == args.day1))
                 {
                     File.Delete(eventDriverDataFile);
                 }
@@ -417,9 +417,9 @@ namespace RaceBeam
             }
 
             // Read in driverData file(s) for this event
-            if (args.Day1 != "")
+            if (args.day1 != "")
             {
-                string filename = eventFolder + "\\" + args.Day1 + "_driverData.csv";
+                string filename = eventFolder + "\\" + args.day1 + "_driverData.csv";
                 err = driverData.LoadData(filename, ',', "Number");
                 if (err != "")
                 {
@@ -428,9 +428,9 @@ namespace RaceBeam
             }
 
             // If day 2 data given, then read it in too
-            if (args.Day2 != "")
+            if (args.day2 != "")
             {
-                string filename = eventFolder + "\\" + args.Day2 + "_driverData.csv";
+                string filename = eventFolder + "\\" + args.day2 + "_driverData.csv";
                 err = driverData.LoadData(filename, ',', "Number");
                 if (err != "")
                 {
@@ -448,20 +448,20 @@ namespace RaceBeam
             // Sort order is given in the csv file
             if (sortedClassList == null)
             {
-                sortedClassList = new SortedDictionary<int, PaxInfo>();
+                sortedClassList = new SortedDictionary<int, paxInfo>();
 
-                List<string> classList = classData.GetKeys();
+                List<string> classList = classData.getKeys();
                 foreach (string className in classList)
                 {
-                    var p = new PaxInfo();
-                    p.CarClass = className;
-                    p.Pax = classData.GetField(className, "PAX");
-                    p.Description = classData.GetField(className, "Description");
-                    p.Group = classData.GetField(className, "Group");
-                    p.DisplayOrder = classData.GetField(className, "Display Order");
-                    if (!int.TryParse(p.DisplayOrder, out int orderVal))
+                    var p = new paxInfo();
+                    p.carClass = className;
+                    p.pax = classData.GetField(className, "PAX");
+                    p.description = classData.GetField(className, "Description");
+                    p.group = classData.GetField(className, "Group");
+                    p.displayOrder = classData.GetField(className, "Display Order");
+                    if (int.TryParse(p.displayOrder, out int orderVal) == false)
                     {
-                        return string.Format("Display order value for class " + p.CarClass + " is not a valid integer\r\n");
+                        return string.Format("Display order value for class " + p.carClass + " is not a valid integer\r\n");
                     }
                     else
                     {
@@ -471,31 +471,31 @@ namespace RaceBeam
                         }
                         catch
                         {
-                            return string.Format("Multiple sort order entries for class " + p.CarClass + "\r\n");
+                            return string.Format("Multiple sort order entries for class " + p.carClass + "\r\n");
                         }
                     }
                 }
             }
-            if (args.Day2 != "")
+            if (args.day2 != "")
             {
                 // Ignore day flags in each file
-                ParseRunData(args, timingDataDay1, 1);
-                ParseRunData(args, timingDataDay2, 2);
+                parseRunData(args, timingDataDay1, 1);
+                parseRunData(args, timingDataDay2, 2);
             }
             else
             {
                 // Use day flags inside timing file
-                ParseRunData(args, timingDataDay1, 1);
+                parseRunData(args, timingDataDay1, 1);
             }
 
             // Do some calcs and fixups on the run data
-            CalcRunTimes(args);
-            RawTimes(args);
-            PaxTimes(args);
+            calcRunTimes(args);
+            rawTimes(args);
+            paxTimes(args);
 
 
-            List<TeamData> teamScores = TeamTimes(args);
-            err = ClassTimes(args);
+            List<teamData> teamScores = teamTimes(args);
+            err = classTimes(args);
             if (err != "")
                 return err;
 
@@ -504,19 +504,19 @@ namespace RaceBeam
             teamScoreData = teamScores;
             sortedClassDict = sortedClassList;
 
-            if (args.WriteCSV)
+            if (args.writeCSV == true)
             {
                 // Write out csv data
-                string csvresults = DoCSV(args);
+                string csvresults = doCSV(args);
                 string csvFileName;
 
-                if (args.Day2 == "")
+                if (args.day2 == "")
                 {
-                    csvFileName = eventFolder + "\\" + args.Day1 + "_CSVData.csv";
+                    csvFileName = eventFolder + "\\" + args.day1 + "_CSVData.csv";
                 }
                 else
                 {
-                    csvFileName = eventFolder + "\\" + args.Day2 + "__2-day__CSVData.csv";
+                    csvFileName = eventFolder + "\\" + args.day2 + "__2-day__CSVData.csv";
                 }
                 try
                 {
@@ -532,60 +532,60 @@ namespace RaceBeam
             return "";
         }
 
-        public static void RawTimes(ScoreArgs args)
+        public static void rawTimes(scoreArgs args)
         {
-            var myList = new List<KeyValuePair<string, DriverScoreData>>(scores);
+            var myList = new List<KeyValuePair<string, driverScoreData>>(scores);
             // Sort by raw time
             myList
                 .Sort(delegate (
-                    KeyValuePair<string, DriverScoreData> firstPair,
-                    KeyValuePair<string, DriverScoreData> nextPair)
+                    KeyValuePair<string, driverScoreData> firstPair,
+                    KeyValuePair<string, driverScoreData> nextPair)
                 {
-                    return firstPair.Value.ScoreData.BestRAW.CompareTo(nextPair.Value.ScoreData.BestRAW);
+                    return firstPair.Value.scoreData.bestRAW.CompareTo(nextPair.Value.scoreData.bestRAW);
                 });
 
             int rank = 1;
             int rookieRank = 1;
             double bestTime = 0.0;
             double rookieBestTime = 0.0;
-            foreach (KeyValuePair<string, DriverScoreData> driver in myList)
+            foreach (KeyValuePair<string, driverScoreData> driver in myList)
             {
-                if (!driver.Value.Rookie)
+                if (driver.Value.rookie == false)
                 {
-                    driver.Value.ScoreData.RAWrookieScore = 0.0;
-                    driver.Value.ScoreData.RAWrookieRank = 0;
+                    driver.Value.scoreData.RAWrookieScore = 0.0;
+                    driver.Value.scoreData.RAWrookieRank = 0;
                 }
 
                 if (rank == 1)
                 {
-                    bestTime = driver.Value.ScoreData.BestRAW;
-                    driver.Value.ScoreData.RAWscore = 100.00;
-                    driver.Value.ScoreData.RAWrank = rank;
+                    bestTime = driver.Value.scoreData.bestRAW;
+                    driver.Value.scoreData.RAWscore = 100.00;
+                    driver.Value.scoreData.RAWrank = rank;
                 }
-                if ((rookieRank == 1) && driver.Value.Rookie)
+                if ((rookieRank == 1) && (driver.Value.rookie == true))
                 {
-                    rookieBestTime = driver.Value.ScoreData.BestRAW;
-                    driver.Value.ScoreData.RAWscore = 100.0;
-                    driver.Value.ScoreData.RAWrank = rank;
+                    rookieBestTime = driver.Value.scoreData.bestRAW;
+                    driver.Value.scoreData.RAWscore = 100.0;
+                    driver.Value.scoreData.RAWrank = rank;
                 }
 
                 if (rank != 1)  // include rookies in overall
                 {
-                    driver.Value.ScoreData.RAWscore = bestTime / driver.Value.ScoreData.BestRAW * 100.00;
-                    driver.Value.ScoreData.RAWrank = rank;
-                    if (driver.Value.Rookie)
+                    driver.Value.scoreData.RAWscore = bestTime / driver.Value.scoreData.bestRAW * 100.00;
+                    driver.Value.scoreData.RAWrank = rank;
+                    if (driver.Value.rookie == true)
                     {
-                        driver.Value.ScoreData.RAWrookieScore = rookieBestTime / driver.Value.ScoreData.BestRAW * 100.00;
-                        driver.Value.ScoreData.RAWrookieRank = rookieRank;
+                        driver.Value.scoreData.RAWrookieScore = rookieBestTime / driver.Value.scoreData.bestRAW * 100.00;
+                        driver.Value.scoreData.RAWrookieRank = rookieRank;
                     }
-                    if (driver.Value.ScoreData.BestRAW >= DNFvalue)
+                    if (driver.Value.scoreData.bestRAW >= DNFvalue)
                     {
-                        driver.Value.ScoreData.RAWscore = 0.0;
-                        driver.Value.ScoreData.RAWrookieScore = 0.0;
+                        driver.Value.scoreData.RAWscore = 0.0;
+                        driver.Value.scoreData.RAWrookieScore = 0.0;
                     }
                 }
                 rank += 1;
-                if (driver.Value.Rookie)
+                if (driver.Value.rookie == true)
                 {
                     rookieRank += 1;
                 }
@@ -596,7 +596,7 @@ namespace RaceBeam
         /// Calculate PAX scores
         /// </summary>
         /// <param name="args"></param>
-        public static void PaxTimes(ScoreArgs args)
+        public static void paxTimes(scoreArgs args)
         {
             int rank = 1;
             int rookieRank = 1;
@@ -605,114 +605,114 @@ namespace RaceBeam
             double prevTime = 0.0;
             double prevRookieTime = 0.0;
 
-            var myList = new List<KeyValuePair<string, DriverScoreData>>(scores);
+            var myList = new List<KeyValuePair<string, driverScoreData>>(scores);
             // Sort by pax time
             myList
                 .Sort(delegate (
-                    KeyValuePair<string, DriverScoreData> firstPair,
-                    KeyValuePair<string, DriverScoreData> nextPair)
+                    KeyValuePair<string, driverScoreData> firstPair,
+                    KeyValuePair<string, driverScoreData> nextPair)
                 {
-                    return firstPair.Value.ScoreData.BestPAX.CompareTo(nextPair.Value.ScoreData.BestPAX);
+                    return firstPair.Value.scoreData.bestPAX.CompareTo(nextPair.Value.scoreData.bestPAX);
                 });
 
-            foreach (KeyValuePair<string, DriverScoreData> driver in myList)
+            foreach (KeyValuePair<string, driverScoreData> driver in myList)
             {
-                if (!driver.Value.Rookie)
+                if (driver.Value.rookie == false)
                 {
-                    driver.Value.ScoreData.PAXrookieScore = 0.0;
+                    driver.Value.scoreData.PAXrookieScore = 0.0;
                 }
                 if (rank == 1)
                 {
-                    bestTime = driver.Value.ScoreData.BestPAX;
+                    bestTime = driver.Value.scoreData.bestPAX;
                     prevTime = bestTime;
-                    driver.Value.ScoreData.PAXscore = 100.00;
-                    driver.Value.ScoreData.PAXrank = 1;
-                    driver.Value.ScoreData.RAWtoFirst = 0.0;
-                    driver.Value.ScoreData.RAWtoNext = 0.0;
+                    driver.Value.scoreData.PAXscore = 100.00;
+                    driver.Value.scoreData.PAXrank = 1;
+                    driver.Value.scoreData.RAWtoFirst = 0.0;
+                    driver.Value.scoreData.RAWtoNext = 0.0;
                 }
-                if ((rookieRank == 1) && driver.Value.Rookie)
+                if ((rookieRank == 1) && (driver.Value.rookie == true))
                 {
-                    rookieBestTime = driver.Value.ScoreData.BestPAX;
+                    rookieBestTime = driver.Value.scoreData.bestPAX;
                     prevRookieTime = rookieBestTime;
-                    driver.Value.ScoreData.PAXrookieScore = 100.0;
-                    driver.Value.ScoreData.PAXRookieRank = 1;
-                    driver.Value.ScoreData.RookieRAWtoFirst = 0.0;
-                    driver.Value.ScoreData.RookieRAWtoNext = 0.0;
+                    driver.Value.scoreData.PAXrookieScore = 100.0;
+                    driver.Value.scoreData.PAXRookieRank = 1;
+                    driver.Value.scoreData.RookieRAWtoFirst = 0.0;
+                    driver.Value.scoreData.RookieRAWtoNext = 0.0;
                 }
                 if (rank != 1)  // include rookies in overall
                 {
-                    driver.Value.ScoreData.PAXscore = bestTime / driver.Value.ScoreData.BestPAX * 100.00;
-                    if (driver.Value.ScoreData.BestPAX >= DNFvalue)
+                    driver.Value.scoreData.PAXscore = bestTime / driver.Value.scoreData.bestPAX * 100.00;
+                    if (driver.Value.scoreData.bestPAX >= DNFvalue)
                     {
-                        driver.Value.ScoreData.PAXscore = 0.0;
+                        driver.Value.scoreData.PAXscore = 0.0;
                         //calc raw from pax difference
                         if (bestTime >= DNFvalue)
                         {
-                            driver.Value.ScoreData.RAWtoFirst = 0.0;
+                            driver.Value.scoreData.RAWtoFirst = 0.0;
                         }
                         else
                         {
-                            driver.Value.ScoreData.RAWtoFirst = bestTime / driver.Value.Pax;
+                            driver.Value.scoreData.RAWtoFirst = bestTime / driver.Value.pax;
                         }
                         if (prevTime >= DNFvalue)
                         {
-                            driver.Value.ScoreData.RAWtoNext = 0.0;
+                            driver.Value.scoreData.RAWtoNext = 0.0;
                         }
                         else
                         {
-                            driver.Value.ScoreData.RAWtoNext = prevTime / driver.Value.Pax;
+                            driver.Value.scoreData.RAWtoNext = prevTime / driver.Value.pax;
                         }
                     }
                     else
                     {
                         //calc raw from pax difference
-                        driver.Value.ScoreData.RAWtoFirst = (driver.Value.ScoreData.BestPAX - bestTime) / driver.Value.Pax;
-                        driver.Value.ScoreData.RAWtoNext = (driver.Value.ScoreData.BestPAX - prevTime) / driver.Value.Pax;
+                        driver.Value.scoreData.RAWtoFirst = (driver.Value.scoreData.bestPAX - bestTime) / driver.Value.pax;
+                        driver.Value.scoreData.RAWtoNext = (driver.Value.scoreData.bestPAX - prevTime) / driver.Value.pax;
                     }
-                    driver.Value.ScoreData.PAXrank = rank;
-                    if (driver.Value.Rookie)
+                    driver.Value.scoreData.PAXrank = rank;
+                    if (driver.Value.rookie == true)
                     {
-                        driver.Value.ScoreData.PAXrookieScore = rookieBestTime / driver.Value.ScoreData.BestPAX * 100.00;
-                        if (driver.Value.ScoreData.BestPAX >= DNFvalue)
+                        driver.Value.scoreData.PAXrookieScore = rookieBestTime / driver.Value.scoreData.bestPAX * 100.00;
+                        if (driver.Value.scoreData.bestPAX >= DNFvalue)
                         {
-                            driver.Value.ScoreData.PAXrookieScore = 0.0;
+                            driver.Value.scoreData.PAXrookieScore = 0.0;
                             if (rookieBestTime >= DNFvalue)
                             {
-                                driver.Value.ScoreData.RookieRAWtoFirst = 0.0;
+                                driver.Value.scoreData.RookieRAWtoFirst = 0.0;
                             }
                             else
                             {
-                                driver.Value.ScoreData.RookieRAWtoFirst = rookieBestTime / driver.Value.Pax;
+                                driver.Value.scoreData.RookieRAWtoFirst = rookieBestTime / driver.Value.pax;
                             }
                             if (prevRookieTime >= DNFvalue)
                             {
-                                driver.Value.ScoreData.RookieRAWtoNext = 0.0;
+                                driver.Value.scoreData.RookieRAWtoNext = 0.0;
                             }
                             else
                             {
-                                driver.Value.ScoreData.RookieRAWtoNext = prevRookieTime / driver.Value.Pax;
+                                driver.Value.scoreData.RookieRAWtoNext = prevRookieTime / driver.Value.pax;
                             }
                         }
                         else
                         {
                             //calc raw from pax difference
-                            driver.Value.ScoreData.RookieRAWtoFirst = (driver.Value.ScoreData.BestPAX - rookieBestTime) / driver.Value.Pax;
-                            driver.Value.ScoreData.RookieRAWtoNext = (driver.Value.ScoreData.BestPAX - prevRookieTime) / driver.Value.Pax;
+                            driver.Value.scoreData.RookieRAWtoFirst = (driver.Value.scoreData.bestPAX - rookieBestTime) / driver.Value.pax;
+                            driver.Value.scoreData.RookieRAWtoNext = (driver.Value.scoreData.bestPAX - prevRookieTime) / driver.Value.pax;
                         }
-                        driver.Value.ScoreData.PAXRookieRank = rookieRank;
+                        driver.Value.scoreData.PAXRookieRank = rookieRank;
                     }
                 }
-                if (driver.Value.ScoreData.BestPAX < DNFvalue)
+                if (driver.Value.scoreData.bestPAX < DNFvalue)
                 {
-                    prevTime = driver.Value.ScoreData.BestPAX;
+                    prevTime = driver.Value.scoreData.bestPAX;
                 }
                 rank += 1;
-                if (driver.Value.Rookie)
+                if (driver.Value.rookie == true)
                 {
                     rookieRank += 1;
-                    if (driver.Value.ScoreData.BestPAX < DNFvalue)
+                    if (driver.Value.scoreData.bestPAX < DNFvalue)
                     {
-                        prevRookieTime = driver.Value.ScoreData.BestPAX;
+                        prevRookieTime = driver.Value.scoreData.bestPAX;
                     }
                 }
             }
@@ -723,23 +723,23 @@ namespace RaceBeam
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        public static string ClassTimes(ScoreArgs args)
+        public static string classTimes(scoreArgs args)
         {
 
             // Sort drivers by PAX time
-            var myList = new List<KeyValuePair<string, DriverScoreData>>(scores);
+            var myList = new List<KeyValuePair<string, driverScoreData>>(scores);
             myList
                 .Sort(delegate (
-                    KeyValuePair<string, DriverScoreData> firstPair,
-                    KeyValuePair<string, DriverScoreData> nextPair)
+                    KeyValuePair<string, driverScoreData> firstPair,
+                    KeyValuePair<string, driverScoreData> nextPair)
                 {
-                    return firstPair.Value.ScoreData.BestPAX.CompareTo(nextPair.Value.ScoreData.BestPAX);
+                    return firstPair.Value.scoreData.bestPAX.CompareTo(nextPair.Value.scoreData.bestPAX);
                 });
 
-            foreach (KeyValuePair<int, PaxInfo> classInfo in sortedClassList)
+            foreach (KeyValuePair<int, paxInfo> classInfo in sortedClassList)
             {
-                PaxInfo curClass = classInfo.Value;
-                string curClassGroup = curClass.Group;
+                paxInfo curClass = classInfo.Value;
+                string curClassGroup = curClass.group;
                 int rank = 1;
                 int rookieRank = 1;
                 double bestTime = 0.0;
@@ -750,132 +750,132 @@ namespace RaceBeam
                 int rookieCarsInClass = 0;
 
                 // First go through and get a total count of cars in this class so we can allocate trophies
-                foreach (KeyValuePair<string, DriverScoreData> driver in myList)
+                foreach (KeyValuePair<string, driverScoreData> driver in myList)
                 {
-                    string origXgrps = driver.Value.CarXGroup;
-                    origXgrps += ";" + driver.Value.CarGroup;
+                    string origXgrps = driver.Value.carXGroup;
+                    origXgrps += ";" + driver.Value.carGroup;
 
                     string sval = configData.GetField("ClassAsGroup", "Value");
                     sval = sval.ToUpperInvariant();
                     if (sval.Contains("Y"))
                     {
-                        origXgrps += ";" + driver.Value.CarClass;
+                        origXgrps += ";" + driver.Value.carClass;
                     }
                     string[] xgroups = origXgrps.Split(';');
                     bool driverIsInXgroup = false;
 
                     foreach (string xg in xgroups)
                     {
-                        if (xg == curClass.CarClass)
+                        if (xg == curClass.carClass)
                         {
                             driverIsInXgroup = true;
                             break;
                         }
                     }
-                    if (!driverIsInXgroup)
+                    if (driverIsInXgroup == false)
                     {
                         continue;
                     }
 
-                    if (driver.Value.Rookie)
+                    if (driver.Value.rookie == true)
                     {
                         rookieCarsInClass += 1;
                     }
                     carsInClass += 1;
                 }
-                trophies = TrophyCount(carsInClass);
-                rookieTrophies = TrophyCount(rookieCarsInClass);
+                trophies = trophyCount(carsInClass);
+                rookieTrophies = trophyCount(rookieCarsInClass);
 
 
-                foreach (KeyValuePair<string, DriverScoreData> driver in myList)
+                foreach (KeyValuePair<string, driverScoreData> driver in myList)
                 {
-                    string origXgrps = driver.Value.CarXGroup;
-                    origXgrps += ";" + driver.Value.CarGroup;
+                    string origXgrps = driver.Value.carXGroup;
+                    origXgrps += ";" + driver.Value.carGroup;
 
                     string sval = configData.GetField("ClassAsGroup", "Value");
                     sval = sval.ToUpperInvariant();
                     if (sval.Contains("Y"))
                     {
-                        origXgrps += ";" + driver.Value.CarClass;
+                        origXgrps += ";" + driver.Value.carClass;
                     }
                     string[] xgroups = origXgrps.Split(';');
                     bool driverIsInXgroup = false;
 
                     foreach (string xg in xgroups)
                     {
-                        if (xg == curClass.CarClass)
+                        if (xg == curClass.carClass)
                         {
                             driverIsInXgroup = true;
                             break;
                         }
                     }
-                    if (!driverIsInXgroup)
+                    if (driverIsInXgroup == false)
                     {
                         continue;
                     }
                     // Clear out all the existing scores for this driver and group
-                    for (int index = 0; index < driver.Value.ScoreData.GroupScores.Count; index++)
+                    for (int index = 0; index < driver.Value.scoreData.groupScores.Count; index++)
                     {
-                        if (driver.Value.ScoreData.GroupScores[index].GroupName == curClass.CarClass)
+                        if (driver.Value.scoreData.groupScores[index].groupName == curClass.carClass)
                         {
-                            driver.Value.ScoreData.GroupScores.RemoveAt(index);
+                            driver.Value.scoreData.groupScores.RemoveAt(index);
                             break;
                         }
                     }
-                    var grp = new Groupscore();
-                    grp.GroupName = curClass.CarClass;
-                    driver.Value.ScoreData.GroupScores.Add(grp);
+                    var grp = new groupscore();
+                    grp.groupName = curClass.carClass;
+                    driver.Value.scoreData.groupScores.Add(grp);
 
                     if (rank == 1)
                     {
-                        grp.GroupScore = 100.0;
-                        grp.GroupRank = rank;
-                        bestTime = driver.Value.ScoreData.BestPAX;
+                        grp.groupScore = 100.0;
+                        grp.groupRank = rank;
+                        bestTime = driver.Value.scoreData.bestPAX;
                     }
-                    if ((rookieRank == 1) && driver.Value.Rookie)
+                    if ((rookieRank == 1) && (driver.Value.rookie == true))
                     {
-                        grp.GroupRookieScore = 100.0;
-                        grp.GroupRookieRank = rookieRank;
-                        rookieBestTime = driver.Value.ScoreData.BestPAX;
+                        grp.groupRookieScore = 100.0;
+                        grp.groupRookieRank = rookieRank;
+                        rookieBestTime = driver.Value.scoreData.bestPAX;
                     }
                     if (rank != 1)
                     {
-                        if (driver.Value.Rookie)
+                        if (driver.Value.rookie == true)
                         {
-                            grp.GroupRookieScore = rookieBestTime / driver.Value.ScoreData.BestPAX * 100.00;
-                            if (driver.Value.ScoreData.BestPAX >= DNFvalue)
+                            grp.groupRookieScore = rookieBestTime / driver.Value.scoreData.bestPAX * 100.00;
+                            if (driver.Value.scoreData.bestPAX >= DNFvalue)
                             {
-                                grp.GroupRookieScore = 0.0;
+                                grp.groupRookieScore = 0.0;
                             }
-                            grp.GroupRookieRank = rookieRank;
+                            grp.groupRookieRank = rookieRank;
                         }
                         // rookies are included in the overall scores
-                        grp.GroupScore = bestTime / driver.Value.ScoreData.BestPAX * 100.00;
-                        if (driver.Value.ScoreData.BestPAX >= DNFvalue)
+                        grp.groupScore = bestTime / driver.Value.scoreData.bestPAX * 100.00;
+                        if (driver.Value.scoreData.bestPAX >= DNFvalue)
                         {
-                            grp.GroupScore = 0.0;
+                            grp.groupScore = 0.0;
                         }
-                        grp.GroupRank = rank;
+                        grp.groupRank = rank;
                     }
 
                     if (trophies-- <= 0)
                     {
-                        grp.GroupTrophy = false;
+                        grp.groupTrophy = false;
                     }
                     else
                     {
-                        grp.GroupTrophy = true;
+                        grp.groupTrophy = true;
                     }
                     rank += 1;
-                    if (driver.Value.Rookie)
+                    if (driver.Value.rookie == true)
                     {
                         if (rookieTrophies-- <= 0)
                         {
-                            grp.GroupRookieTrophy = false;
+                            grp.groupRookieTrophy = false;
                         }
                         else
                         {
-                            grp.GroupRookieTrophy = true;
+                            grp.groupRookieTrophy = true;
                         }
                         rookieRank += 1;
                     }
@@ -884,52 +884,52 @@ namespace RaceBeam
             return "";
         }
 
-        public static List<TeamData> TeamTimes(ScoreArgs args)
+        public static List<teamData> teamTimes(scoreArgs args)
         {
-            var teams = new List<TeamData>();
+            var teams = new List<teamData>();
 
             // go through and collate into teams (based on team name)
-            var myList = new List<KeyValuePair<string, DriverScoreData>>(scores);
+            var myList = new List<KeyValuePair<string, driverScoreData>>(scores);
             myList
                 .Sort(delegate (
-                    KeyValuePair<string, DriverScoreData> firstPair,
-                    KeyValuePair<string, DriverScoreData> nextPair)
+                    KeyValuePair<string, driverScoreData> firstPair,
+                    KeyValuePair<string, driverScoreData> nextPair)
                 {
-                    string firstTeam = firstPair.Value.Team;
-                    string secondTeam = nextPair.Value.Team;
+                    string firstTeam = firstPair.Value.team;
+                    string secondTeam = nextPair.Value.team;
                     if (secondTeam == null)
                         return 1;
                     if (firstTeam == null)
                         return -1;
-                    return firstTeam.CompareTo(nextPair.Value.Team);
+                    return firstTeam.CompareTo(nextPair.Value.team);
                 });
 
             string sval = configData.GetField("teamNumScores", "Value");
-            if (!int.TryParse(sval, out int teamNumScores))
+            if (int.TryParse(sval, out int teamNumScores) == false)
             {
                 teamNumScores = 4;
             }
 
-            TeamData curTeam = null;
-            foreach (KeyValuePair<string, DriverScoreData> driver in myList)
+            teamData curTeam = null;
+            foreach (KeyValuePair<string, driverScoreData> driver in myList)
             {
-                if (driver.Value.Team == null)
+                if (driver.Value.team == null)
                 {
                     continue;
                 }
-                if ((curTeam == null) || (driver.Value.Team != curTeam.Team))
+                if ((curTeam == null) || (driver.Value.team != curTeam.team))
                 {
                     // Not the same team, so create a new one
-                    curTeam = new TeamData();
-                    curTeam.Team = driver.Value.Team;
-                    curTeam.TeamType = driver.Value.CarGroup;   // Only works for RAW/PAX
+                    curTeam = new teamData();
+                    curTeam.team = driver.Value.team;
+                    curTeam.teamType = driver.Value.carGroup;   // Only works for RAW/PAX
                     teams.Add(curTeam);
                 }
                 // add driver to team
-                curTeam.TeamDrivers.Add(driver.Value);
+                curTeam.teamDrivers.Add(driver.Value);
 
                 // Everybody gets to add to the cone count
-                curTeam.ConeTotal += driver.Value.ConeCount;
+                curTeam.coneTotal += driver.Value.coneCount;
             }
 
             // Go through teams (twice) and assign a PAX score and a RAW score
@@ -938,46 +938,46 @@ namespace RaceBeam
             {
                 // first sort each driver by his by RAW time
                 team
-                    .TeamDrivers
+                    .teamDrivers
                     .Sort(delegate (
-                        DriverScoreData first,
-                        DriverScoreData next)
+                        driverScoreData first,
+                        driverScoreData next)
                     {
-                        var firstRaw = first.ScoreData.BestRAW;
-                        var nextRaw = next.ScoreData.BestRAW;
+                        var firstRaw = first.scoreData.bestRAW;
+                        var nextRaw = next.scoreData.bestRAW;
                         return firstRaw.CompareTo(nextRaw);
                     });
 
                 // Add driver's RAW totals to team score, but only the best <n> drivers are used
-                team.DriversTotalled = 0;
-                foreach (DriverScoreData driver in team.TeamDrivers)
+                team.driversTotalled = 0;
+                foreach (driverScoreData driver in team.teamDrivers)
                 {
-                    if (team.DriversTotalled < teamNumScores)
+                    if (team.driversTotalled < teamNumScores)
                     {
-                        team.DriversTotalled += 1;
-                        team.RawTotal += driver.ScoreData.BestRAW;
+                        team.driversTotalled += 1;
+                        team.rawTotal += driver.scoreData.bestRAW;
                     }
                 }
                 // now sort each driver by his by PAX time
                 team
-                    .TeamDrivers
+                    .teamDrivers
                     .Sort(delegate (
-                        DriverScoreData first,
-                        DriverScoreData next)
+                        driverScoreData first,
+                        driverScoreData next)
                     {
-                        var firstPax = first.ScoreData.BestPAX;
-                        var nextPax = next.ScoreData.BestPAX;
+                        var firstPax = first.scoreData.bestPAX;
+                        var nextPax = next.scoreData.bestPAX;
                         return firstPax.CompareTo(nextPax);
                     });
 
                 // Add driver's PAX totals to team score, but only the best <n> drivers are used
-                team.DriversTotalled = 0;
-                foreach (DriverScoreData driver in team.TeamDrivers)
+                team.driversTotalled = 0;
+                foreach (driverScoreData driver in team.teamDrivers)
                 {
-                    if (team.DriversTotalled < teamNumScores)
+                    if (team.driversTotalled < teamNumScores)
                     {
-                        team.DriversTotalled += 1;
-                        team.PaxTotal += driver.ScoreData.BestPAX;
+                        team.driversTotalled += 1;
+                        team.paxTotal += driver.scoreData.bestPAX;
                     }
                 }
             }
@@ -985,10 +985,10 @@ namespace RaceBeam
             // First sort by RAW
             teams
                 .Sort(delegate (
-                    TeamData firstTeam,
-                    TeamData nextTeam)
+                    teamData firstTeam,
+                    teamData nextTeam)
                 {
-                    return firstTeam.RawTotal.CompareTo(nextTeam.RawTotal);
+                    return firstTeam.rawTotal.CompareTo(nextTeam.rawTotal);
                 });
 
             double bestTime = 0;
@@ -997,24 +997,24 @@ namespace RaceBeam
             {
                 if (rank == 1)
                 {
-                    bestTime = team.RawTotal;
-                    team.RawScore = 100.00;
-                    team.RawRank = rank;
+                    bestTime = team.rawTotal;
+                    team.rawScore = 100.00;
+                    team.rawRank = rank;
                 }
                 else
                 {
-                    team.RawScore = bestTime / team.RawTotal * 100.00;
-                    team.RawRank = rank;
+                    team.rawScore = bestTime / team.rawTotal * 100.00;
+                    team.rawRank = rank;
                 }
                 rank += 1;
             }
             // Now sort by PAX totals
             teams
                 .Sort(delegate (
-                    TeamData firstTeam,
-                    TeamData nextTeam)
+                    teamData firstTeam,
+                    teamData nextTeam)
                 {
-                    return firstTeam.PaxTotal.CompareTo(nextTeam.PaxTotal);
+                    return firstTeam.paxTotal.CompareTo(nextTeam.paxTotal);
                 });
 
             rank = 1;
@@ -1022,14 +1022,14 @@ namespace RaceBeam
             {
                 if (rank == 1)
                 {
-                    bestTime = team.PaxTotal;
-                    team.PaxScore = 100.00;
-                    team.PaxRank = rank;
+                    bestTime = team.paxTotal;
+                    team.paxScore = 100.00;
+                    team.paxRank = rank;
                 }
                 else
                 {
-                    team.PaxScore = bestTime / team.PaxTotal * 100.00;
-                    team.PaxRank = rank;
+                    team.paxScore = bestTime / team.paxTotal * 100.00;
+                    team.paxRank = rank;
                 }
                 rank += 1;
             }
@@ -1041,27 +1041,27 @@ namespace RaceBeam
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        public static string DoCSV(ScoreArgs args)
+        public static string doCSV(scoreArgs args)
         {
-            bool wasrookie = args.ShowRookie;
-            args.ShowRookie = true; // force rookie calcs
-            RawTimes(args);
-            PaxTimes(args);
-            ClassTimes(args);
-            args.ShowRookie = wasrookie;
-            ClassTimes(args);
+            bool wasrookie = args.showRookie;
+            args.showRookie = true; // force rookie calcs
+            rawTimes(args);
+            paxTimes(args);
+            classTimes(args);
+            args.showRookie = wasrookie;
+            classTimes(args);
 
             string results = "";
-            var myList = new List<KeyValuePair<string, DriverScoreData>>(scores);
+            var myList = new List<KeyValuePair<string, driverScoreData>>(scores);
             // Sort by car number
             myList
                 .Sort(delegate (
-                    KeyValuePair<string, DriverScoreData> firstPair,
-                    KeyValuePair<string, DriverScoreData> nextPair)
+                    KeyValuePair<string, driverScoreData> firstPair,
+                    KeyValuePair<string, driverScoreData> nextPair)
                 {
                     int d1Number, d2Number;
-                    d1Number = GetLeadingInt(firstPair.Value.Number);
-                    d2Number = GetLeadingInt(nextPair.Value.Number);
+                    d1Number = GetLeadingInt(firstPair.Value.number);
+                    d2Number = GetLeadingInt(nextPair.Value.number);
                     return d1Number.CompareTo(d2Number);
                 });
 
@@ -1071,16 +1071,16 @@ namespace RaceBeam
             // We also calc the max xgroups for any driver
 
             var maxXgroups = 0;
-            foreach (KeyValuePair<string, DriverScoreData> driver in myList)
+            foreach (KeyValuePair<string, driverScoreData> driver in myList)
             {
-                string origXgrps = driver.Value.CarXGroup;
+                string origXgrps = driver.Value.carXGroup;
                 if (string.IsNullOrEmpty(origXgrps))
                 {
-                    origXgrps = driver.Value.CarGroup;
+                    origXgrps = driver.Value.carGroup;
                 }
                 else
                 {
-                    origXgrps += ";" + driver.Value.CarGroup;
+                    origXgrps += ";" + driver.Value.carGroup;
                 }
                 string sval = configData.GetField("ClassAsGroup", "Value");
                 sval = sval.ToUpperInvariant();
@@ -1088,11 +1088,11 @@ namespace RaceBeam
                 {
                     if (string.IsNullOrEmpty(origXgrps))
                     {
-                        origXgrps = driver.Value.CarClass;
+                        origXgrps = driver.Value.carClass;
                     }
                     else
                     {
-                        origXgrps += ";" + driver.Value.CarClass;
+                        origXgrps += ";" + driver.Value.carClass;
                     }
                 }
                 string[] xgrps = origXgrps.Split(';');
@@ -1110,46 +1110,46 @@ namespace RaceBeam
             }
             results += "\r\n";
 
-            foreach (KeyValuePair<string, DriverScoreData> driver in myList)
+            foreach (KeyValuePair<string, driverScoreData> driver in myList)
             {
-                string driverName = driver.Value.FirstName + " " + driver.Value.LastName.Substring(0, 1);
+                string driverName = driver.Value.firstName + " " + driver.Value.lastName.Substring(0, 1);
                 if (configData.GetField("ShowLastName", "Value").Contains("Y"))
                 {
-                    driverName = driver.Value.FirstName + " " + driver.Value.LastName;
+                    driverName = driver.Value.firstName + " " + driver.Value.lastName;
                 }
                 string line = string
                     .Format("{0},{1},{2},{3},{4},{5},{6},{7,8:#.000},{8},{9},{10},{11},{12,8:#.000},{13,8:#.000},{14,8:#.000},{15,8:#.000},{16,8:#.000},{17,8:#.000},{18,8:#.000},{19},{20},{21},{22}",
-                        driver.Value.Number,
-                        driver.Value.Member,
-                        driver.Value.Rookie ? "Y" : "N",
-                        driver.Value.CarGroup,
-                        driver.Value.CarXGroup,
-                        driver.Value.CarClass,
-                        driver.Value.Team,
-                        driver.Value.Pax,
+                        driver.Value.number,
+                        driver.Value.member,
+                        driver.Value.rookie ? "Y" : "N",
+                        driver.Value.carGroup,
+                        driver.Value.carXGroup,
+                        driver.Value.carClass,
+                        driver.Value.team,
+                        driver.Value.pax,
                         driverName,
-                        driver.Value.FirstName,
-                        driver.Value.LastName,
-                        driver.Value.CarDescription,
-                        driver.Value.Sponsor,
-                        driver.Value.ScoreData.BestRAW,
-                        driver.Value.ScoreData.BestPAX,
-                        driver.Value.ScoreData.PAXscore,
-                        driver.Value.ScoreData.PAXrookieScore,
-                        driver.Value.ScoreData.RAWscore,
-                        driver.Value.ScoreData.RAWrookieScore,
-                        driver.Value.ConeCount.ToString(),
+                        driver.Value.firstName,
+                        driver.Value.lastName,
+                        driver.Value.carDescription,
+                        driver.Value.sponsor,
+                        driver.Value.scoreData.bestRAW,
+                        driver.Value.scoreData.bestPAX,
+                        driver.Value.scoreData.PAXscore,
+                        driver.Value.scoreData.PAXrookieScore,
+                        driver.Value.scoreData.RAWscore,
+                        driver.Value.scoreData.RAWrookieScore,
+                        driver.Value.coneCount.ToString(),
                         driver.Value.Day1Set1Info,
                         driver.Value.Day1Set2Info,
                         driver.Value.Day1Set3Info);
 
                 // emit all the xgroup scores (we know we have enough xgroup headers to hold the list)
-                foreach (var grp in driver.Value.ScoreData.GroupScores)
+                foreach (var grp in driver.Value.scoreData.groupScores)
                 {
                     line += string.Format(",{0},{1},{2}",
-                                          grp.GroupName,
-                                          grp.GroupScore,
-                                          grp.GroupRookieScore
+                                          grp.groupName,
+                                          grp.groupScore,
+                                          grp.groupRookieScore
                                          );
                 }
                 line += "\r\n";
@@ -1165,16 +1165,16 @@ namespace RaceBeam
         /// <param name="args"></param>
         /// <param name="rdata"></param>
         /// <param name="dayNumber"></param>
-        public static void ParseRunData(ScoreArgs args, CSVData rdata, int dayNumber)
+        public static void parseRunData(scoreArgs args, CSVData rdata, int dayNumber)
         {
 
             // Refresh statistics
-            stats = new StatsDataClass();
+            stats = new statsDataClass();
 
             for (int i = 0; i < rdata.Length(); i++)
             {
-                DriverScoreData drv;
-                var run = new SingleRunData();
+                driverScoreData drv;
+                var run = new singleRunData();
                 double fval;
                 int ival;
                 string sval;
@@ -1182,7 +1182,7 @@ namespace RaceBeam
 
                 // we key everything by car number
                 string number = rdata.GetField(indexS, "car_number");
-                if (string.IsNullOrEmpty(number))
+                if (string.IsNullOrEmpty(number) == true)
                 {
                     continue;
                 }
@@ -1197,126 +1197,126 @@ namespace RaceBeam
                 }
                 else
                 {
-                    drv = new DriverScoreData();
+                    drv = new driverScoreData();
                 }
-                drv.Number = number;
-                if (drv.FirstName == null)
+                drv.number = number;
+                if (drv.firstName == null)
                 {
-                    drv.FirstName = driverData.GetField(number, "First Name");
-                    if (drv.FirstName == "")
+                    drv.firstName = driverData.GetField(number, "First Name");
+                    if (drv.firstName == "")
                     {
-                        drv.FirstName = "Unknown";
-                        drv.LastName = "Driver";
-                        drv.CarDescription = "Unknown car";
-                        drv.Member = "No";
-                        drv.Rookie = false;
-                        drv.CarClass = "AM";
-                        drv.CarGroup = "AM";
-                        drv.CarXGroup = "";
-                        drv.CarGroupDescription = "Unregistered";
-                        drv.Pax = 1.0;
+                        drv.firstName = "Unknown";
+                        drv.lastName = "Driver";
+                        drv.carDescription = "Unknown car";
+                        drv.member = "No";
+                        drv.rookie = false;
+                        drv.carClass = "AM";
+                        drv.carGroup = "AM";
+                        drv.carXGroup = "";
+                        drv.carGroupDescription = "Unregistered";
+                        drv.pax = 1.0;
                         //Console.WriteLine("Missing data for car #" + number.ToString());
                     }
                 }
-                if (drv.LastName == null)
+                if (drv.lastName == null)
                 {
-                    drv.LastName = driverData.GetField(number, "Last Name");
-                    if (drv.LastName == "")
+                    drv.lastName = driverData.GetField(number, "Last Name");
+                    if (drv.lastName == "")
                     {
-                        drv.LastName = "Unknown";
+                        drv.lastName = "Unknown";
                     }
                 }
-                if (drv.CarDescription == null)
+                if (drv.carDescription == null)
                 {
-                    drv.CarDescription = driverData.GetField(number, "Car Model");
+                    drv.carDescription = driverData.GetField(number, "Car Model");
                 }
-                if (drv.Member == null)
+                if (drv.member == null)
                 {
-                    drv.Member = driverData.GetField(number, "Member");
-                    if (drv.Member.ToUpperInvariant().Contains("Y"))
+                    drv.member = driverData.GetField(number, "Member");
+                    if (drv.member.ToUpperInvariant().Contains("Y") == true)
                     {
-                        drv.Member = "Yes";
+                        drv.member = "Yes";
                     }
                     else
                     {
-                        drv.Member = "No";
+                        drv.member = "No";
                     }
                 }
-                if (drv.Sponsor == null)
+                if (drv.sponsor == null)
                 {
-                    drv.Sponsor = driverData.GetField(number, "Sponsor");
+                    drv.sponsor = driverData.GetField(number, "Sponsor");
                 }
-                if (drv.Team == null)
+                if (drv.team == null)
                 {
-                    drv.Team = driverData.GetField(number, "Team");
+                    drv.team = driverData.GetField(number, "Team");
                 }
 
-                if (drv.CarDescription.Length > 20)
+                if (drv.carDescription.Length > 20)
                 {
-                    drv.CarDescription = drv.CarDescription.Substring(0, 20);
+                    drv.carDescription = drv.carDescription.Substring(0, 20);
                 }
 
                 string rookie = driverData.GetField(number, "Rookie");
-                if (rookie.ToUpperInvariant().Contains("Y"))
+                if (rookie.ToUpperInvariant().Contains("Y") == true)
                 {
-                    drv.Rookie = true;
+                    drv.rookie = true;
                 }
                 else
                 {
-                    drv.Rookie = false;
+                    drv.rookie = false;
                 }
-                if (drv.CarClass == null)
+                if (drv.carClass == null)
                 {
-                    drv.CarClass = driverData.GetField(number, "Class");
-                    string realClass = drv.CarClass;
+                    drv.carClass = driverData.GetField(number, "Class");
+                    string realClass = drv.carClass;
                     sval = classData.GetField(realClass, "PAX");
-                    if (double.TryParse(sval, out fval))
+                    if (double.TryParse(sval, out fval) == true)
                     {
-                        drv.Pax = fval;
+                        drv.pax = fval;
                     }
                     else
                     {
-                        drv.Pax = 1.0;
+                        drv.pax = 1.0;
                     }
                 }
-                if (drv.CarGroup == null)
+                if (drv.carGroup == null)
                 {
-                    drv.CarGroup = driverData.GetField(number, "Group");
-                    if (string.IsNullOrEmpty(drv.CarGroup))
+                    drv.carGroup = driverData.GetField(number, "Group");
+                    if (string.IsNullOrEmpty(drv.carGroup) == true)
                     {
-                        drv.CarGroup = drv.CarClass;
+                        drv.carGroup = drv.carClass;
                     }
-                    drv.CarGroupDescription = classData.GetField(drv.CarGroup, "Description");
+                    drv.carGroupDescription = classData.GetField(drv.carGroup, "Description");
                     // Use group PAX as a max official runs value (when it is > 2)
-                    drv.MaxOfficialRuns = args.MaxOfficialRuns;
-                    sval = classData.GetField(drv.CarGroup, "PAX");
-                    if (int.TryParse(sval, out int intVal))
+                    drv.maxOfficialRuns = args.maxOfficialRuns;
+                    sval = classData.GetField(drv.carGroup, "PAX");
+                    if (int.TryParse(sval, out int intVal) == true)
                     {
                         if (intVal > 2)
                         {
-                            drv.MaxOfficialRuns = intVal;
+                            drv.maxOfficialRuns = intVal;
                         }
                     }
                 }
-                if (drv.CarXGroup == null)
+                if (drv.carXGroup == null)
                 {
-                    drv.CarXGroup = driverData.GetField(number, "XGroup");
-                    if (string.IsNullOrEmpty(drv.CarXGroup))
+                    drv.carXGroup = driverData.GetField(number, "XGroup");
+                    if (string.IsNullOrEmpty(drv.carXGroup) == true)
                     {
-                        drv.CarXGroup = "";
-                        drv.CarXGroupDescription = "";
+                        drv.carXGroup = "";
+                        drv.carXGroupDescription = "";
                     }
                     else
                     {
-                        drv.CarXGroupDescription = classData.GetField(drv.CarXGroup, "Description");
+                        drv.carXGroupDescription = classData.GetField(drv.carXGroup, "Description");
                         // Use group PAX as a max official runs value (when it is > 2)
                         // If both group and xgroup specify a value, use the lowest one
-                        sval = classData.GetField(drv.CarXGroup, "PAX");
-                        if (int.TryParse(sval, out int intVal))
+                        sval = classData.GetField(drv.carXGroup, "PAX");
+                        if (int.TryParse(sval, out int intVal) == true)
                         {
-                            if ((intVal > 2) && (intVal < drv.MaxOfficialRuns))
+                            if ((intVal > 2) && (intVal < drv.maxOfficialRuns))
                             {
-                                drv.MaxOfficialRuns = intVal;
+                                drv.maxOfficialRuns = intVal;
                             }
                         }
                     }
@@ -1325,8 +1325,8 @@ namespace RaceBeam
                 string startstr = rdata.GetField(indexS, "start_time");
                 double runt = 0.0;
                 if ((stopstr != null) &&
-                    double.TryParse(stopstr, out double stopint) &&
-                    double.TryParse(startstr, out double startint))
+                    (double.TryParse(stopstr, out double stopint) == true) &&
+                    (double.TryParse(startstr, out double startint) == true))
                 {
                     if (stopint > startint)
                     {
@@ -1340,29 +1340,29 @@ namespace RaceBeam
                 }
                 sval = rdata.GetField(indexS, "run_time");
 
-                if (double.TryParse(sval, out fval))
+                if (double.TryParse(sval, out fval) == true)
                 {
-                    run.Time = fval;
+                    run.time = fval;
                     if ((fval != runt) && (runt != 0.0))
                     {
-                        run.Time = runt;
+                        run.time = runt;
                     }
-                    run.Penalty = rdata.GetField(indexS, "penalty");
-                    run.AdjustedRawTime = AdjustTime(run.Time, run.Penalty, 1.0);
-                    run.ConeCount = CalcCones(run.Penalty);
-                    if (run.AdjustedRawTime == DNFvalue)
+                    run.penalty = rdata.GetField(indexS, "penalty");
+                    run.adjustedRawTime = adjustTime(run.time, run.penalty, 1.0);
+                    run.coneCount = calcCones(run.penalty);
+                    if (run.adjustedRawTime == DNFvalue)
                     {
                         run.PAXtime = DNFvalue;
                     }
                     else
                     {
-                        run.PAXtime = AdjustTime(run.Time, run.Penalty, drv.Pax);
+                        run.PAXtime = adjustTime(run.time, run.penalty, drv.pax);
                     }
                     sval = rdata.GetField(indexS, "run_number");
-                    run.RunNumber = 0;
-                    if (int.TryParse(sval, out ival))
+                    run.runNumber = 0;
+                    if (int.TryParse(sval, out ival) == true)
                     {
-                        run.RunNumber = ival;
+                        run.runNumber = ival;
                     }
                     // Handle old style "day" instead of "set"
                     string setFlag = rdata.GetField(indexS, "set");
@@ -1371,7 +1371,7 @@ namespace RaceBeam
                         setFlag = rdata.GetField(indexS, "day");
                     }
                     int set = 3;
-                    if (int.TryParse(setFlag, out ival))
+                    if (int.TryParse(setFlag, out ival) == true)
                     {
                         set = ival;
                     }
@@ -1379,114 +1379,114 @@ namespace RaceBeam
                     {
                         set = 3;    // Make it a fun run
                     }
-                    run.StartTime = rdata.GetField(indexS, "datetime");
-                    if (run.StartTime.Length > 3)
+                    run.startTime = rdata.GetField(indexS, "datetime");
+                    if (run.startTime.Length > 3)
                     {
-                        run.StartTime = run.StartTime.Substring(3);
+                        run.startTime = run.startTime.Substring(3);
                     }
-                    run.StopTime = rdata.GetField(indexS, "datetime_stop");
-                    if (run.StopTime.Length > 3)
+                    run.stopTime = rdata.GetField(indexS, "datetime_stop");
+                    if (run.stopTime.Length > 3)
                     {
-                        run.StopTime = run.StopTime.Substring(3);
+                        run.stopTime = run.stopTime.Substring(3);
                     }
                     // update this driver's raw FTD
-                    if (drv.ScoreData.BestFTD > run.AdjustedRawTime)
+                    if (drv.scoreData.bestFTD > run.adjustedRawTime)
                     {
-                        drv.ScoreData.BestFTD = run.AdjustedRawTime;
+                        drv.scoreData.bestFTD = run.adjustedRawTime;
                     }
                     if (set == 1)
                     {
                         if (dayNumber == 1)
                         {
-                            if (drv.Day1Set1.BestSUM == DNFvalue)
-                                drv.Day1Set1.BestSUM = 0.0; // Actually exists, so reset from DNF
+                            if (drv.Day1Set1.bestSUM == DNFvalue)
+                                drv.Day1Set1.bestSUM = 0.0; // Actually exists, so reset from DNF
 
                             // some interesting stats
-                            if (stats.Day1.Set1TimeOfFirstRun == "")
+                            if (stats.day1.set1TimeOfFirstRun == "")
                             {
-                                stats.Day1.Set1TimeOfFirstRun = run.StartTime;
+                                stats.day1.set1TimeOfFirstRun = run.startTime;
                             }
-                            stats.Day1.Set1TimeOfLastRun = run.StartTime;
-                            stats.Day1.Set1NumberOfRuns += 1;
-                            stats.Day1.Set1TotalTime += run.Time;
-                            drv.Day1Set1Info += string.Format("{0,5:#.000}", run.Time);
-                            if (!string.IsNullOrEmpty(run.Penalty))
+                            stats.day1.set1TimeOfLastRun = run.startTime;
+                            stats.day1.set1NumberOfRuns += 1;
+                            stats.day1.set1TotalTime += run.time;
+                            drv.Day1Set1Info += string.Format("{0,5:#.000}", run.time);
+                            if (string.IsNullOrEmpty(run.penalty) == false)
                             {
-                                drv.Day1Set1Info += "+" + run.Penalty;
+                                drv.Day1Set1Info += "+" + run.penalty;
                             }
                             drv.Day1Set1Info += ";";
 
-                            drv.Day1Set1.Runs.Add(run); // Add this run to the driver's list
+                            drv.Day1Set1.runs.Add(run); // Add this run to the driver's list
 
-                            if ((drv.Day1Set1.Runs.Count <= drv.MaxOfficialRuns) && (run.AdjustedRawTime < drv.Day1Set1.BestRAW))
+                            if ((drv.Day1Set1.runs.Count <= drv.maxOfficialRuns) && (run.adjustedRawTime < drv.Day1Set1.bestRAW))
                             {
-                                drv.Day1Set1.BestRAW = run.AdjustedRawTime;
-                                drv.Day1Set1.BestRun = run;
+                                drv.Day1Set1.bestRAW = run.adjustedRawTime;
+                                drv.Day1Set1.bestRun = run;
                             }
-                            if ((drv.Day1Set1.Runs.Count <= drv.MaxOfficialRuns) && (run.PAXtime < drv.Day1Set1.BestPAX))
+                            if ((drv.Day1Set1.runs.Count <= drv.maxOfficialRuns) && (run.PAXtime < drv.Day1Set1.bestPAX))
                             {
-                                drv.Day1Set1.BestPAX = run.PAXtime;
+                                drv.Day1Set1.bestPAX = run.PAXtime;
                             }
 
-                            drv.ConeCount += run.ConeCount;
-                            if (run.AdjustedRawTime >= DNFvalue)
+                            drv.coneCount += run.coneCount;
+                            if (run.adjustedRawTime >= DNFvalue)
                             {
                                 string dnfSeconds = configData.GetField("secondsForDNF", "Value");
-                                if (!int.TryParse(dnfSeconds, out int DNFpenalty))
+                                if (int.TryParse(dnfSeconds, out int DNFpenalty) == false)
                                 {
                                     DNFpenalty = 200;
                                 }
-                                drv.Day1Set1.BestSUM += DNFpenalty; // We count a DNF as 200 seconds
+                                drv.Day1Set1.bestSUM += DNFpenalty; // We count a DNF as 200 seconds
                             }
                             else
                             {
-                                drv.Day1Set1.BestSUM += run.AdjustedRawTime;
+                                drv.Day1Set1.bestSUM += run.adjustedRawTime;
                             }
                         }
                         else    // day 2
                         {
-                            if (drv.Day2Set1.BestSUM == DNFvalue)
-                                drv.Day2Set1.BestSUM = 0.0; // Actually exists, so reset from DNF
+                            if (drv.Day2Set1.bestSUM == DNFvalue)
+                                drv.Day2Set1.bestSUM = 0.0; // Actually exists, so reset from DNF
 
                             // some interesting stats
-                            if (stats.Day2.Set1TimeOfFirstRun == "")
+                            if (stats.day2.set1TimeOfFirstRun == "")
                             {
-                                stats.Day2.Set1TimeOfFirstRun = run.StartTime;
+                                stats.day2.set1TimeOfFirstRun = run.startTime;
                             }
-                            stats.Day2.Set1TimeOfLastRun = run.StartTime;
-                            stats.Day2.Set1NumberOfRuns += 1;
-                            stats.Day2.Set1TotalTime += run.Time;
-                            drv.Day2Set1Info += string.Format("{0,5:#.000}", run.Time);
-                            if (!string.IsNullOrEmpty(run.Penalty))
+                            stats.day2.set1TimeOfLastRun = run.startTime;
+                            stats.day2.set1NumberOfRuns += 1;
+                            stats.day2.set1TotalTime += run.time;
+                            drv.Day2Set1Info += string.Format("{0,5:#.000}", run.time);
+                            if (string.IsNullOrEmpty(run.penalty) == false)
                             {
-                                drv.Day2Set1Info += "+" + run.Penalty;
+                                drv.Day2Set1Info += "+" + run.penalty;
                             }
                             drv.Day2Set1Info += ";";
 
-                            drv.Day2Set1.Runs.Add(run); // Add this run to the driver's list
+                            drv.Day2Set1.runs.Add(run); // Add this run to the driver's list
 
-                            if ((drv.Day2Set1.Runs.Count <= drv.MaxOfficialRuns) && (run.AdjustedRawTime < drv.Day2Set1.BestRAW))
+                            if ((drv.Day2Set1.runs.Count <= drv.maxOfficialRuns) && (run.adjustedRawTime < drv.Day2Set1.bestRAW))
                             {
-                                drv.Day2Set1.BestRAW = run.AdjustedRawTime;
-                                drv.Day2Set1.BestRun = run;
+                                drv.Day2Set1.bestRAW = run.adjustedRawTime;
+                                drv.Day2Set1.bestRun = run;
                             }
-                            if ((drv.Day2Set1.Runs.Count <= drv.MaxOfficialRuns) && (run.PAXtime < drv.Day2Set1.BestPAX))
+                            if ((drv.Day2Set1.runs.Count <= drv.maxOfficialRuns) && (run.PAXtime < drv.Day2Set1.bestPAX))
                             {
-                                drv.Day2Set1.BestPAX = run.PAXtime;
+                                drv.Day2Set1.bestPAX = run.PAXtime;
                             }
-                            drv.ConeCount += run.ConeCount;
-                            if (run.AdjustedRawTime >= DNFvalue)
+                            drv.coneCount += run.coneCount;
+                            if (run.adjustedRawTime >= DNFvalue)
                             {
                                 string dnfSeconds = configData.GetField("secondsForDNF", "Value");
-                                if (!int.TryParse(dnfSeconds, out int DNFpenalty))
+                                if (int.TryParse(dnfSeconds, out int DNFpenalty) == false)
                                 {
                                     DNFpenalty = 200;
                                 }
-                                drv.Day2Set1.BestSUM += DNFpenalty; // We count a DNF as 200 seconds
+                                drv.Day2Set1.bestSUM += DNFpenalty; // We count a DNF as 200 seconds
                             }
                             else
                             {
-                                drv.Day2Set1.BestSUM += run.AdjustedRawTime;
+                                drv.Day2Set1.bestSUM += run.adjustedRawTime;
                             }
                         }
                     }
@@ -1494,94 +1494,94 @@ namespace RaceBeam
                     {
                         if (dayNumber == 1)
                         {
-                            if (drv.Day1Set2.BestSUM == DNFvalue)
-                                drv.Day1Set2.BestSUM = 0.0; // Actually exists, so reset from DNF
+                            if (drv.Day1Set2.bestSUM == DNFvalue)
+                                drv.Day1Set2.bestSUM = 0.0; // Actually exists, so reset from DNF
 
                             // some interesting stats
-                            if (stats.Day1.Set2TimeOfFirstRun == "")
+                            if (stats.day1.set2TimeOfFirstRun == "")
                             {
-                                stats.Day1.Set2TimeOfFirstRun = run.StartTime;
+                                stats.day1.set2TimeOfFirstRun = run.startTime;
                             }
-                            stats.Day1.Set2TimeOfLastRun = run.StartTime;
-                            stats.Day1.Set2NumberOfRuns += 1;
-                            stats.Day1.Set2TotalTime += run.Time;
-                            drv.Day1Set2Info += string.Format("{0,5:#.000}", run.Time);
-                            if (!string.IsNullOrEmpty(run.Penalty))
+                            stats.day1.set2TimeOfLastRun = run.startTime;
+                            stats.day1.set2NumberOfRuns += 1;
+                            stats.day1.set2TotalTime += run.time;
+                            drv.Day1Set2Info += string.Format("{0,5:#.000}", run.time);
+                            if (string.IsNullOrEmpty(run.penalty) == false)
                             {
-                                drv.Day1Set2Info += "+" + run.Penalty;
+                                drv.Day1Set2Info += "+" + run.penalty;
                             }
                             drv.Day1Set2Info += ";";
 
-                            drv.Day1Set2.Runs.Add(run); // Add this run to the driver's list
+                            drv.Day1Set2.runs.Add(run); // Add this run to the driver's list
 
-                            if ((drv.Day1Set2.Runs.Count <= drv.MaxOfficialRuns) && (run.AdjustedRawTime < drv.Day1Set2.BestRAW))
+                            if ((drv.Day1Set2.runs.Count <= drv.maxOfficialRuns) && (run.adjustedRawTime < drv.Day1Set2.bestRAW))
                             {
-                                drv.Day1Set2.BestRAW = run.AdjustedRawTime;
-                                drv.Day1Set2.BestRun = run;
+                                drv.Day1Set2.bestRAW = run.adjustedRawTime;
+                                drv.Day1Set2.bestRun = run;
                             }
-                            if ((drv.Day1Set2.Runs.Count <= drv.MaxOfficialRuns) && (run.PAXtime < drv.Day1Set2.BestPAX))
+                            if ((drv.Day1Set2.runs.Count <= drv.maxOfficialRuns) && (run.PAXtime < drv.Day1Set2.bestPAX))
                             {
-                                drv.Day1Set2.BestPAX = run.PAXtime;
+                                drv.Day1Set2.bestPAX = run.PAXtime;
                             }
-                            drv.ConeCount += run.ConeCount;
-                            if (run.AdjustedRawTime >= DNFvalue)
+                            drv.coneCount += run.coneCount;
+                            if (run.adjustedRawTime >= DNFvalue)
                             {
                                 string dnfSeconds = configData.GetField("secondsForDNF", "Value");
-                                if (!int.TryParse(dnfSeconds, out int DNFpenalty))
+                                if (int.TryParse(dnfSeconds, out int DNFpenalty) == false)
                                 {
                                     DNFpenalty = 200;
                                 }
-                                drv.Day1Set2.BestSUM += DNFpenalty; // We count a DNF as 200 seconds
+                                drv.Day1Set2.bestSUM += DNFpenalty; // We count a DNF as 200 seconds
                             }
                             else
                             {
-                                drv.Day1Set2.BestSUM += run.AdjustedRawTime;
+                                drv.Day1Set2.bestSUM += run.adjustedRawTime;
                             }
                         }
                         else    // day 2
                         {
-                            if (drv.Day2Set2.BestSUM == DNFvalue)
-                                drv.Day2Set2.BestSUM = 0.0; // Actually exists, so reset from DNF
+                            if (drv.Day2Set2.bestSUM == DNFvalue)
+                                drv.Day2Set2.bestSUM = 0.0; // Actually exists, so reset from DNF
 
                             // some interesting stats
-                            if (stats.Day2.Set2TimeOfFirstRun == "")
+                            if (stats.day2.set2TimeOfFirstRun == "")
                             {
-                                stats.Day2.Set2TimeOfFirstRun = run.StartTime;
+                                stats.day2.set2TimeOfFirstRun = run.startTime;
                             }
-                            stats.Day2.Set2TimeOfLastRun = run.StartTime;
-                            stats.Day2.Set2NumberOfRuns += 1;
-                            stats.Day2.Set2TotalTime += run.Time;
-                            drv.Day2Set2Info += string.Format("{0,5:#.000}", run.Time);
-                            if (!string.IsNullOrEmpty(run.Penalty))
+                            stats.day2.set2TimeOfLastRun = run.startTime;
+                            stats.day2.set2NumberOfRuns += 1;
+                            stats.day2.set2TotalTime += run.time;
+                            drv.Day2Set2Info += string.Format("{0,5:#.000}", run.time);
+                            if (string.IsNullOrEmpty(run.penalty) == false)
                             {
-                                drv.Day2Set2Info += "+" + run.Penalty;
+                                drv.Day2Set2Info += "+" + run.penalty;
                             }
                             drv.Day2Set2Info += ";";
 
-                            drv.Day2Set2.Runs.Add(run); // Add this run to the driver's list
+                            drv.Day2Set2.runs.Add(run); // Add this run to the driver's list
 
-                            if ((drv.Day2Set2.Runs.Count <= drv.MaxOfficialRuns) && (run.AdjustedRawTime < drv.Day2Set2.BestRAW))
+                            if ((drv.Day2Set2.runs.Count <= drv.maxOfficialRuns) && (run.adjustedRawTime < drv.Day2Set2.bestRAW))
                             {
-                                drv.Day2Set2.BestRAW = run.AdjustedRawTime;
-                                drv.Day2Set2.BestRun = run;
+                                drv.Day2Set2.bestRAW = run.adjustedRawTime;
+                                drv.Day2Set2.bestRun = run;
                             }
-                            if ((drv.Day2Set2.Runs.Count <= drv.MaxOfficialRuns) && (run.PAXtime < drv.Day2Set2.BestPAX))
+                            if ((drv.Day2Set2.runs.Count <= drv.maxOfficialRuns) && (run.PAXtime < drv.Day2Set2.bestPAX))
                             {
-                                drv.Day2Set2.BestPAX = run.PAXtime;
+                                drv.Day2Set2.bestPAX = run.PAXtime;
                             }
-                            drv.ConeCount += run.ConeCount;
-                            if (run.AdjustedRawTime >= DNFvalue)
+                            drv.coneCount += run.coneCount;
+                            if (run.adjustedRawTime >= DNFvalue)
                             {
                                 string dnfSeconds = configData.GetField("secondsForDNF", "Value");
-                                if (!int.TryParse(dnfSeconds, out int DNFpenalty))
+                                if (int.TryParse(dnfSeconds, out int DNFpenalty) == false)
                                 {
                                     DNFpenalty = 200;
                                 }
-                                drv.Day2Set2.BestSUM += DNFpenalty; // We count a DNF as 200 seconds
+                                drv.Day2Set2.bestSUM += DNFpenalty; // We count a DNF as 200 seconds
                             }
                             else
                             {
-                                drv.Day2Set2.BestSUM += run.AdjustedRawTime;
+                                drv.Day2Set2.bestSUM += run.adjustedRawTime;
                             }
                         }
                     }
@@ -1589,94 +1589,94 @@ namespace RaceBeam
                     {
                         if (dayNumber == 1)
                         {
-                            if (drv.Day1Set3.BestSUM == DNFvalue)
-                                drv.Day1Set3.BestSUM = 0.0; // Actually exists, so reset from DNF
+                            if (drv.Day1Set3.bestSUM == DNFvalue)
+                                drv.Day1Set3.bestSUM = 0.0; // Actually exists, so reset from DNF
 
                             // some interesting stats
-                            if (stats.Day1.Set3TimeOfFirstRun == "")
+                            if (stats.day1.set3TimeOfFirstRun == "")
                             {
-                                stats.Day1.Set3TimeOfFirstRun = run.StartTime;
+                                stats.day1.set3TimeOfFirstRun = run.startTime;
                             }
-                            stats.Day1.Set3TimeOfLastRun = run.StartTime;
-                            stats.Day1.Set3NumberOfRuns += 1;
-                            stats.Day1.Set3TotalTime += run.Time;
-                            drv.Day1Set3Info += string.Format("{0,5:#.000}", run.Time);
-                            if (!string.IsNullOrEmpty(run.Penalty))
+                            stats.day1.set3TimeOfLastRun = run.startTime;
+                            stats.day1.set3NumberOfRuns += 1;
+                            stats.day1.set3TotalTime += run.time;
+                            drv.Day1Set3Info += string.Format("{0,5:#.000}", run.time);
+                            if (string.IsNullOrEmpty(run.penalty) == false)
                             {
-                                drv.Day1Set3Info += "+" + run.Penalty;
+                                drv.Day1Set3Info += "+" + run.penalty;
                             }
                             drv.Day1Set3Info += ";";
 
-                            drv.Day1Set3.Runs.Add(run); // Add this run to the driver's list
+                            drv.Day1Set3.runs.Add(run); // Add this run to the driver's list
 
-                            if ((drv.Day1Set3.Runs.Count <= drv.MaxOfficialRuns) && (run.AdjustedRawTime < drv.Day1Set3.BestRAW))
+                            if ((drv.Day1Set3.runs.Count <= drv.maxOfficialRuns) && (run.adjustedRawTime < drv.Day1Set3.bestRAW))
                             {
-                                drv.Day1Set3.BestRAW = run.AdjustedRawTime;
-                                drv.Day1Set3.BestRun = run;
+                                drv.Day1Set3.bestRAW = run.adjustedRawTime;
+                                drv.Day1Set3.bestRun = run;
                             }
-                            if ((drv.Day1Set3.Runs.Count <= drv.MaxOfficialRuns) && (run.PAXtime < drv.Day1Set3.BestPAX))
+                            if ((drv.Day1Set3.runs.Count <= drv.maxOfficialRuns) && (run.PAXtime < drv.Day1Set3.bestPAX))
                             {
-                                drv.Day1Set3.BestPAX = run.PAXtime;
+                                drv.Day1Set3.bestPAX = run.PAXtime;
                             }
-                            drv.ConeCount += run.ConeCount;
-                            if (run.AdjustedRawTime >= DNFvalue)
+                            drv.coneCount += run.coneCount;
+                            if (run.adjustedRawTime >= DNFvalue)
                             {
                                 string dnfSeconds = configData.GetField("secondsForDNF", "Value");
-                                if (!int.TryParse(dnfSeconds, out int DNFpenalty))
+                                if (int.TryParse(dnfSeconds, out int DNFpenalty) == false)
                                 {
                                     DNFpenalty = 200;
                                 }
-                                drv.Day1Set3.BestSUM += DNFpenalty; // We count a DNF as 200 seconds
+                                drv.Day1Set3.bestSUM += DNFpenalty; // We count a DNF as 200 seconds
                             }
                             else
                             {
-                                drv.Day1Set3.BestSUM += run.AdjustedRawTime;
+                                drv.Day1Set3.bestSUM += run.adjustedRawTime;
                             }
                         }
                         else    // day 2
                         {
-                            if (drv.Day2Set3.BestSUM == DNFvalue)
-                                drv.Day2Set3.BestSUM = 0.0; // Actually exists, so reset from DNF
+                            if (drv.Day2Set3.bestSUM == DNFvalue)
+                                drv.Day2Set3.bestSUM = 0.0; // Actually exists, so reset from DNF
 
                             // some interesting stats
-                            if (stats.Day2.Set3TimeOfFirstRun == "")
+                            if (stats.day2.set3TimeOfFirstRun == "")
                             {
-                                stats.Day2.Set3TimeOfFirstRun = run.StartTime;
+                                stats.day2.set3TimeOfFirstRun = run.startTime;
                             }
-                            stats.Day2.Set3TimeOfLastRun = run.StartTime;
-                            stats.Day2.Set3NumberOfRuns += 1;
-                            stats.Day2.Set3TotalTime += run.Time;
-                            drv.Day2Set3Info += string.Format("{0,5:#.000}", run.Time);
-                            if (!string.IsNullOrEmpty(run.Penalty))
+                            stats.day2.set3TimeOfLastRun = run.startTime;
+                            stats.day2.set3NumberOfRuns += 1;
+                            stats.day2.set3TotalTime += run.time;
+                            drv.Day2Set3Info += string.Format("{0,5:#.000}", run.time);
+                            if (string.IsNullOrEmpty(run.penalty) == false)
                             {
-                                drv.Day2Set3Info += "+" + run.Penalty;
+                                drv.Day2Set3Info += "+" + run.penalty;
                             }
                             drv.Day2Set3Info += ";";
 
-                            drv.Day2Set3.Runs.Add(run); // Add this run to the driver's list
+                            drv.Day2Set3.runs.Add(run); // Add this run to the driver's list
 
-                            if ((drv.Day2Set3.Runs.Count <= drv.MaxOfficialRuns) && (run.AdjustedRawTime < drv.Day2Set3.BestRAW))
+                            if ((drv.Day2Set3.runs.Count <= drv.maxOfficialRuns) && (run.adjustedRawTime < drv.Day2Set3.bestRAW))
                             {
-                                drv.Day2Set3.BestRAW = run.AdjustedRawTime;
-                                drv.Day1Set3.BestRun = run;
+                                drv.Day2Set3.bestRAW = run.adjustedRawTime;
+                                drv.Day1Set3.bestRun = run;
                             }
-                            if ((drv.Day2Set3.Runs.Count <= drv.MaxOfficialRuns) && (run.PAXtime < drv.Day2Set3.BestPAX))
+                            if ((drv.Day2Set3.runs.Count <= drv.maxOfficialRuns) && (run.PAXtime < drv.Day2Set3.bestPAX))
                             {
-                                drv.Day2Set3.BestPAX = run.PAXtime;
+                                drv.Day2Set3.bestPAX = run.PAXtime;
                             }
-                            drv.ConeCount += run.ConeCount;
-                            if (run.AdjustedRawTime >= DNFvalue)
+                            drv.coneCount += run.coneCount;
+                            if (run.adjustedRawTime >= DNFvalue)
                             {
                                 string dnfSeconds = configData.GetField("secondsForDNF", "Value");
-                                if (!int.TryParse(dnfSeconds, out int DNFpenalty))
+                                if (int.TryParse(dnfSeconds, out int DNFpenalty) == false)
                                 {
                                     DNFpenalty = 200;
                                 }
-                                drv.Day2Set3.BestSUM += DNFpenalty; // We count a DNF as 200 seconds
+                                drv.Day2Set3.bestSUM += DNFpenalty; // We count a DNF as 200 seconds
                             }
                             else
                             {
-                                drv.Day2Set3.BestSUM += run.AdjustedRawTime;
+                                drv.Day2Set3.bestSUM += run.adjustedRawTime;
                             }
                         }
                     }
@@ -1697,161 +1697,161 @@ namespace RaceBeam
         /// Fix up run data
         /// </summary>
         /// <param name="args"></param>
-        public static void CalcRunTimes(ScoreArgs args)
+        public static void calcRunTimes(scoreArgs args)
         {
-            var myList = new List<KeyValuePair<string, DriverScoreData>>(scores);
+            var myList = new List<KeyValuePair<string, driverScoreData>>(scores);
 
-            foreach (KeyValuePair<string, DriverScoreData> driver in myList)
+            foreach (KeyValuePair<string, driverScoreData> driver in myList)
             {
-                if (driver.Value.LastName == "")
-                    driver.Value.LastName = "Unknown";
-                if (driver.Value.CarDescription.Length > 20)
+                if (driver.Value.lastName == "")
+                    driver.Value.lastName = "Unknown";
+                if (driver.Value.carDescription.Length > 20)
                 {
-                    driver.Value.CarDescription = driver.Value.CarDescription.Substring(0, 20);
+                    driver.Value.carDescription = driver.Value.carDescription.Substring(0, 20);
                 }
 
-                if (args.Set1Only)
+                if (args.set1Only == true)
                 {
                     // We use both days if they exist
-                    if ((driver.Value.Day2Set1.Runs.Count <= 0) && (string.IsNullOrEmpty(args.Day2)))
+                    if ((driver.Value.Day2Set1.runs.Count <= 0) && (string.IsNullOrEmpty(args.day2)))
                     {
-                        driver.Value.ScoreData.BestRAW = driver.Value.Day1Set1.BestRAW;
-                        driver.Value.ScoreData.BestPAX = driver.Value.Day1Set1.BestPAX;
-                        driver.Value.ScoreData.BestSUM = driver.Value.Day1Set1.BestRAW;
+                        driver.Value.scoreData.bestRAW = driver.Value.Day1Set1.bestRAW;
+                        driver.Value.scoreData.bestPAX = driver.Value.Day1Set1.bestPAX;
+                        driver.Value.scoreData.bestSUM = driver.Value.Day1Set1.bestRAW;
                     }
                     else
                     {
-                        driver.Value.ScoreData.BestRAW = driver.Value.Day1Set1.BestRAW + driver.Value.Day2Set1.BestRAW;
-                        driver.Value.ScoreData.BestPAX = driver.Value.Day1Set1.BestPAX + driver.Value.Day2Set1.BestPAX;
-                        driver.Value.ScoreData.BestSUM = driver.Value.Day1Set1.BestRAW + driver.Value.Day2Set1.BestRAW;
+                        driver.Value.scoreData.bestRAW = driver.Value.Day1Set1.bestRAW + driver.Value.Day2Set1.bestRAW;
+                        driver.Value.scoreData.bestPAX = driver.Value.Day1Set1.bestPAX + driver.Value.Day2Set1.bestPAX;
+                        driver.Value.scoreData.bestSUM = driver.Value.Day1Set1.bestRAW + driver.Value.Day2Set1.bestRAW;
                     }
                 }
-                else if (args.Set2Only)
+                else if (args.set2Only == true)
                 {
                     // We use both days if they exist
-                    if ((driver.Value.Day2Set2.Runs.Count <= 0) && (string.IsNullOrEmpty(args.Day2)))
+                    if ((driver.Value.Day2Set2.runs.Count <= 0) && (string.IsNullOrEmpty(args.day2)))
                     {
-                        driver.Value.ScoreData.BestRAW = driver.Value.Day1Set2.BestRAW;
-                        driver.Value.ScoreData.BestPAX = driver.Value.Day1Set2.BestPAX;
-                        driver.Value.ScoreData.BestSUM = driver.Value.Day1Set2.BestRAW;
+                        driver.Value.scoreData.bestRAW = driver.Value.Day1Set2.bestRAW;
+                        driver.Value.scoreData.bestPAX = driver.Value.Day1Set2.bestPAX;
+                        driver.Value.scoreData.bestSUM = driver.Value.Day1Set2.bestRAW;
                     }
                     else
                     {
-                        driver.Value.ScoreData.BestRAW = driver.Value.Day1Set2.BestRAW + driver.Value.Day2Set2.BestRAW;
-                        driver.Value.ScoreData.BestPAX = driver.Value.Day1Set2.BestPAX + driver.Value.Day2Set2.BestPAX;
-                        driver.Value.ScoreData.BestSUM = driver.Value.Day1Set2.BestRAW + driver.Value.Day2Set2.BestRAW;
+                        driver.Value.scoreData.bestRAW = driver.Value.Day1Set2.bestRAW + driver.Value.Day2Set2.bestRAW;
+                        driver.Value.scoreData.bestPAX = driver.Value.Day1Set2.bestPAX + driver.Value.Day2Set2.bestPAX;
+                        driver.Value.scoreData.bestSUM = driver.Value.Day1Set2.bestRAW + driver.Value.Day2Set2.bestRAW;
                     }
                 }
-                else if (args.Set1PlusSet2)
+                else if (args.set1PlusSet2 == true)
                 {
                     // both sets added together
                     // We use both days if they exist
-                    if ((driver.Value.Day2Set1.Runs.Count <= 0) && (string.IsNullOrEmpty(args.Day2)))
+                    if ((driver.Value.Day2Set1.runs.Count <= 0) && (string.IsNullOrEmpty(args.day2)))
                     {
-                        driver.Value.ScoreData.BestRAW = driver.Value.Day1Set1.BestRAW + driver.Value.Day1Set2.BestRAW;
-                        driver.Value.ScoreData.BestPAX = driver.Value.Day1Set1.BestPAX + driver.Value.Day1Set2.BestPAX;
-                        driver.Value.ScoreData.BestSUM = driver.Value.Day1Set1.BestRAW + driver.Value.Day1Set2.BestRAW;
+                        driver.Value.scoreData.bestRAW = driver.Value.Day1Set1.bestRAW + driver.Value.Day1Set2.bestRAW;
+                        driver.Value.scoreData.bestPAX = driver.Value.Day1Set1.bestPAX + driver.Value.Day1Set2.bestPAX;
+                        driver.Value.scoreData.bestSUM = driver.Value.Day1Set1.bestRAW + driver.Value.Day1Set2.bestRAW;
                     }
                     else
                     {
                         // two days, 4 sets
-                        driver.Value.ScoreData.BestRAW = driver.Value.Day1Set1.BestRAW + driver.Value.Day1Set2.BestRAW +
-                            driver.Value.Day2Set1.BestRAW + driver.Value.Day2Set2.BestRAW;
-                        driver.Value.ScoreData.BestPAX = driver.Value.Day1Set1.BestPAX + driver.Value.Day1Set2.BestPAX +
-                            driver.Value.Day2Set1.BestPAX + driver.Value.Day2Set2.BestPAX;
-                        driver.Value.ScoreData.BestSUM = driver.Value.Day1Set1.BestRAW + driver.Value.Day1Set2.BestRAW +
-                            driver.Value.Day2Set1.BestRAW + driver.Value.Day2Set2.BestRAW;
+                        driver.Value.scoreData.bestRAW = driver.Value.Day1Set1.bestRAW + driver.Value.Day1Set2.bestRAW +
+                            driver.Value.Day2Set1.bestRAW + driver.Value.Day2Set2.bestRAW;
+                        driver.Value.scoreData.bestPAX = driver.Value.Day1Set1.bestPAX + driver.Value.Day1Set2.bestPAX +
+                            driver.Value.Day2Set1.bestPAX + driver.Value.Day2Set2.bestPAX;
+                        driver.Value.scoreData.bestSUM = driver.Value.Day1Set1.bestRAW + driver.Value.Day1Set2.bestRAW +
+                            driver.Value.Day2Set1.bestRAW + driver.Value.Day2Set2.bestRAW;
                     }
                 }
-                else if (args.BestSingleRun)
+                else if (args.bestSingleRun == true)
                 {
                     // We use the best run of the official sets
-                    if ((driver.Value.Day2Set1.Runs.Count <= 0) && (string.IsNullOrEmpty(args.Day2)))
+                    if ((driver.Value.Day2Set1.runs.Count <= 0) && (string.IsNullOrEmpty(args.day2)))
                     {
                         // best run of the two sets
-                        if (driver.Value.Day1Set1.BestPAX < driver.Value.Day1Set2.BestPAX)
+                        if (driver.Value.Day1Set1.bestPAX < driver.Value.Day1Set2.bestPAX)
                         {
-                            driver.Value.ScoreData.BestPAX = driver.Value.Day1Set1.BestPAX;
+                            driver.Value.scoreData.bestPAX = driver.Value.Day1Set1.bestPAX;
                         }
                         else
                         {
-                            driver.Value.ScoreData.BestPAX = driver.Value.Day1Set2.BestPAX;
+                            driver.Value.scoreData.bestPAX = driver.Value.Day1Set2.bestPAX;
                         }
-                        if (driver.Value.Day1Set1.BestRAW < driver.Value.Day1Set2.BestRAW)
+                        if (driver.Value.Day1Set1.bestRAW < driver.Value.Day1Set2.bestRAW)
                         {
-                            driver.Value.ScoreData.BestRAW = driver.Value.Day1Set1.BestRAW;
-                        }
-                        else
-                        {
-                            driver.Value.ScoreData.BestRAW = driver.Value.Day1Set2.BestRAW;
-                        }
-                        if (driver.Value.Day1Set1.BestSUM < driver.Value.Day1Set2.BestSUM)
-                        {
-                            driver.Value.ScoreData.BestSUM = driver.Value.Day1Set1.BestSUM;
+                            driver.Value.scoreData.bestRAW = driver.Value.Day1Set1.bestRAW;
                         }
                         else
                         {
-                            driver.Value.ScoreData.BestSUM = driver.Value.Day1Set2.BestSUM;
+                            driver.Value.scoreData.bestRAW = driver.Value.Day1Set2.bestRAW;
+                        }
+                        if (driver.Value.Day1Set1.bestSUM < driver.Value.Day1Set2.bestSUM)
+                        {
+                            driver.Value.scoreData.bestSUM = driver.Value.Day1Set1.bestSUM;
+                        }
+                        else
+                        {
+                            driver.Value.scoreData.bestSUM = driver.Value.Day1Set2.bestSUM;
                         }
                     }
                     else
                     {
                         // 2 day event, so we total the best run from each day
                         // best run of the two sets
-                        if (driver.Value.Day1Set1.BestPAX < driver.Value.Day1Set2.BestPAX)
+                        if (driver.Value.Day1Set1.bestPAX < driver.Value.Day1Set2.bestPAX)
                         {
-                            driver.Value.ScoreData.BestPAX = driver.Value.Day1Set1.BestPAX;
-                            if (driver.Value.Day2Set1.BestPAX < driver.Value.Day2Set2.BestPAX)
+                            driver.Value.scoreData.bestPAX = driver.Value.Day1Set1.bestPAX;
+                            if (driver.Value.Day2Set1.bestPAX < driver.Value.Day2Set2.bestPAX)
                             {
-                                driver.Value.ScoreData.BestPAX += driver.Value.Day2Set1.BestPAX;
+                                driver.Value.scoreData.bestPAX += driver.Value.Day2Set1.bestPAX;
                             }
                             else
                             {
-                                driver.Value.ScoreData.BestPAX += driver.Value.Day2Set2.BestPAX;
+                                driver.Value.scoreData.bestPAX += driver.Value.Day2Set2.bestPAX;
                             }
                         }
                         else
                         {
-                            driver.Value.ScoreData.BestPAX = driver.Value.Day1Set2.BestPAX;
-                            if (driver.Value.Day2Set1.BestPAX < driver.Value.Day2Set2.BestPAX)
+                            driver.Value.scoreData.bestPAX = driver.Value.Day1Set2.bestPAX;
+                            if (driver.Value.Day2Set1.bestPAX < driver.Value.Day2Set2.bestPAX)
                             {
-                                driver.Value.ScoreData.BestPAX += driver.Value.Day2Set1.BestPAX;
+                                driver.Value.scoreData.bestPAX += driver.Value.Day2Set1.bestPAX;
                             }
                             else
                             {
-                                driver.Value.ScoreData.BestPAX += driver.Value.Day2Set2.BestPAX;
+                                driver.Value.scoreData.bestPAX += driver.Value.Day2Set2.bestPAX;
                             }
                         }
-                        if (driver.Value.Day1Set1.BestRAW < driver.Value.Day1Set2.BestRAW)
+                        if (driver.Value.Day1Set1.bestRAW < driver.Value.Day1Set2.bestRAW)
                         {
-                            driver.Value.ScoreData.BestRAW = driver.Value.Day1Set1.BestRAW;
-                            if (driver.Value.Day2Set1.BestRAW < driver.Value.Day2Set2.BestRAW)
+                            driver.Value.scoreData.bestRAW = driver.Value.Day1Set1.bestRAW;
+                            if (driver.Value.Day2Set1.bestRAW < driver.Value.Day2Set2.bestRAW)
                             {
-                                driver.Value.ScoreData.BestRAW += driver.Value.Day2Set1.BestRAW;
+                                driver.Value.scoreData.bestRAW += driver.Value.Day2Set1.bestRAW;
                             }
                             else
                             {
-                                driver.Value.ScoreData.BestRAW += driver.Value.Day2Set2.BestRAW;
+                                driver.Value.scoreData.bestRAW += driver.Value.Day2Set2.bestRAW;
                             }
                         }
                         else
                         {
-                            driver.Value.ScoreData.BestRAW = driver.Value.Day1Set2.BestRAW;
-                            if (driver.Value.Day2Set1.BestRAW < driver.Value.Day2Set2.BestRAW)
+                            driver.Value.scoreData.bestRAW = driver.Value.Day1Set2.bestRAW;
+                            if (driver.Value.Day2Set1.bestRAW < driver.Value.Day2Set2.bestRAW)
                             {
-                                driver.Value.ScoreData.BestRAW += driver.Value.Day2Set1.BestRAW;
+                                driver.Value.scoreData.bestRAW += driver.Value.Day2Set1.bestRAW;
                             }
                             else
                             {
-                                driver.Value.ScoreData.BestRAW += driver.Value.Day2Set2.BestRAW;
+                                driver.Value.scoreData.bestRAW += driver.Value.Day2Set2.bestRAW;
                             }
                         }
                     }
                 }
                 // Adjust PAX for DNS values
-                if (driver.Value.ScoreData.BestRAW >= DNFvalue)
+                if (driver.Value.scoreData.bestRAW >= DNFvalue)
                 {
-                    driver.Value.ScoreData.BestRAW = DNFvalue;
+                    driver.Value.scoreData.bestRAW = DNFvalue;
                 }
             }
         }
@@ -1865,22 +1865,22 @@ namespace RaceBeam
         /// <param name="penalty"></param>
         /// <param name="PAX"></param>
         /// <returns></returns>
-        public static double AdjustTime(double rawtime, string penalty, double PAX)
+        public static double adjustTime(double rawtime, string penalty, double PAX)
         {
             if (penalty == "DNF")
             {
                 return DNFvalue;
             }
             string conePen = configData.GetField("ConePenalySeconds", "Value");
-            if (!int.TryParse(conePen, out int conePenalty))
+            if (int.TryParse(conePen, out int conePenalty) == false)
             {
                 conePenalty = 2;
             }
 
             double totalTime = rawtime * PAX;
-            if (int.TryParse(penalty, out int cones))
+            if (int.TryParse(penalty, out int cones) == true)
             {
-                if (ConesGetPAXed)
+                if (ConesGetPAXed == true)
                 {
                     totalTime = (rawtime + (cones * conePenalty)) * PAX;
                 }
@@ -1897,7 +1897,7 @@ namespace RaceBeam
         /// </summary>
         /// <param name="numDrivers"></param>
         /// <returns></returns>
-        public static int TrophyCount(int numDrivers)
+        public static int trophyCount(int numDrivers)
         {
             if (numDrivers == 0) return 0;
             if (numDrivers <= 3) return 1;
@@ -1932,7 +1932,7 @@ namespace RaceBeam
                     return 1;
                 }
                 string pointString = points[position];
-                if (!int.TryParse(pointString, out int pointValue))
+                if (int.TryParse(pointString, out int pointValue) == false)
                 {
                     return 1;
                 }
@@ -1968,16 +1968,16 @@ namespace RaceBeam
             while (i < input.Length && char.IsDigit(input[i])) i++;
 
             input = input.Substring(0, i);
-            if (!int.TryParse(input, out int value))
+            if (int.TryParse(input, out int value) == false)
             {
                 return 0;
             }
             return value;
         }
 
-        public static int CalcCones(string penalty)
+        public static int calcCones(string penalty)
         {
-            if (int.TryParse(penalty, out int cones))
+            if (int.TryParse(penalty, out int cones) == true)
             {
                 return cones;
             }

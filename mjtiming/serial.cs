@@ -97,7 +97,7 @@ namespace RaceBeam
                 secondaryDisplayPortName = configData.GetField("secondaryDisplayPort", "Value");
                 string reverseDigits = configData.GetField("reverseDisplayDigits", "Value");
                 reverseDigits = reverseDigits.ToUpperInvariant();
-                if (!string.IsNullOrEmpty(reverseDigits) && reverseDigits.StartsWith("Y"))
+                if ((string.IsNullOrEmpty(reverseDigits) == false) && (reverseDigits.StartsWith("Y") == true))
                 {
                     reverseDisplayDigits = true;
                 }
@@ -107,7 +107,7 @@ namespace RaceBeam
                 }
 
                 string timeoutString = configData.GetField("serialTimeoutMS", "Value");
-                if (!int.TryParse(timeoutString, out int readTimeout))
+                if (int.TryParse(timeoutString, out int readTimeout) == false)
                 {
                     readTimeout = 100;
                 }
@@ -143,12 +143,12 @@ namespace RaceBeam
         {
             try
             {
-                if ((TimerComPort != null) && TimerComPort.IsOpen)
+                if ((TimerComPort != null) && (TimerComPort.IsOpen == true))
                 {
                     TimerComPort.Close();
                     TimerComPort = null;
                 }
-                if ((DisplayComPort != null) && DisplayComPort.IsOpen)
+                if ((DisplayComPort != null) && (DisplayComPort.IsOpen == true))
                 {
                     DisplayComPort.Close();
                     DisplayComPort = null;
@@ -167,7 +167,7 @@ namespace RaceBeam
 
             // Parse up time string and get into a 6 digit form
             // Display sign wants 0x80 followed by 6 digits in reverse: 0x80FFF.SSS
-            if (!timestr.Contains('.'))
+            if (timestr.Contains('.') == false)
             {
                 timestr += ".000";
             }
@@ -196,14 +196,14 @@ namespace RaceBeam
             Array.Reverse(timeArr);
 
             // check for need to reverse digits for this display
-            if (reverseDisplayDigits)
+            if (reverseDisplayDigits == true)
             {
                 Array.Reverse(timeArr);
             }
             // Convert penalty into a single byte
             // 0-8 is cone count, 9 is a DNF
             string penaltyString;
-            if (string.IsNullOrEmpty(timeData.penalty))
+            if (string.IsNullOrEmpty(timeData.penalty) == true)
             {
                 penaltyString = "0";
             }
@@ -213,13 +213,13 @@ namespace RaceBeam
             }
             // Default to no penalty (ascii '0')
             var penalty = System.Text.Encoding.UTF8.GetBytes("0");
-            if (!string.IsNullOrEmpty(penaltyString))
+            if (string.IsNullOrEmpty(penaltyString) == false)
             {
                 if (penaltyString.Contains("D"))
                 {
                     penalty[0] += 9;
                 }
-                if (int.TryParse(penaltyString, out int iVal))
+                if (int.TryParse(penaltyString, out int iVal) == true)
                 {
                     if (iVal > 8)
                     {
@@ -235,7 +235,7 @@ namespace RaceBeam
             var dbuf = System.Text.Encoding.UTF8.GetBytes(timeArr);
             var header = new byte[1];
             var trailer = new byte[2];
-            if (!sendPenalty)
+            if (sendPenalty == false)
             {
                 header[0] = 0x80;  //Race America header
             }
@@ -248,7 +248,7 @@ namespace RaceBeam
             // Primary display first
             try
             {
-                if (string.IsNullOrEmpty(DisplayPortName))
+                if (string.IsNullOrEmpty(DisplayPortName) == true)
                 {
                     return;
                 }
@@ -256,7 +256,7 @@ namespace RaceBeam
                 if ((DisplayPortName != TimerPortName) && (DisplayPortName != ""))
                 {
                     // First see if we have to open the display port
-                    if ((DisplayComPort == null) || !DisplayComPort.IsOpen)
+                    if ((DisplayComPort == null) || (DisplayComPort.IsOpen == false))
                     {
                         DisplayComPort = new SerialPort(DisplayPortName, 9600, Parity.None, 8, StopBits.One)
                         {
@@ -281,7 +281,7 @@ namespace RaceBeam
                 else
                 {
                     // Same port as timer -- we don't play with that serial port here
-                    if ((TimerComPort != null) && TimerComPort.IsOpen)
+                    if ((TimerComPort != null) && (TimerComPort.IsOpen == true))
                     {
                         // Port is open, so send the message
                         TimerComPort.Write(header, 0, header.Length);
@@ -305,7 +305,7 @@ namespace RaceBeam
             // Secondary display
             try
             {
-                if (string.IsNullOrEmpty(secondaryDisplayPortName))
+                if (string.IsNullOrEmpty(secondaryDisplayPortName) == true)
                 {
                     return;
                 }
@@ -313,7 +313,7 @@ namespace RaceBeam
                 if ((secondaryDisplayPortName != TimerPortName) && (secondaryDisplayPortName != ""))
                 {
                     // First see if we have to open the display port
-                    if ((secondaryDisplayComPort == null) || !secondaryDisplayComPort.IsOpen)
+                    if ((secondaryDisplayComPort == null) || (secondaryDisplayComPort.IsOpen == false))
                     {
                         secondaryDisplayComPort = new SerialPort(secondaryDisplayPortName, 9600, Parity.None, 8, StopBits.One)
                         {
@@ -329,7 +329,7 @@ namespace RaceBeam
                     //showMsg("Sending time out display port: " + timestr + "\n");
                     secondaryDisplayComPort.Write(header, 0, header.Length);
                     secondaryDisplayComPort.Write(dbuf, 0, dbuf.Length);
-                    if (sendPenalty)
+                    if (sendPenalty == true)
                     {
                         TimerComPort.Write(penalty, 0, penalty.Length);
                     }
@@ -338,12 +338,12 @@ namespace RaceBeam
                 else
                 {
                     // Same port as timer -- we don't play with that serial port here
-                    if ((TimerComPort != null) && TimerComPort.IsOpen)
+                    if ((TimerComPort != null) && (TimerComPort.IsOpen == true))
                     {
                         // Port is open, so send the message
                         TimerComPort.Write(header, 0, header.Length);
                         TimerComPort.Write(dbuf, 0, dbuf.Length);
-                        if (sendPenalty)
+                        if (sendPenalty == true)
                         {
                             TimerComPort.Write(penalty, 0, penalty.Length);
                         }
@@ -468,10 +468,10 @@ namespace RaceBeam
 
             // Extract any start or stop events in buffer
             m = reg.Match(inputBuffer);
-            if (!m.Success)
+            if (m.Success == false)
             {
                 // Probably an info message from the receiver (we get a bunch)
-                if (configData.GetField("logTimingMessages", "Value").Contains("Y"))
+                if (configData.GetField("logTimingMessages", "Value").Contains("Y") == true)
                 {
                     showMsg(inputBuffer + "\n");
                 }
@@ -480,7 +480,7 @@ namespace RaceBeam
 
             GroupCollection g = m.Groups;
             string sval = g[2].Value;
-            if (!uint.TryParse(sval, out uint time))
+            if (uint.TryParse(sval, out uint time) == false)
             {
                 showMsg("Received invalid time string: " + inputBuffer + "\n");
                 return;
@@ -520,7 +520,7 @@ namespace RaceBeam
             }
 
             inputBuffer = inputBuffer.Trim();
-            if (configData.GetField("logTimingMessages", "Value").Contains("Y"))
+            if (configData.GetField("logTimingMessages", "Value").Contains("Y") == true)
             {
                 showMsg("barcode data: " + inputBuffer + "\n");
             }
@@ -548,7 +548,7 @@ namespace RaceBeam
             }
             catch
             {
-                if (!string.IsNullOrEmpty(barcodePortName))
+                if (string.IsNullOrEmpty(barcodePortName) == false)
                 {
                     showMsg("Unable to open barcode port: " + barcodePortName + "\n");
                 }
@@ -560,7 +560,7 @@ namespace RaceBeam
         {
             try
             {
-                if ((barcodePortName != null) && (barcodeComPort.IsOpen))
+                if ((barcodePortName != null) && (barcodeComPort.IsOpen == true))
                 {
                     barcodeComPort.Close();
                     barcodeComPort = null;

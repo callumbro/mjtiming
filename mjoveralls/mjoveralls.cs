@@ -117,7 +117,7 @@ namespace RaceBeam
                 else if (args[i] == "-best")
                 {
                     i += 1;
-                    if (!int.TryParse(args[i], out numDays))
+                    if (int.TryParse(args[i], out numDays) == false)
                     {
                         Usage();
                     }
@@ -125,7 +125,7 @@ namespace RaceBeam
                 else if (args[i] == "-rookiebest")
                 {
                     i += 1;
-                    if (!int.TryParse(args[i], out numRookieDays))
+                    if (int.TryParse(args[i], out numRookieDays) == false)
                     {
                         Usage();
                     }
@@ -201,7 +201,7 @@ namespace RaceBeam
             PrintData(false, false);
 
             // raw data, rookie
-            if (doRookie)
+            if (doRookie == true)
             {
 
                 CalcData(false, true);
@@ -216,7 +216,7 @@ namespace RaceBeam
             PrintData(true, false);
 
             // pax data, rookie
-            if (doRookie)
+            if (doRookie == true)
             {
                 CalcData(true, true);
                 Console.WriteLine("");
@@ -226,7 +226,7 @@ namespace RaceBeam
             // class scores
             CalcData(true, false);
             Console.WriteLine(ClassScores(false)); // everyone
-            if (doRookie)
+            if (doRookie == true)
             {
                 CalcData(true, true);
                 Console.WriteLine(ClassScores(true)); // rookie
@@ -268,7 +268,7 @@ namespace RaceBeam
                 {
                     break;
                 }
-                if (membersOnly && !driver.Value.member.ToUpperInvariant().Contains("Y"))
+                if ((membersOnly == true) && (driver.Value.member.ToUpperInvariant().Contains("Y") == false))
                 {
                     continue;
                 }
@@ -350,9 +350,9 @@ namespace RaceBeam
                     KeyValuePair<string, DriverData> firstPair,
                     KeyValuePair<string, DriverData> nextPair)
                 {
-                    if (isPAX)
+                    if (isPAX == true)
                     {
-                        if (isRookie)
+                        if (isRookie == true)
                         {
                             return nextPair.Value.totalRookiePAX.CompareTo(firstPair.Value.totalRookiePAX);
                         }
@@ -363,7 +363,7 @@ namespace RaceBeam
                     }
                     else
                     {
-                        if (isRookie)
+                        if (isRookie == true)
                         {
                             return nextPair.Value.totalRookieRAW.CompareTo(firstPair.Value.totalRookieRAW);
                         }
@@ -376,9 +376,9 @@ namespace RaceBeam
 
             // print header line
             Console.Write(separator);
-            if (isPAX)
+            if (isPAX == true)
             {
-                if (isRookie)
+                if (isRookie == true)
                 {
                     Console.WriteLine("Rookie-only PAX scores");
                 }
@@ -389,7 +389,7 @@ namespace RaceBeam
             }
             else
             {
-                if (isRookie)
+                if (isRookie == true)
                 {
                     Console.WriteLine("Rookie-only RAW scores");
                 }
@@ -404,7 +404,7 @@ namespace RaceBeam
             {
                 Console.Write("{0,10} ", name);
             }
-            if (isRookie)
+            if (isRookie == true)
                 Console.WriteLine("    Best {0}", numRookieDays.ToString());
             else
                 Console.WriteLine("    Best {0}", numDays.ToString());
@@ -414,14 +414,14 @@ namespace RaceBeam
             foreach (KeyValuePair<string, DriverData> driver in myList)
             {
                 string rookie = driver.Value.rookie.ToUpperInvariant();
-                if (isRookie && !rookie.Contains("Y"))
+                if ((isRookie == true) && (rookie.Contains("Y") == false))
                 {
                     continue;
                 }
                 // don't print out people with 0 scores (say 1 event with a DNS)
-                if (isPAX)
+                if (isPAX == true)
                 {
-                    if (isRookie && (driver.Value.totalRookiePAX <= 0.0))
+                    if ((isRookie == true) && (driver.Value.totalRookiePAX <= 0.0))
                     {
                         break;
                     }
@@ -438,7 +438,7 @@ namespace RaceBeam
                     }
                 }
                 string member = driver.Value.member.ToUpperInvariant();
-                if (membersOnly && !member.Contains("Y"))
+                if ((membersOnly == true) && (member.Contains("Y") == false))
                 {
                     continue;
                 }
@@ -450,16 +450,16 @@ namespace RaceBeam
 
                 foreach (string eventName in eventNames)
                 {
-                    if (!driver.Value.overallScores.ContainsKey(eventName))
+                    if (driver.Value.overallScores.ContainsKey(eventName) == false)
                     {
                         // never attended
                         line = string.Format(" {0,10:#0.000}", 0.00);
                     }
                     else
                     {
-                        if (isPAX)
+                        if (isPAX == true)
                         {
-                            if (isRookie)
+                            if (isRookie == true)
                             {
                                 line = string.Format(" {0,10:#0.000}", driver.Value.overallScores[eventName].rookiePAXScore);
                             }
@@ -470,7 +470,7 @@ namespace RaceBeam
                         }
                         else
                         {
-                            if (isRookie)
+                            if (isRookie == true)
                             {
                                 line = string.Format(" {0,10:#0.000}", driver.Value.overallScores[eventName].rookieRAWScore);
                             }
@@ -482,9 +482,9 @@ namespace RaceBeam
                     }
                     Console.Write(line);
                 }
-                if (isPAX)
+                if (isPAX == true)
                 {
-                    if (isRookie)
+                    if (isRookie == true)
                     {
                         line = string.Format("  {0,10:#0.000}", driver.Value.totalRookiePAX);
                     }
@@ -495,7 +495,7 @@ namespace RaceBeam
                 }
                 else
                 {
-                    if (isRookie)
+                    if (isRookie == true)
                     {
                         line = string.Format("  {0,10:#0.000}", driver.Value.totalRookieRAW);
                     }
@@ -529,9 +529,9 @@ namespace RaceBeam
                         EventScore first,
                         EventScore next)
                     {
-                        if (isPAX)
+                        if (isPAX == true)
                         {
-                            if (isRookie)
+                            if (isRookie == true)
                             {
                                 return next.rookiePAXScore.CompareTo(first.rookiePAXScore);
                             }
@@ -542,7 +542,7 @@ namespace RaceBeam
                         }
                         else
                         {
-                            if (isRookie)
+                            if (isRookie == true)
                             {
                                 return next.rookieRAWScore.CompareTo(first.rookieRAWScore);
                             }
@@ -555,7 +555,7 @@ namespace RaceBeam
 
                 // Add up scores until we hit the "best N" count
                 int bestCount = numDays;
-                if (isRookie)
+                if (isRookie == true)
                 {
                     bestCount = numRookieDays;
                 }
@@ -576,7 +576,7 @@ namespace RaceBeam
                 foreach (string grp in driver.groupScores.Keys)
                 {
                     bestCount = numDays;
-                    if (isRookie)
+                    if (isRookie == true)
                     {
                         bestCount = numRookieDays;
                     }
@@ -588,7 +588,7 @@ namespace RaceBeam
                             EventScore first,
                             EventScore next)
                         {
-                            if (isRookie)
+                            if (isRookie == true)
                             {
                                 return next.groupRookieScore.CompareTo(first.groupRookieScore);
                             }
@@ -598,7 +598,7 @@ namespace RaceBeam
                             }
                         });
 
-                    if (isRookie)
+                    if (isRookie == true)
                     {
                         bestCount = numRookieDays;
                         driver.groupScores[grp].totalRookiePAX = 0.0;
@@ -610,7 +610,7 @@ namespace RaceBeam
                     }
                     foreach (EventScore evScore in myList)
                     {
-                        if (isRookie)
+                        if (isRookie == true)
                         {
                             driver.groupScores[grp].totalRookiePAX += evScore.groupRookieScore;
                         }
@@ -642,21 +642,21 @@ namespace RaceBeam
                 var reg = new Regex(@".*(\d\d_\d\d_\d\d.*)_CSVData.csv");
                 Match m;
                 m = reg.Match(scorefile);
-                if (!m.Success)
+                if (m.Success == false)
                 {
                     Console.WriteLine("Unable to parse:" + scorefile);
                     return "";
                 }
                 GroupCollection g = m.Groups;
                 string eventName = g[1].Value;
-                if (!eventNames.Contains(eventName))
+                if (eventNames.Contains(eventName) == false)
                 {
                     eventNames.Add(eventName);
                 }
 
                 var ev = new CSVData();
                 ev.LoadData(scorefile, ',', "Car#");
-                foreach (string carnum in ev.GetKeys())
+                foreach (string carnum in ev.getKeys())
                 {
                     DriverData driver;
                     // Each event is keyed by car number, but we will key the overalls by the driver's full name
@@ -668,7 +668,7 @@ namespace RaceBeam
                     {
                         continue;
                     }
-                    if (!scores.ContainsKey(driverName))
+                    if (scores.ContainsKey(driverName) == false)
                     {
                         driver = new DriverData
                         {
@@ -679,13 +679,13 @@ namespace RaceBeam
                             member = "N",
                             totalEvents = 1
                         };
-                        if (ev.GetField(carnum, "Mbr").ToUpperInvariant().Contains("Y"))
+                        if (ev.GetField(carnum, "Mbr").ToUpperInvariant().Contains("Y") == true)
                         {
                             driver.member = "Y";
                         }
                         driver.rookie = "N";
                         string rk = ev.GetField(carnum, "Rky").ToUpperInvariant();
-                        if (rk.Contains("Y") || rk.Contains("TRUE"))
+                        if ((rk.Contains("Y") == true) || (rk.Contains("TRUE")))
                         {
                             driver.rookie = "Y";
                         }
@@ -699,7 +699,7 @@ namespace RaceBeam
                         driver = scores[driverName];
                         driver.totalEvents += 1;
                         string mem = "N";
-                        if (ev.GetField(carnum, "Mbr").ToUpperInvariant().Contains("Y"))
+                        if (ev.GetField(carnum, "Mbr").ToUpperInvariant().Contains("Y") == true)
                         {
                             mem = "Y";
                         }
@@ -711,7 +711,7 @@ namespace RaceBeam
                                                   "( " + driver.member + " to " + mem + " )");
                         }
                         string rook = "N";
-                        if (ev.GetField(carnum, "Rky").ToUpperInvariant().Contains("Y"))
+                        if (ev.GetField(carnum, "Rky").ToUpperInvariant().Contains("Y") == true)
                         {
                             rook = "Y";
                         }
@@ -737,7 +737,7 @@ namespace RaceBeam
                     string cones = ev.GetField(carnum, "Cones");
                     _ = int.TryParse(cones, out evScores.coneCount);
 
-                    if (!driver.overallScores.ContainsKey(eventName))
+                    if (driver.overallScores.ContainsKey(eventName) == false)
                     {
                         driver.overallScores.Add(eventName, evScores);
                     }
@@ -756,7 +756,7 @@ namespace RaceBeam
                         }
                         // Get groupScore ptr (or create one if this is the first occurrence)
                         GroupScore grpscore;
-                        if (!driver.groupScores.ContainsKey(grpname))
+                        if (driver.groupScores.ContainsKey(grpname) == false)
                         {
                             grpscore = new GroupScore
                             {
@@ -793,7 +793,7 @@ namespace RaceBeam
         {
             string results = separator;
 
-            if (isRookie)
+            if (isRookie == true)
             {
                 results += "Rookie-only group/class scores\r\n";
             }
@@ -805,7 +805,7 @@ namespace RaceBeam
             // First build a sorted class list
             // Sort order is given in the csv file
             var sortedClassList = new SortedDictionary<int, PaxInfo>();
-            List<string> classList = classData.GetKeys();
+            List<string> classList = classData.getKeys();
             foreach (string className in classList)
             {
                 var p = new PaxInfo
@@ -816,7 +816,7 @@ namespace RaceBeam
                     group = classData.GetField(className, "Group"),
                     displayOrder = classData.GetField(className, "Display Order")
                 };
-                if (!int.TryParse(p.displayOrder, out int orderVal))
+                if (int.TryParse(p.displayOrder, out int orderVal) == false)
                 {
                     results += string.Format("Display order value for class " + p.carClass + " is not a valid integer\r\n");
                 }
@@ -848,7 +848,7 @@ namespace RaceBeam
                 foreach (string driverName in scores.Keys)
                 {
                     DriverData driver = scores[driverName];
-                    if (isRookie && !driver.rookie.ToUpperInvariant().Contains("Y"))
+                    if ((isRookie == true) && (driver.rookie.ToUpperInvariant().Contains("Y") == false))
                     {
                         continue;
                     }
@@ -869,7 +869,7 @@ namespace RaceBeam
                         DriverData first,
                         DriverData next)
                     {
-                        if (isRookie)
+                        if (isRookie == true)
                         {
                             return next.groupScores[curClass.carClass].totalRookiePAX.CompareTo(first.groupScores[curClass.carClass].totalRookiePAX);
                         }
@@ -881,11 +881,11 @@ namespace RaceBeam
 
                 foreach (DriverData driver in drvList)
                 {
-                    if (isRookie && !driver.rookie.ToUpperInvariant().Contains("Y"))
+                    if ((isRookie == true) && (driver.rookie.ToUpperInvariant().Contains("Y") == false))
                     {
                         continue;
                     }
-                    if (membersOnly && !driver.member.ToUpperInvariant().Contains("Y"))
+                    if ((membersOnly == true) && (driver.member.ToUpperInvariant().Contains("Y") == false))
                     {
                         continue;
                     }
@@ -918,13 +918,13 @@ namespace RaceBeam
                     // Driver score dict has gaps -- not all events attended
                     foreach (string eventName in eventNames)
                     {
-                        if (!driver.groupScores[curClass.carClass].eventScores.ContainsKey(eventName))
+                        if (driver.groupScores[curClass.carClass].eventScores.ContainsKey(eventName) == false)
                         {
                             results += string.Format(" {0,10:#0.000}", 0.00);
                         }
                         else
                         {
-                            if (isRookie)
+                            if (isRookie == true)
                             {
                                 results += string.Format(" {0,10:#0.000}", driver.groupScores[curClass.carClass].eventScores[eventName].groupRookieScore);
                             }
@@ -935,7 +935,7 @@ namespace RaceBeam
                         }
                     }
                     // Now the best N event total
-                    if (isRookie)
+                    if (isRookie == true)
                     {
                         results += string.Format(" {0,10:#0.000}", driver.groupScores[curClass.carClass].totalRookiePAX);
                     }

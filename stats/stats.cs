@@ -53,7 +53,7 @@ namespace RaceBeam
                     string iStart = i.ToString();
                     string iLastStart = (i - 1).ToString();
                     string carNum = rdata.GetField(iStart, "car_number");
-                    if (!driverNums.ContainsKey(carNum))
+                    if (driverNums.ContainsKey(carNum) == false)
                     {
                         driverNums.Add(carNum, 1);
                     }
@@ -67,7 +67,7 @@ namespace RaceBeam
                     {
                         totalDNFs += 1;
                     }
-                    if (int.TryParse(penalty, out int cones))
+                    if (int.TryParse(penalty, out int cones) == true)
                     {
                         totalCones += cones;
                     }

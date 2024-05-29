@@ -16,7 +16,7 @@ namespace RaceBeam
     {
         CSVData driverData = new CSVData();
         string driverPath = "";
-        private readonly System.Collections.Generic.Dictionary<int, int> dispOrder = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> dispOrder = new Dictionary<int, int>();
         bool dataModified = false;
         int lastFindIndex = 0;
         string lastFindText = "";
@@ -26,8 +26,8 @@ namespace RaceBeam
             this.Closing += new System.ComponentModel.CancelEventHandler(RegForm_Closing);
             drivers.CellValidating += new DataGridViewCellValidatingEventHandler(Drivers_CellValidating);
             drivers.CellValidated += new DataGridViewCellEventHandler(Drivers_CellValidated);
-            drivers.SortCompare += new System.Windows.Forms.DataGridViewSortCompareEventHandler(this.Drivers_SortCompare);
-            drivers.UserDeletingRow += new System.Windows.Forms.DataGridViewRowCancelEventHandler(this.Drivers_UserDeletingRow);
+            drivers.SortCompare += new DataGridViewSortCompareEventHandler(this.Drivers_SortCompare);
+            drivers.UserDeletingRow += new DataGridViewRowCancelEventHandler(this.Drivers_UserDeletingRow);
             LoadRegData();
 
             DataGridViewColumnCollection cols = drivers.Columns;
@@ -49,8 +49,10 @@ namespace RaceBeam
             }
             drivers.AllowUserToResizeColumns = true;
         }
-        // ----------------------------------------------------------------------
-        // Save data to driver file
+
+        /// <summary>
+        /// Save data to driver file
+        /// </summary>
         void SaveRegData()
         {
             string row;
@@ -60,7 +62,7 @@ namespace RaceBeam
             if (driverPath == "")
             {
                 MessageBox.Show("Driver data file not defined in config file");
-                System.Environment.Exit(0);
+                Environment.Exit(0);
             }
             // We must ensure that "Number" is the first column saved.
             // Order of the remainder is unimportant (but leave as user arranged them)
@@ -143,14 +145,14 @@ namespace RaceBeam
                 // not interested in any errors
             }
         }
-        // ----------------------------------------------------------------------
+
         public void LoadRegData()
         {
             driverPath = configData.GetField("driverDataFile", "Value");
             if (driverPath == "")
             {
                 MessageBox.Show("Driver data file not defined in config file");
-                System.Environment.Exit(0);
+                Environment.Exit(0);
             }
             driverData = new CSVData();
 
@@ -158,7 +160,7 @@ namespace RaceBeam
             if (err != "")
             {
                 MessageBox.Show("Unable to load registration file: " + err);
-                System.Environment.Exit(0);
+                Environment.Exit(0);
             }
             drivers.Rows.Clear();
             drivers.Columns.Clear();
@@ -166,26 +168,26 @@ namespace RaceBeam
             int i = 0;
             foreach (string col in columns)
             {
-                if (drivers.Columns.Contains(col))
+                if (drivers.Columns.Contains(col) == true)
                 {
                     continue;
                 }
                 drivers.Columns.Add(col, col);
                 drivers.Columns[i++].MinimumWidth = 40; //AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             }
-            if (!drivers.Columns.Contains("Barcode"))
+            if (drivers.Columns.Contains("Barcode") == false)
             {
                 drivers.Columns.Add("Barcode", "Barcode");
             }
-            if (!drivers.Columns.Contains("Team"))
+            if (drivers.Columns.Contains("Team") == false)
             {
                 drivers.Columns.Add("Team", "Team");
             }
-            if (!drivers.Columns.Contains("XGroup"))
+            if (drivers.Columns.Contains("XGroup") == false)
             {
                 drivers.Columns.Add("XGroup", "XGroup");
             }
-            List<string> carNumbers = driverData.GetKeys();
+            List<string> carNumbers = driverData.getKeys();
             foreach (string carNumber in carNumbers)
             {
                 bool doesExist = false;
@@ -198,7 +200,7 @@ namespace RaceBeam
                         break;
                     }
                 }
-                if (doesExist)
+                if (doesExist == true)
                 {
                     continue;
                 }
@@ -212,9 +214,13 @@ namespace RaceBeam
             }
             drivers.Refresh();
         }
-        // ----------------------------------------------------------------------
-        // Find a driver that has the given barcode
-        // Returns car number or -1 if not found
+
+        /// <summary>
+        /// Find a driver that has the given barcode
+        /// Returns car number or -1 if not found
+        /// </summary>
+        /// <param name="barcode"></param>
+        /// <returns></returns>
         public string FindBarcode(string barcode)
         {
             for (int index = 0; index < drivers.RowCount; index++)
@@ -226,7 +232,7 @@ namespace RaceBeam
             }
             return null;
         }
-        // ----------------------------------------------------------------------
+
         void FindButtonClick(object sender, EventArgs e)
         {
             bool found = false;
@@ -248,7 +254,7 @@ namespace RaceBeam
             }
 
             string findLower = lastFindText.ToLowerInvariant();
-            while (!found)
+            while (found == false)
             {
                 string s1 = drivers["First Name", foundIndex].Value.ToString().ToLowerInvariant();
 
@@ -279,7 +285,7 @@ namespace RaceBeam
                     break;
                 }
             }
-            if (!found)
+            if (found == false)
             {
                 lastFindIndex = 0;
                 lastFindText = findText.Text;
@@ -293,11 +299,11 @@ namespace RaceBeam
             // select the row
             drivers.Rows[foundIndex].Selected = true;
         }
-        // ----------------------------------------------------------------------
+
         private void Drivers_UserDeletingRow(object sender, System.Windows.Forms.DataGridViewRowCancelEventArgs e)
         {
             // Handles user Deleting Row
-            if (e.Row.IsNewRow)
+            if (e.Row.IsNewRow == true)
                 return;
             DataGridViewCell num = drivers["Number", e.Row.Index];
             if (num.Value == null)
@@ -308,7 +314,7 @@ namespace RaceBeam
                 e.Cancel = true;
             }
         }
-        // ----------------------------------------------------------------------
+
         private void Drivers_SortCompare(object sender, DataGridViewSortCompareEventArgs e)
         {
             int intValue1, intValue2;
@@ -341,13 +347,16 @@ namespace RaceBeam
 
             e.Handled = true;
         }
-        // ----------------------------------------------------------------------
-        // Find a free number over 300
+
+        /// <summary>
+        /// Find a free number over 300
+        /// </summary>
+        /// <returns></returns>
         int FindNumber()
         {
             var used = new List<int>();
             var seed = configData.GetField("SeedCarNumber", "Value");
-            if (!int.TryParse(seed, out int firstFree))
+            if (int.TryParse(seed, out int firstFree) == false)
             {
                 firstFree = 300;
             }
@@ -358,7 +367,7 @@ namespace RaceBeam
                     continue;
                 }
                 string sval = drivers["Number", i].Value.ToString();
-                if (int.TryParse(sval, out int intval))
+                if (int.TryParse(sval, out int intval) == true)
                 {
                     used.Add(intval);
                 }
@@ -373,8 +382,10 @@ namespace RaceBeam
             }
             return firstFree;
         }
-        // ----------------------------------------------------------------------
-        // Go to first empty row, fill in driver number with first free # > 300, and go into edit mode
+
+        /// <summary>
+        /// Go to first empty row, fill in driver number with first free # > 300, and go into edit mode
+        /// </summary>
         void GotoLastRegRow()
         {
 
@@ -398,9 +409,14 @@ namespace RaceBeam
             drivers.BeginEdit(true);
             drivers.Rows[index].Selected = true;
         }
-        // ----------------------------------------------------------------------
-        // Look for a driver number (string really)
-        // Returns the grid index where it was found or -1 if not found
+
+        /// <summary>
+        /// Look for a driver number (string really)
+        /// Returns the grid index where it was found or -1 if not found
+        /// </summary>
+        /// <param name="number"></param>
+        /// <param name="skipIndex"></param>
+        /// <returns></returns>
         private int FindDriverNumber(string number, int skipIndex)
         {
             for (int i = 0; i < drivers.RowCount; i++)
@@ -420,9 +436,13 @@ namespace RaceBeam
             }
             return -1;
         }
-        // ----------------------------------------------------------------------
-        // do not allow duplicate driver numbers
-        // Do not allow commas -- that's our separator
+
+        /// <summary>
+        /// do not allow duplicate driver numbers
+        /// Do not allow commas -- that's our separator
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Drivers_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
         {
             dataModified = true;  // may not be true, but could be true
@@ -475,9 +495,13 @@ namespace RaceBeam
                 return;
             }
         }
-        // ----------------------------------------------------------------------
-        // Force member or rookie to be Yes/No
-        // Force registered to be Yes or blank
+
+        /// <summary>
+        /// Force member or rookie to be Yes/No
+        /// Force registered to be Yes or blank
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Drivers_CellValidated(object sender, DataGridViewCellEventArgs e)
         {
             string headerText = drivers.Columns[e.ColumnIndex].HeaderText;
@@ -495,23 +519,22 @@ namespace RaceBeam
 
             string ucData = data.ToUpperInvariant();
 
-            if (headerText.Equals("Registered") ||
-                headerText.Equals("Member") ||
-                headerText.Equals("Rookie")
-               )
+            if ((headerText.Equals("Registered") == true) ||
+                (headerText.Equals("Member") == true) ||
+                (headerText.Equals("Rookie") == true))
             {
-                if (ucData.Contains("Y"))
+                if (ucData.Contains("Y") == true)
                 {
                     drivers[e.ColumnIndex, e.RowIndex].Value = "Yes";
                 }
                 else
                 {
                     drivers[e.ColumnIndex, e.RowIndex].Value = "No";
-                    if (headerText.Equals("Registered"))
+                    if (headerText.Equals("Registered") == true)
                         drivers[e.ColumnIndex, e.RowIndex].Value = "";
                 }
             }
-            if (headerText.Equals("Class"))
+            if (headerText.Equals("Class") == true)
             {
                 // look up in class data and verify it exists
                 if (classData.GetField(data, "PAX") == "")
@@ -535,7 +558,7 @@ namespace RaceBeam
                 drivers[e.ColumnIndex, e.RowIndex].Value = ucData;
             }
             // We do allow an empty group field
-            if (headerText.Equals("Group") && (data != ""))
+            if ((headerText.Equals("Group") == true) && (data != ""))
             {
                 if (data.Trim() == "")
                 {
@@ -559,7 +582,7 @@ namespace RaceBeam
                 }
             }
             // We do allow an empty group field
-            if (headerText.Equals("XGroup") && (data != ""))
+            if ((headerText.Equals("XGroup") == true) && (data != ""))
             {
                 if (data.Trim() == "")
                 {
@@ -589,23 +612,23 @@ namespace RaceBeam
                 }
             }
         }
-        // ----------------------------------------------------------------------
+
         void AddDriverButtonClick(object sender, EventArgs e)
         {
             dataModified = true;
             drivers.Rows.Add();
             GotoLastRegRow();
         }
-        // ----------------------------------------------------------------------
+
         void RegForm_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (dataModified)
+            if (dataModified == true)
             {
                 SaveRegData();
                 dataModified = false;
             }
         }
-        // ----------------------------------------------------------------------
+
         void UnregButtonClick(object sender, System.EventArgs e)
         {
             DialogResult result = MessageBox.Show(
@@ -623,7 +646,7 @@ namespace RaceBeam
                 }
             }
         }
-        // ----------------------------------------------------------------------
+
         void ClearNotesButtonClick(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show(
@@ -640,7 +663,7 @@ namespace RaceBeam
                     for (int i = 0; i < drivers.RowCount; i++)
                     {
                         string note = drivers["Notes", i].Value.ToString();
-                        if (!note.Contains("eason"))
+                        if (note.Contains("eason") == false)
                         {
                             drivers["Notes", i].Value = "";
                         }
@@ -652,8 +675,10 @@ namespace RaceBeam
                 }
             }
         }
-        // ----------------------------------------------------------------------
-        // Create or update an HTML formatted file of all registrants
+
+        /// <summary>
+        /// Create or update an HTML formatted file of all registrants
+        /// </summary>
         public class PaxInfo
         {
             public string carClass;
@@ -662,8 +687,12 @@ namespace RaceBeam
             public string group;
             public string displayOrder;
         }
-        // ----------------------------------------------------------------------
-        // Import/merge registration data from a tab separated report
+
+        /// <summary>
+        /// Import/merge registration data from a tab separated report
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void MSRImportButtonClick(object sender, System.EventArgs e)
         {
             ImportData(',', "");
@@ -680,13 +709,17 @@ namespace RaceBeam
             }
             drivers.Rows.Clear();
         }
-        // ----------------------------------------------------------------------
-        // Import/merge registration data from a tab separated report
+
+        /// <summary>
+        /// Import/merge registration data from a tab separated report
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void KareloImportButtonClick(object sender, EventArgs e)
         {
             ImportData('\t', "Row");
         }
-        // ----------------------------------------------------------------------
+
         void ImportData(char separator, string keyField)
         {
             var report = new CSVData();
@@ -726,14 +759,14 @@ namespace RaceBeam
                 int reportrow;
                 reportrow = dline;
                 string fname = report.GetField(reportrow.ToString(), "First Name");
-                if (string.IsNullOrEmpty(fname))
+                if (string.IsNullOrEmpty(fname) == true)
                 {
                     continue; // Ignore entire row if first name is blank?
                 }
                 fname = fname.Trim();
 
                 string lname = report.GetField(reportrow.ToString(), "Last Name");
-                if (string.IsNullOrEmpty(lname))
+                if (string.IsNullOrEmpty(lname) == true)
                 {
                     continue;
                 }
@@ -756,28 +789,28 @@ namespace RaceBeam
                         index = driver;
                         break;
                     }
-                    if (!driverFound)
+                    if (driverFound == false)
                     {
                         string carnum = report.GetField(reportrow.ToString(), "Number");
-                        if (string.IsNullOrEmpty(carnum))
+                        if (string.IsNullOrEmpty(carnum) == true)
                         {
                             carnum = report.GetField(reportrow.ToString(), "Car Number");
                         }
-                        if (string.IsNullOrEmpty(carnum))
+                        if (string.IsNullOrEmpty(carnum) == true)
                         {
                             carnum = report.GetField(reportrow.ToString(), "Choice 1");
                         }
-                        if (string.IsNullOrEmpty(carnum))
+                        if (string.IsNullOrEmpty(carnum) == true)
                         {
                             carnum = report.GetField(reportrow.ToString(), "No.");
                         }
                         // carnum = carnum.TrimStart('0');	// trim leading zeroes (confusing for timing)
-                        if (string.IsNullOrEmpty(carnum))
+                        if (string.IsNullOrEmpty(carnum) == true)
                         {
                             carnum = FindNumber().ToString();
                         }
                         // They might want car# plus class
-                        if (concat_checkbox.Checked)
+                        if (concat_checkbox.Checked == true)
                         {
                             string driverclass = report.GetField(reportrow.ToString(), "Class");
                             carnum += driverclass;
@@ -791,7 +824,7 @@ namespace RaceBeam
                                 break;
                             }
                         }
-                        if (numFound)
+                        if (numFound == true)
                         {
                             // Already in use -- give him a new one
                             carnum = FindNumber().ToString();
@@ -809,11 +842,11 @@ namespace RaceBeam
                     drivers["Notes", index].Value = "";
 
                     string carclass = report.GetField(reportrow.ToString(), "Vehicle Class");
-                    if (string.IsNullOrEmpty(carclass))
+                    if (string.IsNullOrEmpty(carclass) == true)
                     {
                         carclass = report.GetField(reportrow.ToString(), "Class");
                     }
-                    if (string.IsNullOrEmpty(carclass) || carclass.Contains("selected"))
+                    if ((string.IsNullOrEmpty(carclass) == true) || (carclass.Contains("selected") == true))
                     {
                         carclass = "AM";  // everyone into "AM" if nothing else
                     }
@@ -828,7 +861,7 @@ namespace RaceBeam
                         if (classData.GetField(carclass.ToUpperInvariant(), "PAX") == "")
                         {
                             bool classFound = false;
-                            List<string> classKeys = classData.GetKeys();
+                            List<string> classKeys = classData.getKeys();
                             foreach (string className in classKeys)
                             {
                                 string group = classData.GetField(className, "Group");
@@ -839,7 +872,7 @@ namespace RaceBeam
                                     break;
                                 }
                             }
-                            if (!classFound)
+                            if (classFound == false)
                             {
                                 drivers["Class", index].Value = "AM";
                             }
@@ -856,48 +889,48 @@ namespace RaceBeam
                     }
 
                     string year = report.GetField(reportrow.ToString(), "Year");
-                    if (string.IsNullOrEmpty(year))
+                    if (string.IsNullOrEmpty(year) == true)
                     {
                         year = "";
                     }
                     string make = report.GetField(reportrow.ToString(), "Make");
-                    if (string.IsNullOrEmpty(make))
+                    if (string.IsNullOrEmpty(make) == true)
                     {
                         make = "";
                     }
                     string model = report.GetField(reportrow.ToString(), "Model");
-                    if (string.IsNullOrEmpty(model))
+                    if (string.IsNullOrEmpty(model) == true)
                     {
                         model = "";
                     }
                     string carmodel = year + " " + make + " " + model;
                     carmodel = carmodel.Trim();
-                    if (string.IsNullOrEmpty(carmodel))
+                    if (string.IsNullOrEmpty(carmodel) == true)
                     {
                         carmodel = report.GetField(reportrow.ToString(), "Vehicle Year/Make/Model");
                     }
-                    if (string.IsNullOrEmpty(carmodel))
+                    if (string.IsNullOrEmpty(carmodel) == true)
                     {
                         carmodel = "Unknown";
                     }
                     drivers["Car Model", index].Value = carmodel;
 
                     string colour = report.GetField(reportrow.ToString(), "Colour");
-                    if (string.IsNullOrEmpty(colour))
+                    if (string.IsNullOrEmpty(colour) == true)
                     {
                         colour = "";
                     }
                     colour = report.GetField(reportrow.ToString(), "Color");
-                    if (string.IsNullOrEmpty(colour))
+                    if (string.IsNullOrEmpty(colour) == true)
                     {
                         colour = "";
                     }
                     drivers["Car Color", index].Value = colour;
 
-                    if (drivers.Columns.Contains("Member"))
+                    if (drivers.Columns.Contains("Member") == true)
                     {
                         if ((drivers["Member", index].Value == null) ||
-                            (string.IsNullOrEmpty(drivers["Member", index].Value.ToString())))
+                            (string.IsNullOrEmpty(drivers["Member", index].Value.ToString()) == true))
                         {
                             drivers["Member", index].Value = "No";
                             string fee = report.GetField(reportrow.ToString(), "Fee");
@@ -908,14 +941,14 @@ namespace RaceBeam
                         }
                     }
 
-                    if (drivers.Columns.Contains("Rookie"))
+                    if (drivers.Columns.Contains("Rookie") == true)
                     {
                         string novice = report.GetField(reportrow.ToString(), "Novice");
                         if (novice == "")
                         {
                             novice = report.GetField(reportrow.ToString(), "Rookie");
                         }
-                        if (string.IsNullOrEmpty(novice) || novice.Contains("1"))
+                        if ((string.IsNullOrEmpty(novice) == true) || novice.Contains("1"))
                         {
                             drivers["Rookie", index].Value = "Yes";
                         }
@@ -924,7 +957,7 @@ namespace RaceBeam
                             drivers["Rookie", index].Value = "No";
                         }
                         if ((drivers["Rookie", index].Value == null) ||
-                            string.IsNullOrEmpty(drivers["Rookie", index].Value.ToString()))
+                            (string.IsNullOrEmpty(drivers["Rookie", index].Value.ToString()) == true))
                         {
                             drivers["Rookie", index].Value = "Yes";
                         }
@@ -937,19 +970,19 @@ namespace RaceBeam
                     }
 
                     string comment = report.GetField(reportrow.ToString(), "Comment");
-                    if (string.IsNullOrEmpty(comment))
+                    if (string.IsNullOrEmpty(comment) == true)
                     {
                         comment = "";
                     }
                     string payment = report.GetField(reportrow.ToString(), "Payment Method");
-                    if (!string.IsNullOrEmpty(payment))
+                    if (string.IsNullOrEmpty(payment) == false)
                     {
                         comment = payment + comment;
                     }
                     else
                     {
                         payment = report.GetField(reportrow.ToString(), "Amnt.");
-                        if (!string.IsNullOrEmpty(payment))
+                        if (string.IsNullOrEmpty(payment) == false)
                         {
                             comment = payment + comment;
                         }
@@ -960,10 +993,10 @@ namespace RaceBeam
                         }
                     }
 
-                    if (drivers.Columns.Contains("Notes"))
+                    if (drivers.Columns.Contains("Notes") == true)
                     {
                         drivers["Notes", index].Value += " " + comment;
-                        if (!driverFound)
+                        if (driverFound == false)
                         {
                             drivers["Notes", index].Value += " (new entry)";
                         }

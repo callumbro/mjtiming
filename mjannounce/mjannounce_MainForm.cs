@@ -35,15 +35,15 @@ namespace RaceBeam
         private string paxTimes;
         private string rawTimes;
         private string coneCounts;
-        private string classTimes;
-        private string teamTimes;
+        private string classtimes;
+        private string teamtimes;
         private string statistics;
         private int queryCount = 0;
         private string compare_results = "";
         private string prev_results = "";
-        private string template = "<html><head><style type=\"text/css\">@@{style}@@</style></head><body><h3>M&J Solo Live Timing</h3><a href=\"/\">Home</a><div>@@{content}@@</div></body></html>";
+        private string template = "<html><head><style type=\"text/css\">%{style}%</style></head><body><h3>M&J Solo Live Timing</h3><a href=\"/\">Home</a><div>%{content}%</div></body></html>";
         private string style = "";
-        private readonly static string links = "<ul>@@{runs}@@@@{raw}@@@@{classes}@@@@{pax}@@@@{team}@@@@{cones}@@</ul>";
+        private readonly static string links = "<ul>%{runs}%%{raw}%%{classes}%%{pax}%%{team}%%{cones}%</ul>";
 
         HttpListener listener = null;
 
@@ -54,17 +54,18 @@ namespace RaceBeam
             //
             InitializeComponent();
 
-            LoadConfig();
+            Load_config();
         }
 
-        public void LoadConfig()
+        public void Load_config()
         {
             mjFolder = Process.GetCurrentProcess().MainModule.FileName;
             mjFolder = Path.GetDirectoryName(mjFolder);
+            mjFolder += "\\..";
             configFilename = mjFolder + "\\config\\configData.csv";
             scoresTextBox.Font = new Font(scoresTextBox.Font.FontFamily, 6);
 
-            if (!File.Exists(configFilename))
+            if (File.Exists(configFilename) == false)
             {
                 MessageBox.Show("Unable to find config file: " + configFilename);
                 Environment.Exit(0);
@@ -97,7 +98,7 @@ namespace RaceBeam
             }
             // Copy over webstyles file if one doesn't exist
             string styleFile = mjFolder + "\\config\\_webStyle.css";
-            if (!File.Exists(styleFile))
+            if (File.Exists(styleFile) == false)
             {
                 string templateFile = mjFolder + "\\config_templates\\_webStyle.css";
                 File.Copy(templateFile, styleFile, false);
@@ -172,7 +173,7 @@ namespace RaceBeam
         {
             if (webserverButton.Text.Contains("Start"))
             {
-                if (IsAdministrator())
+                if (IsAdministrator() == true)
                 {
                     StartWebserver();
                 }
@@ -203,74 +204,74 @@ namespace RaceBeam
                 this.BeginInvoke(new InvokeScoring(GenScores));
                 return;
             }
-            var args = new ScoreArgs
+            var args = new scoreArgs
             {
-                Day1 = Day1TextBox.Text,
-                Day2 = Day2TextBox.Text
+                day1 = Day1TextBox.Text,
+                day2 = Day2TextBox.Text
             };
 
-            if (!int.TryParse(OfficialRunsTextBox.Text, out args.MaxOfficialRuns))
+            if (int.TryParse(OfficialRunsTextBox.Text, out args.maxOfficialRuns) == false)
             {
-                args.MaxOfficialRuns = 999;
+                args.maxOfficialRuns = 999;
             }
-            args.WriteCSV = false;
-            args.EventFolder = "";
+            args.writeCSV = false;
+            args.eventFolder = "";
 
             foreach (string item in scoringList.CheckedItems)
             {
                 if (item.Contains("Run Times"))
-                    args.ShowRunTimes = true;
+                    args.showRunTimes = true;
                 else if (item.Contains("Raw Times"))
-                    args.ShowRawTimes = true;
+                    args.showRawTimes = true;
                 else if (item.Contains("Class Times"))
-                    args.ShowClassTimes = true;
+                    args.showClassTimes = true;
                 else if (item.Contains("PAX Times"))
-                    args.ShowPaxTimes = true;
+                    args.showPaxTimes = true;
                 else if (item.Contains("Team"))
-                    args.ShowTeams = true;
+                    args.showTeams = true;
                 else if (item.Contains("Cone"))
-                    args.ShowConeCounts = true;
+                    args.showConeCounts = true;
             }
 
-            if (bestRunRadioButton.Checked)
+            if (bestRunRadioButton.Checked == true)
             {
-                args.BestSingleRun = true;  // override to single day
+                args.bestSingleRun = true;  // override to single day
             }
-            else if (day1Plusset2RadioButton.Checked)
+            else if (day1Plusset2RadioButton.Checked == true)
             {
-                args.Set1PlusSet2 = true;   // score as recorded
+                args.set1PlusSet2 = true;   // score as recorded
             }
-            else if (set1RadioButton.Checked)
+            else if (set1RadioButton.Checked == true)
             {
-                args.Set1Only = true;
+                args.set1Only = true;
             }
-            if (set2RadioButton.Checked)
+            if (set2RadioButton.Checked == true)
             {
-                args.Set2Only = true;
+                args.set2Only = true;
             }
 
             string results = "";
             lock (lockObject)
             {
-                TextScores
-                    .TextScoreSplit(
+                textScores
+                    .textScoreSplit(
                         args,
                         out runTimes,
                         out rawTimes,
                         out paxTimes,
-                        out classTimes,
-                        out teamTimes,
+                        out classtimes,
+                        out teamtimes,
                         out coneCounts,
                         out statistics);
 
-                if (args.ShowRunTimes) results += separator + runTimes;
-                if (args.ShowRawTimes) results += separator + rawTimes;
-                if (args.ShowPaxTimes) results += separator + paxTimes;
-                if (args.ShowClassTimes) results += separator + classTimes;
-                if (args.ShowConeCounts) results += separator + coneCounts;
-                if (args.ShowTeams) results += separator + teamTimes;
+                if (args.showRunTimes) results += separator + runTimes;
+                if (args.showRawTimes) results += separator + rawTimes;
+                if (args.showPaxTimes) results += separator + paxTimes;
+                if (args.showClassTimes) results += separator + classtimes;
+                if (args.showConeCounts) results += separator + coneCounts;
+                if (args.showTeams) results += separator + teamtimes;
                 compare_results = results;
-                if (!string.IsNullOrEmpty(statistics))
+                if (string.IsNullOrEmpty(statistics) == false)
                     results += separator + statistics;
             }
 
@@ -316,7 +317,7 @@ namespace RaceBeam
             folder += "\\..";
             string styleFilename = folder + "\\config\\_webStyle.css";
             style = File.ReadAllText(styleFilename);
-            template = template.Replace("@@{style}@@", style);
+            template = template.Replace("%{style}%", style);
 
             listener.Prefixes.Add("http://+:80/");
             listener.Start();
@@ -330,7 +331,7 @@ namespace RaceBeam
             try
             {
                 ShowCount("");
-                if ((webListener == null) || !webListener.IsListening)
+                if ((webListener == null) || (webListener.IsListening == false))
                 {
                     return;
                 }
@@ -344,65 +345,65 @@ namespace RaceBeam
                     foreach (string item in scoringList.CheckedItems)
                     {
                         if (item.Contains("Run Times"))
-                            currentLinks = currentLinks.Replace("@@{runs}@@", "<li><a href=\"Runs\">Runs</a></li>");
+                            currentLinks = currentLinks.Replace("%{runs}%", "<li><a href=\"runs\">Runs</a></li>");
                         else if (item.Contains("Raw Times"))
-                            currentLinks = currentLinks.Replace("@@{raw}@@", "<li><a href=\"Raw\">Raw</a></li>");
+                            currentLinks = currentLinks.Replace("%{raw}%", "<li><a href=\"raw\">Raw</a></li>");
                         else if (item.Contains("PAX Times"))
-                            currentLinks = currentLinks.Replace("@@{pax}@@", "<li><a href=\"Pax\">PAX</a></li>");
+                            currentLinks = currentLinks.Replace("%{pax}%", "<li><a href=\"pax\">PAX</a></li>");
                         else if (item.Contains("Class Times"))
-                            currentLinks = currentLinks.Replace("@@{classes}@@", "<li><a href=\"Classes\">Classes</a></li>");
+                            currentLinks = currentLinks.Replace("%{classes}%", "<li><a href=\"classes\">Classes</a></li>");
                         else if (item.Contains("Cone"))
-                            currentLinks = currentLinks.Replace("@@{cones}@@", "<li><a href=\"Cones\">Cones</a></li>");
+                            currentLinks = currentLinks.Replace("%{cones}%", "<li><a href=\"cones\">Cones</a></li>");
                         else if (item.Contains("Team"))
-                            currentLinks = currentLinks.Replace("@@{team}@@", "<li><a href=\"Team\">Team</a></li>");
+                            currentLinks = currentLinks.Replace("%{team}%", "<li><a href=\"team\">Team</a></li>");
                     }
-                    response = template.Replace("@@{content}@@", currentLinks);
+                    response = template.Replace("%{content}%", currentLinks);
                 }
-                else if (request == "/Runs")
+                else if (request == "/runs")
                 {
                     lock (lockObject)
                     {
-                        response = template.Replace("@@{content}@@", "<pre>" + runTimes + "</pre>");
+                        response = template.Replace("%{content}%", "<pre>" + runTimes + "</pre>");
                     }
                 }
-                else if (request == "/Raw")
+                else if (request == "/raw")
                 {
                     lock (lockObject)
                     {
-                        response = template.Replace("@@{content}@@", "<pre>" + rawTimes + "</pre>");
+                        response = template.Replace("%{content}%", "<pre>" + rawTimes + "</pre>");
                     }
                 }
-                else if (request == "/Pax")
+                else if (request == "/pax")
                 {
                     lock (lockObject)
                     {
-                        response = template.Replace("@@{content}@@", "<pre>" + paxTimes + "</pre>");
+                        response = template.Replace("%{content}%", "<pre>" + paxTimes + "</pre>");
                     }
                 }
-                else if (request == "/Classes")
+                else if (request == "/classes")
                 {
                     lock (lockObject)
                     {
-                        response = template.Replace("@@{content}@@", "<pre>" + classTimes + "</pre>");
+                        response = template.Replace("%{content}%", "<pre>" + classtimes + "</pre>");
                     }
                 }
-                else if (request == "/Team")
+                else if (request == "/team")
                 {
                     lock (lockObject)
                     {
-                        response = template.Replace("@@{content}@@", "<pre>" + teamTimes + "</pre>");
+                        response = template.Replace("%{content}%", "<pre>" + teamtimes + "</pre>");
                     }
                 }
-                else if (request == "/Cones")
+                else if (request == "/cones")
                 {
                     lock (lockObject)
                     {
-                        response = template.Replace("@@{content}@@", "<pre>" + coneCounts + "</pre>");
+                        response = template.Replace("%{content}%", "<pre>" + coneCounts + "</pre>");
                     }
                 }
 
                 // Replace any remaining placeholders
-                response = Regex.Replace(response, @"@@{\w*}@@", "");
+                response = Regex.Replace(response, @"%{\w*}%", "");
 
                 byte[] byteArr = Encoding.ASCII.GetBytes(response);
                 context.Response.OutputStream.Write(byteArr, 0, byteArr.Length);

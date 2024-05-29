@@ -10,14 +10,14 @@ namespace RaceBeam
     /// </summary>
     public static class Heats
     {
-        private class ClassCount
+        private class classCount
         {
             public string name;
             public int count;
             public List<string> drivers = new List<string>();
         }
         // --------------------------------------------------------------------
-        public static string DoHeatCalcs()
+        public static string doHeatCalcs()
         {
             string heatInfo = "";
             var driverData = new CSVData();
@@ -57,9 +57,9 @@ namespace RaceBeam
             {
                 return (err);
             }
-            List<string> driverList = driverData.GetKeys();
+            List<string> driverList = driverData.getKeys();
 
-            var groupCounts = new Dictionary<string, ClassCount>();
+            var groupCounts = new Dictionary<string, classCount>();
             int registeredDrivers = 0;
             foreach (string driver in driverList)
             {
@@ -72,7 +72,7 @@ namespace RaceBeam
                 string registered = driverData.GetField(driver, "Registered");
                 string driverGroupName = driverData.GetField(driver, "Group");
                 registered = registered.ToUpperInvariant();
-                if (!registered.Contains("Y"))
+                if (registered.Contains("Y") == false)
                 {
                     continue;
                 }
@@ -92,7 +92,7 @@ namespace RaceBeam
                 }
 
                 string heatName = driverGroupName;
-                if (!heatByGroup)
+                if (heatByGroup == false)
                 {
                     heatName = className;
                 }
@@ -109,7 +109,7 @@ namespace RaceBeam
                 }
                 else
                 {
-                    var c = new ClassCount();
+                    var c = new classCount();
                     c.name = heatName;
                     c.count = 1;
                     c.drivers.Add(driver);
@@ -118,11 +118,11 @@ namespace RaceBeam
             }
 
             // sort group list in inverse order of size
-            var groupList = new List<ClassCount>(groupCounts.Values);
+            var groupList = new List<classCount>(groupCounts.Values);
             groupList
                 .Sort(delegate (
-                    ClassCount first,
-                    ClassCount next)
+                    classCount first,
+                    classCount next)
                 {
                     return next.count.CompareTo(first.count);
                 });
@@ -141,7 +141,7 @@ namespace RaceBeam
 
 
 
-            foreach (ClassCount classGroup in groupList)
+            foreach (classCount classGroup in groupList)
             {
                 heatInfo += classGroup.count.ToString("#00") + " : " + classGroup.name + "\n";
                 // Allocate assignments for two heats
@@ -242,14 +242,14 @@ namespace RaceBeam
 
 
             // Display the team assignments
-            var teamCounts = new Dictionary<string, ClassCount>();
+            var teamCounts = new Dictionary<string, classCount>();
             foreach (string driver in driverList)
             {
                 // We need to order by the driver class
                 string teamName = driverData.GetField(driver, "Team");
                 string registered = driverData.GetField(driver, "Registered");
                 registered = registered.ToUpperInvariant();
-                if (!registered.Contains("Y"))
+                if (registered.Contains("Y") == false)
                     continue;
 
                 if (teamCounts.ContainsKey(teamName))
@@ -258,18 +258,18 @@ namespace RaceBeam
                 }
                 else
                 {
-                    var c = new ClassCount();
+                    var c = new classCount();
                     c.name = teamName;
                     c.count = 1;
                     teamCounts.Add(c.name, c);
                 }
             }
             // Sort teams by name
-            var teamList = new List<ClassCount>(teamCounts.Values);
+            var teamList = new List<classCount>(teamCounts.Values);
             teamList
                 .Sort(delegate (
-                    ClassCount first,
-                    ClassCount next)
+                    classCount first,
+                    classCount next)
                 {
                     return first.name.CompareTo(next.name);
                 });
@@ -289,17 +289,17 @@ namespace RaceBeam
             // Listing of each driver
             heatInfo += "-------------------------------------------------------\n";
             heatInfo += "Listing of drivers for two heats\n";
-            heatInfo += Listheat("Heat 1 of 2", heat1Of2, groupCounts, driverData);
-            heatInfo += Listheat("Heat 2 of 2", heat2Of2, groupCounts, driverData);
+            heatInfo += listheat("Heat 1 of 2", heat1Of2, groupCounts, driverData);
+            heatInfo += listheat("Heat 2 of 2", heat2Of2, groupCounts, driverData);
             heatInfo += "\n-------------------------------------------------------\n";
             heatInfo += "Listing of drivers for three heats\n";
-            heatInfo += Listheat("Heat 1 of 3", heat1Of3, groupCounts, driverData);
-            heatInfo += Listheat("Heat 2 of 3", heat2Of3, groupCounts, driverData);
-            heatInfo += Listheat("Heat 3 of 3", heat3Of3, groupCounts, driverData);
+            heatInfo += listheat("Heat 1 of 3", heat1Of3, groupCounts, driverData);
+            heatInfo += listheat("Heat 2 of 3", heat2Of3, groupCounts, driverData);
+            heatInfo += listheat("Heat 3 of 3", heat3Of3, groupCounts, driverData);
             return heatInfo;
         }
-        // --------------------------------------------------------------------
-        private static string Listheat(string title, List<string> heat, Dictionary<string, ClassCount> groupCounts, CSVData driverData)
+
+        private static string listheat(string title, List<string> heat, Dictionary<string, classCount> groupCounts, CSVData driverData)
         {
             string output = "";
 
@@ -312,11 +312,11 @@ namespace RaceBeam
                         string first,
                         string next)
                     {
-                        if (!int.TryParse(first, out int d1Number))
+                        if (int.TryParse(first, out int d1Number) == false)
                         {
                             return first.CompareTo(next);
                         }
-                        if (!int.TryParse(next, out int d2Number))
+                        if (int.TryParse(next, out int d2Number) == false)
                         {
                             return first.CompareTo(next);
                         }

@@ -10,13 +10,13 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
     class PaxScore
     {
         // returned list of all driver's score data
-        public static Dictionary<string, ScoreCalcs.DriverScoreData> scores;
+        public static Dictionary<string, scoreCalcs.driverScoreData> scores;
         // Returned list of team scores
-        public static List<ScoreCalcs.TeamData> teamScores;
+        public static List<scoreCalcs.teamData> teamScores;
         // Returned list of all class data, sorted by sort order given in file
-        public static SortedDictionary<int, ScoreCalcs.PaxInfo> sortedClassList;
+        public static SortedDictionary<int, scoreCalcs.paxInfo> sortedClassList;
         // Returned statistics
-        public static ScoreCalcs.StatsDataClass stats;
+        public static scoreCalcs.statsDataClass stats;
 
         public static void Usage()
         {
@@ -29,18 +29,18 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
             // default to 1 day scoring, today's date
 
 
-            var argblock = new ScoreArgs();     // parameters passed to the scoring module
+            var argblock = new scoreArgs();     // parameters passed to the scoring module
             string day1Name = DateTime.Now.ToString("yyyy_MM_dd");
-            argblock.Day1 = day1Name;
-            argblock.Set1Only = true;
+            argblock.day1 = day1Name;
+            argblock.set1Only = true;
             // Where the config file resides
-            argblock.ConfigFolder = "C:\\mjtiming\\config";
+            argblock.configFolder = "C:\\mjtiming\\config";
             // this overrides the eventfolder specified in the config file
-            argblock.EventFolder = "C:\\mjtiming\\eventdata";
+            argblock.eventFolder = "C:\\mjtiming\\eventdata";
 
             // Do the scoring calcs
-            string err = ScoreCalcs
-                .DoScore(
+            string err = scoreCalcs
+                .doScore(
                     argblock,
                     out scores,
                     out teamScores,
@@ -61,19 +61,19 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        public static string PaxTimes(ScoreArgs args)
+        public static string PaxTimes(scoreArgs args)
         {
             string results = "";
             // List of all drivers and their score data
-            var myList = new List<KeyValuePair<string, ScoreCalcs.DriverScoreData>>(scores);
+            var myList = new List<KeyValuePair<string, scoreCalcs.driverScoreData>>(scores);
 
             // Sort by pax time
             myList
                 .Sort(delegate (
-                    KeyValuePair<string, ScoreCalcs.DriverScoreData> firstPair,
-                    KeyValuePair<string, ScoreCalcs.DriverScoreData> nextPair)
+                    KeyValuePair<string, scoreCalcs.driverScoreData> firstPair,
+                    KeyValuePair<string, scoreCalcs.driverScoreData> nextPair)
                 {
-                    return firstPair.Value.ScoreData.BestPAX.CompareTo(nextPair.Value.ScoreData.BestPAX);
+                    return firstPair.Value.scoreData.bestPAX.CompareTo(nextPair.Value.scoreData.bestPAX);
                 });
 
             results += string.Format("Overall ranking by PAX:\r\n");
@@ -81,21 +81,21 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 "Rank", "Car#", "Mbr", "Rky", "Class", "Driver", "Car", "Raw Time", "PAX #", "PAX Time", "Score");
             results += hdr;
 
-            foreach (KeyValuePair<string, ScoreCalcs.DriverScoreData> driver in myList)
+            foreach (KeyValuePair<string, scoreCalcs.driverScoreData> driver in myList)
             {
 
                 results += string.Format("{0,4} {1,4} {2,3} {3,3} {4,5} {5,-16} {6,-22} {7,8:#.000}  {8,5:#0.000} {9,9:#.000} {10,7:#0.000}\r\n",
-                    driver.Value.ScoreData.PAXrank,
-                    driver.Value.Number,
-                    driver.Value.Member,
-                    driver.Value.Rookie ? "Y" : "N",
-                    driver.Value.CarClass,
-                    driver.Value.FirstName + " " + driver.Value.LastName.Substring(0, 1),
-                    driver.Value.CarDescription,
-                    driver.Value.ScoreData.BestRAW < ScoreCalcs.DNFvalue ? driver.Value.ScoreData.BestRAW.ToString("#.000") : "DNS",
-                    driver.Value.Pax,
-                    driver.Value.ScoreData.BestPAX < ScoreCalcs.DNFvalue ? driver.Value.ScoreData.BestPAX.ToString("#.000") : "DNS",
-                    driver.Value.ScoreData.PAXscore
+                    driver.Value.scoreData.PAXrank,
+                    driver.Value.number,
+                    driver.Value.member,
+                    driver.Value.rookie ? "Y" : "N",
+                    driver.Value.carClass,
+                    driver.Value.firstName + " " + driver.Value.lastName.Substring(0, 1),
+                    driver.Value.carDescription,
+                    driver.Value.scoreData.bestRAW < scoreCalcs.DNFvalue ? driver.Value.scoreData.bestRAW.ToString("#.000") : "DNS",
+                    driver.Value.pax,
+                    driver.Value.scoreData.bestPAX < scoreCalcs.DNFvalue ? driver.Value.scoreData.bestPAX.ToString("#.000") : "DNS",
+                    driver.Value.scoreData.PAXscore
                 );
             }
             return results;

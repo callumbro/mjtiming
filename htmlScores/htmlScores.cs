@@ -17,16 +17,16 @@ using System.IO;
 
 namespace RaceBeam  // this is required to get easy reference to the datatypes
 {
-    static class HtmlScore
+    static class Htmlscore
     {
         // returned list of all driver's score data
-        public static Dictionary<string, ScoreCalcs.DriverScoreData> scores;
+        public static Dictionary<string, scoreCalcs.driverScoreData> scores;
         // Returned list of team scores
-        public static List<ScoreCalcs.TeamData> teamScores;
+        public static List<scoreCalcs.teamData> teamScores;
         // Returned list of all class data, sorted by sort order given in file
-        public static SortedDictionary<int, ScoreCalcs.PaxInfo> sortedClassList;
+        public static SortedDictionary<int, scoreCalcs.paxInfo> sortedClassList;
         // Returned statistics
-        public static ScoreCalcs.StatsDataClass stats;
+        public static scoreCalcs.statsDataClass stats;
 
         public static CSVData configData = new CSVData();
         public static bool showLastName = false;
@@ -49,11 +49,11 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
         {
             // parse command line arguments
             // default to 1 day scoring, today's date, first set only
-            ScoreArgs scoreArgs = new ScoreArgs();
+            scoreArgs scoreArgs = new scoreArgs();
             var argblock = scoreArgs;
-            argblock.Day1 = DateTime.Now.ToString("yyyy_MM_dd");
+            argblock.day1 = DateTime.Now.ToString("yyyy_MM_dd");
             string configFilename;
-            string configFolder = argblock.ConfigFolder;
+            string configFolder = argblock.configFolder;
 
             configFolder = Process.GetCurrentProcess().MainModule.FileName;
             configFolder = Path.GetDirectoryName(configFolder);
@@ -80,71 +80,71 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 else if (args[i] == "-day1")
                 {
                     i += 1;
-                    argblock.Day1 = args[i];
+                    argblock.day1 = args[i];
                 }
                 else if (args[i] == "-day2")
                 {
                     i += 1;
-                    argblock.Day2 = args[i];
+                    argblock.day2 = args[i];
                 }
                 else if (args[i] == "-classfile")
                 {
                     i += 1;
-                    argblock.ClassFile = args[i];
+                    argblock.classFile = args[i];
                 }
                 else if (args[i] == "-title")
                 {
                     i += 1;
-                    argblock.Title = @"<h1 align=""center"">" + args[i] + "</h1>";
+                    argblock.title = @"<h1 align=""center"">" + args[i] + "</h1>";
                 }
                 else if (args[i] == "-path")
                 {
                     i += 1;
-                    argblock.EventFolder = args[i];
+                    argblock.eventFolder = args[i];
                 }
                 else if (args[i] == "-set1only")
                 {
-                    argblock.Set1Only = true;
+                    argblock.set1Only = true;
                 }
                 else if (args[i] == "-set2only")
                 {
-                    argblock.Set2Only = true;
+                    argblock.set2Only = true;
                 }
                 else if (args[i] == "-bestsinglerun")
                 {
-                    argblock.BestSingleRun = true;
+                    argblock.bestSingleRun = true;
                 }
                 else if (args[i] == "-set1plusset2")
                 {
-                    argblock.Set1PlusSet2 = true;
+                    argblock.set1PlusSet2 = true;
                 }
                 else if (args[i] == "-runtimes")
                 {
-                    argblock.ShowRunTimes = true;
+                    argblock.showRunTimes = true;
                 }
                 else if (args[i] == "-rawtimes")
                 {
-                    argblock.ShowRawTimes = true;
+                    argblock.showRawTimes = true;
                 }
                 else if (args[i] == "-paxtimes")
                 {
-                    argblock.ShowPaxTimes = true;
+                    argblock.showPaxTimes = true;
                 }
                 else if (args[i] == "-rookie")
                 {
-                    argblock.ShowRookie = true;
+                    argblock.showRookie = true;
                 }
                 else if (args[i] == "-classtimes")
                 {
-                    argblock.ShowClassTimes = true;
+                    argblock.showClassTimes = true;
                 }
                 else if (args[i] == "-teams")
                 {
-                    argblock.ShowTeams = true;
+                    argblock.showTeams = true;
                 }
                 else if (args[i] == "-conecounts")
                 {
-                    argblock.ShowConeCounts = true;
+                    argblock.showConeCounts = true;
                 }
                 else if (args[i] == "-eventname")
                 {
@@ -153,9 +153,9 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 else if (args[i] == "-maxofficialruns")
                 {
                     i += 1;
-                    if (!int.TryParse(args[i], out argblock.MaxOfficialRuns))
+                    if (int.TryParse(args[i], out argblock.maxOfficialRuns) == false)
                     {
-                        argblock.MaxOfficialRuns = 999;
+                        argblock.maxOfficialRuns = 999;
                     }
                 }
                 else
@@ -164,9 +164,9 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 }
             }
             // Do the scoring calcs ad get the results back
-            err = ScoreCalcs.DoScore(argblock, out scores, out teamScores, out stats, out sortedClassList);
+            err = scoreCalcs.doScore(argblock, out scores, out teamScores, out stats, out sortedClassList);
 
-            if (!string.IsNullOrEmpty(err))
+            if (string.IsNullOrEmpty(err) == false)
             {
                 Console.WriteLine(err);
                 return;
@@ -188,58 +188,58 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
 
             string results;
             string pathStart;
-            if (string.IsNullOrEmpty(argblock.Day2))
+            if (string.IsNullOrEmpty(argblock.day2))
             {
-                pathStart = argblock.EventFolder + "\\" + argblock.Day1;
+                pathStart = argblock.eventFolder + "\\" + argblock.day1;
             }
             else
             {
-                pathStart = argblock.EventFolder + "\\" + argblock.Day2 + "__2-day";
+                pathStart = argblock.eventFolder + "\\" + argblock.day2 + "__2-day";
             }
-            if (argblock.ShowRawTimes)
+            if (argblock.showRawTimes)
             {
-                results = htmlHeader + argblock.Title + RawTimes(argblock) + htmlFooter;
+                results = htmlHeader + argblock.title + RawTimes(argblock) + htmlFooter;
                 string path = pathStart + "__htmlRAWScores.html";
                 File.WriteAllText(path, results);
             }
 
-            if (argblock.ShowPaxTimes)
+            if (argblock.showPaxTimes)
             {
-                results = htmlHeader + argblock.Title + PaxTimes(argblock) + htmlFooter;
+                results = htmlHeader + argblock.title + PaxTimes(argblock) + htmlFooter;
                 string path = pathStart + "__htmlPAXScores.html";
                 File.WriteAllText(path, results);
             }
 
-            if (argblock.ShowClassTimes)
+            if (argblock.showClassTimes)
             {
-                results = htmlHeader + argblock.Title + ClassTimes(argblock) + htmlFooter;
+                results = htmlHeader + argblock.title + ClassTimes(argblock) + htmlFooter;
                 string path = pathStart + "__htmlClassScores.html";
                 File.WriteAllText(path, results);
             }
-            if (argblock.ShowRunTimes)
+            if (argblock.showRunTimes)
             {
-                results = htmlHeader + argblock.Title + RunTimes(argblock) + htmlFooter;
+                results = htmlHeader + argblock.title + RunTimes(argblock) + htmlFooter;
                 // Always show statistics
                 results += Statistics(argblock);
                 string path = pathStart + "__htmlRunTimes.html";
                 File.WriteAllText(path, results);
             }
-            if (argblock.ShowTeams)
+            if (argblock.showTeams)
             {
-                results = htmlHeader + argblock.Title + TeamTimes(argblock) + htmlFooter;
+                results = htmlHeader + argblock.title + TeamTimes(argblock) + htmlFooter;
                 string path = pathStart + "__htmlTeamScores.html";
                 File.WriteAllText(path, results);
             }
-            if (argblock.ShowConeCounts)
+            if (argblock.showConeCounts)
             {
-                results = htmlHeader + argblock.Title + ConeCounts(argblock) + htmlFooter;
+                results = htmlHeader + argblock.title + ConeCounts(argblock) + htmlFooter;
                 string path = pathStart + "__htmlConeCounts.html";
                 File.WriteAllText(path, results);
             }
 
         }
 
-        public static string RawTimes(ScoreArgs args)
+        public static string RawTimes(scoreArgs args)
         {
             string results = htmlTableHeader;
             results = results.Replace("%TABLENAME%", "Overall ranking by RAW time");
@@ -249,59 +249,59 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
             rookieResults = rookieResults.Replace("%TABLENAME%", "Rookie ranking by RAW time");
             rookieResults += @"<tr class=""hdr2""><td>Rank</td><td>Car#</td><td>Class</td><td>Driver</td><td>Car</td><td>Raw Time</td><td>Score</td></tr>";
 
-            var myList = new List<KeyValuePair<string, ScoreCalcs.DriverScoreData>>(scores);
+            var myList = new List<KeyValuePair<string, scoreCalcs.driverScoreData>>(scores);
             // Sort by raw time
             myList
                 .Sort(delegate (
-                    KeyValuePair<string, ScoreCalcs.DriverScoreData> firstPair,
-                    KeyValuePair<string, ScoreCalcs.DriverScoreData> nextPair)
+                    KeyValuePair<string, scoreCalcs.driverScoreData> firstPair,
+                    KeyValuePair<string, scoreCalcs.driverScoreData> nextPair)
                 {
-                    return firstPair.Value.ScoreData.BestRAW.CompareTo(nextPair.Value.ScoreData.BestRAW);
+                    return firstPair.Value.scoreData.bestRAW.CompareTo(nextPair.Value.scoreData.bestRAW);
                 });
 
-            foreach (KeyValuePair<string, ScoreCalcs.DriverScoreData> driver in myList)
+            foreach (KeyValuePair<string, scoreCalcs.driverScoreData> driver in myList)
             {
                 string driverRAW = "";
-                driverRAW = driver.Value.ScoreData.BestRAW.ToString("#0.000");
-                if (driver.Value.ScoreData.BestRAW >= ScoreCalcs.DNFvalue)
+                driverRAW = driver.Value.scoreData.bestRAW.ToString("#0.000");
+                if (driver.Value.scoreData.bestRAW >= scoreCalcs.DNFvalue)
                 {
                     driverRAW = "DNS";
                 }
 
-                string driverName = driver.Value.FirstName + " " + driver.Value.LastName.Substring(0, 1);
+                string driverName = driver.Value.firstName + " " + driver.Value.lastName.Substring(0, 1);
                 if (showLastName)
                 {
-                    driverName = driver.Value.FirstName + " " + driver.Value.LastName;
+                    driverName = driver.Value.firstName + " " + driver.Value.lastName;
                 }
                 string line = string
                     .Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,8:#.000}</td><td>{6,7:#0.000}</td>\r\n",
-                        driver.Value.ScoreData.RAWrank,
-                        driver.Value.Number,
-                        driver.Value.CarClass,
+                        driver.Value.scoreData.RAWrank,
+                        driver.Value.number,
+                        driver.Value.carClass,
                         driverName,
-                        driver.Value.CarDescription,
+                        driver.Value.carDescription,
                         driverRAW,
-                        driver.Value.ScoreData.RAWscore);
+                        driver.Value.scoreData.RAWscore);
 
                 results += string.Format(line);
-                if (driver.Value.Rookie)
+                if (driver.Value.rookie)
                 {
                     line = string
                         .Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,8:#.000}</td><td>{6,7:#0.000}</td>\r\n",
-                            driver.Value.ScoreData.RAWrookieRank,
-                            driver.Value.Number,
-                            driver.Value.CarClass,
+                            driver.Value.scoreData.RAWrookieRank,
+                            driver.Value.number,
+                            driver.Value.carClass,
                             driverName,
-                            driver.Value.CarDescription,
+                            driver.Value.carDescription,
                             driverRAW,
-                            driver.Value.ScoreData.RAWrookieScore);
+                            driver.Value.scoreData.RAWrookieScore);
 
                     rookieResults += line;
                 }
             }
             results += htmlTableFooter;
             rookieResults += htmlTableFooter;
-            if (args.ShowRookie)
+            if (args.showRookie)
             {
                 return results + rookieResults;
             }
@@ -316,7 +316,7 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        public static string PaxTimes(ScoreArgs args)
+        public static string PaxTimes(scoreArgs args)
         {
             string results = htmlTableHeader;
             results = results.Replace("%TABLENAME%", "Overall ranking by PAX time");
@@ -326,51 +326,51 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
             rookieResults = rookieResults.Replace("%TABLENAME%", "Rookie ranking by PAX time");
             rookieResults += @"<tr class=""hdr2""><td>Rank</td><td>Car#</td><td>Class</td><td>Driver</td><td>Car</td><td>Raw Time</td><td>PAX #</td><td>PAX Time</td><td>Score</td></tr>";
 
-            var myList = new List<KeyValuePair<string, ScoreCalcs.DriverScoreData>>(scores);
+            var myList = new List<KeyValuePair<string, scoreCalcs.driverScoreData>>(scores);
             // Sort by pax time
             myList
                 .Sort(delegate (
-                    KeyValuePair<string, ScoreCalcs.DriverScoreData> firstPair,
-                    KeyValuePair<string, ScoreCalcs.DriverScoreData> nextPair)
+                    KeyValuePair<string, scoreCalcs.driverScoreData> firstPair,
+                    KeyValuePair<string, scoreCalcs.driverScoreData> nextPair)
                 {
-                    return firstPair.Value.ScoreData.BestPAX.CompareTo(nextPair.Value.ScoreData.BestPAX);
+                    return firstPair.Value.scoreData.bestPAX.CompareTo(nextPair.Value.scoreData.bestPAX);
                 });
 
-            foreach (KeyValuePair<string, ScoreCalcs.DriverScoreData> driver in myList)
+            foreach (KeyValuePair<string, scoreCalcs.driverScoreData> driver in myList)
             {
-                string driverName = driver.Value.FirstName + " " + driver.Value.LastName.Substring(0, 1);
+                string driverName = driver.Value.firstName + " " + driver.Value.lastName.Substring(0, 1);
                 if (showLastName)
                 {
-                    driverName = driver.Value.FirstName + " " + driver.Value.LastName;
+                    driverName = driver.Value.firstName + " " + driver.Value.lastName;
                 }
                 results += string
                     .Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,5:#.000}</td><td>{6,5:#.000}</td><td> {7,5:#.000}</td><td>{8,5:#0.000}</td>\r\n",
-                        driver.Value.ScoreData.PAXrank,
-                        driver.Value.Number,
-                        driver.Value.CarClass,
+                        driver.Value.scoreData.PAXrank,
+                        driver.Value.number,
+                        driver.Value.carClass,
                         driverName,
-                        driver.Value.CarDescription,
-                        driver.Value.ScoreData.BestRAW < ScoreCalcs.DNFvalue ? driver.Value.ScoreData.BestRAW.ToString("#.000") : "DNS",
-                        driver.Value.Pax,
-                        driver.Value.ScoreData.BestPAX < ScoreCalcs.DNFvalue ? driver.Value.ScoreData.BestPAX.ToString("#.000") : "DNS",
-                        driver.Value.ScoreData.PAXscore);
+                        driver.Value.carDescription,
+                        driver.Value.scoreData.bestRAW < scoreCalcs.DNFvalue ? driver.Value.scoreData.bestRAW.ToString("#.000") : "DNS",
+                        driver.Value.pax,
+                        driver.Value.scoreData.bestPAX < scoreCalcs.DNFvalue ? driver.Value.scoreData.bestPAX.ToString("#.000") : "DNS",
+                        driver.Value.scoreData.PAXscore);
 
-                if (driver.Value.Rookie)
+                if (driver.Value.rookie)
                 {
                     rookieResults += string
                         .Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,5:#.000}</td><td>{6,5:#.000}</td><td>{7,5:#.000}</td><td>{8,5:#0.000}</td>\r\n",
-                            driver.Value.ScoreData.PAXRookieRank,
-                            driver.Value.Number,
-                            driver.Value.CarClass,
+                            driver.Value.scoreData.PAXRookieRank,
+                            driver.Value.number,
+                            driver.Value.carClass,
                             driverName,
-                            driver.Value.CarDescription,
-                            driver.Value.ScoreData.BestRAW < ScoreCalcs.DNFvalue ? driver.Value.ScoreData.BestRAW.ToString("#.000") : "DNS",
-                            driver.Value.Pax,
-                            driver.Value.ScoreData.BestPAX < ScoreCalcs.DNFvalue ? driver.Value.ScoreData.BestPAX.ToString("#.000") : "DNS",
-                            driver.Value.ScoreData.PAXrookieScore);
+                            driver.Value.carDescription,
+                            driver.Value.scoreData.bestRAW < scoreCalcs.DNFvalue ? driver.Value.scoreData.bestRAW.ToString("#.000") : "DNS",
+                            driver.Value.pax,
+                            driver.Value.scoreData.bestPAX < scoreCalcs.DNFvalue ? driver.Value.scoreData.bestPAX.ToString("#.000") : "DNS",
+                            driver.Value.scoreData.PAXrookieScore);
                 }
             }
-            if (args.ShowRookie)
+            if (args.showRookie)
             {
                 return results + rookieResults;
             }
@@ -387,7 +387,7 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
             while (i < input.Length && char.IsDigit(input[i])) i++;
 
             input = input.Substring(0, i);
-            if (!int.TryParse(input, out int value))
+            if (int.TryParse(input, out int value) == false)
             {
                 return 0;
             }
@@ -399,22 +399,22 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        public static string RunTimes(ScoreArgs args)
+        public static string RunTimes(scoreArgs args)
         {
             string results = htmlTableHeader;
             results = results.Replace("%TABLENAME%", "Run times (ordered by car number)");
             results += @"<tr class=""hdr2""><td>Car #</td><td>Member</td><td>Rookie</td><td>Class</td><td>Driver</td><td>Car</td><td>Sponsor</td></tr>";
 
-            var myList = new List<KeyValuePair<string, ScoreCalcs.DriverScoreData>>(scores);
+            var myList = new List<KeyValuePair<string, scoreCalcs.driverScoreData>>(scores);
             // Sort by car number
             myList
                 .Sort(delegate (
-                    KeyValuePair<string, ScoreCalcs.DriverScoreData> firstPair,
-                    KeyValuePair<string, ScoreCalcs.DriverScoreData> nextPair)
+                    KeyValuePair<string, scoreCalcs.driverScoreData> firstPair,
+                    KeyValuePair<string, scoreCalcs.driverScoreData> nextPair)
                 {
                     int d1Number, d2Number;
-                    d1Number = GetLeadingInt(firstPair.Value.Number);
-                    d2Number = GetLeadingInt(nextPair.Value.Number);
+                    d1Number = GetLeadingInt(firstPair.Value.number);
+                    d2Number = GetLeadingInt(nextPair.Value.number);
                     return d1Number.CompareTo(d2Number);
                 });
 
@@ -423,47 +423,47 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
             int numDays = 1;
             int day1NumSets = 1;    // min # of sets in a day
             int day2NumSets = 0;
-            if (!string.IsNullOrEmpty(args.Day2))
+            if (string.IsNullOrEmpty(args.day2) == false)
             {
                 numDays = 2;
                 day2NumSets = 1;    // min # of sets in a day
             }
-            foreach (KeyValuePair<string, ScoreCalcs.DriverScoreData> driver in myList)
+            foreach (KeyValuePair<string, scoreCalcs.driverScoreData> driver in myList)
             {
-                if ((driver.Value.Day1Set2.Runs.Count > 0) && (day1NumSets < 2))
+                if ((driver.Value.Day1Set2.runs.Count > 0) && (day1NumSets < 2))
                 {
                     day1NumSets = 2;
                 }
-                if ((driver.Value.Day1Set3.Runs.Count > 0) && (day1NumSets < 3))
+                if ((driver.Value.Day1Set3.runs.Count > 0) && (day1NumSets < 3))
                 {
                     day1NumSets = 3;
                 }
-                if ((numDays == 2) && (driver.Value.Day2Set2.Runs.Count > 0) && (day2NumSets < 2))
+                if ((numDays == 2) && (driver.Value.Day2Set2.runs.Count > 0) && (day2NumSets < 2))
                 {
                     day2NumSets = 2;
                 }
-                if ((numDays == 2) && (driver.Value.Day2Set3.Runs.Count > 0) && (day2NumSets < 3))
+                if ((numDays == 2) && (driver.Value.Day2Set3.runs.Count > 0) && (day2NumSets < 3))
                 {
                     day2NumSets = 3;
                 }
             }
 
-            foreach (KeyValuePair<string, ScoreCalcs.DriverScoreData> driver in myList)
+            foreach (KeyValuePair<string, scoreCalcs.driverScoreData> driver in myList)
             {
-                string driverName = driver.Value.FirstName + " " + driver.Value.LastName.Substring(0, 1);
+                string driverName = driver.Value.firstName + " " + driver.Value.lastName.Substring(0, 1);
                 if (showLastName)
                 {
-                    driverName = driver.Value.FirstName + " " + driver.Value.LastName;
+                    driverName = driver.Value.firstName + " " + driver.Value.lastName;
                 }
                 string line = string
                     .Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,5}</td><td>{6,5}</td></tr>\r\n",
-                        driver.Value.Number,
-                        driver.Value.Member,
-                        driver.Value.Rookie ? "Yes" : "No",
-                        driver.Value.CarClass,
+                        driver.Value.number,
+                        driver.Value.member,
+                        driver.Value.rookie ? "Yes" : "No",
+                        driver.Value.carClass,
                         driverName,
-                        driver.Value.CarDescription,
-                        driver.Value.Sponsor);
+                        driver.Value.carDescription,
+                        driver.Value.sponsor);
 
                 results += string.Format(line);
                 results += "<td colspan=\"1\"></td><td colspan=\"99\"><table width=\"100%\" cellpadding=\"2\" style=\"border-collapse: collapse\" border=\"1\" align=\"left\">";
@@ -493,15 +493,15 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 }
 
 
-                if (args.Set1Only)
+                if (args.set1Only == true)
                 {
                     results += string.Format("<tr><td class=\"hdr3\">{0,35}</td>", "Total (set1 only):");
                 }
-                else if (args.Set2Only)
+                else if (args.set2Only == true)
                 {
                     results += string.Format("<tr><td class=\"hdr3\">{0,35}</td>", "Total (set2 only):");
                 }
-                else if (args.BestSingleRun)
+                else if (args.bestSingleRun == true)
                 {
                     results += string.Format("<tr><td class=\"hdr3\">{0,35}</td>", "Total (single best run):");
                 }
@@ -512,13 +512,13 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 }
 
 
-                if (driver.Value.ScoreData.BestRAW >= ScoreCalcs.DNFvalue)
+                if (driver.Value.scoreData.bestRAW >= scoreCalcs.DNFvalue)
                 {
                     results += string.Format("<td class=\"highlight\">{0,8}</td>\r\n", "DNS");
                 }
                 else
                 {
-                    results += string.Format("<td class=\"highlight\">{0,8:#.000}</td>\r\n", driver.Value.ScoreData.BestRAW);
+                    results += string.Format("<td class=\"highlight\">{0,8:#.000}</td>\r\n", driver.Value.scoreData.bestRAW);
                 }
                 results += "</table>";
             }
@@ -526,59 +526,59 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
             return results;
         }
 
-        public static string PrintSet(ScoreArgs args, ScoreCalcs.SingleSetData setData, int dayNumber, int setNumber)
+        public static string PrintSet(scoreArgs args, scoreCalcs.singleSetData setData, int dayNumber, int setNumber)
         {
             string results = string.Format("<tr><td class=\"hdr3\">Day {0,1} Set {1,1}</td>", dayNumber, setNumber);
             bool hasRuns = false;
             int startRunNumber = -1;
-            foreach (var run in setData.Runs)
+            foreach (var run in setData.runs)
             {
                 hasRuns = true;
                 if (startRunNumber < 0)
                 {
                     // Note that run numbers don't start at 1 -- they increment across sets
-                    startRunNumber = run.RunNumber;
+                    startRunNumber = run.runNumber;
                 }
-                if ((run.RunNumber - startRunNumber) == args.MaxOfficialRuns)
+                if ((run.runNumber - startRunNumber) == args.maxOfficialRuns)
                 {
                     results += "<td class=\"data2\">Fun--></td>";
                 }
-                if (run.Penalty == "DNF")
+                if (run.penalty == "DNF")
                 {
-                    if (run.Time >= ScoreCalcs.DNFvalue)
+                    if (run.time >= scoreCalcs.DNFvalue)
                     {
                         // didn't even run
                         results += string.Format("<td class=\"data2\">{0,8:#.000}</td>", "DNS");
                     }
                     else
                     {
-                        results += string.Format("<td class=\"data2\">{0,8:#.000}{1,-4}</td>", run.Time, "+DNF");
+                        results += string.Format("<td class=\"data2\">{0,8:#.000}{1,-4}</td>", run.time, "+DNF");
                     }
                 }
-                else if (run.Penalty == "")
+                else if (run.penalty == "")
                 {
-                    if (run == setData.BestRun)
+                    if (run == setData.bestRun)
                     {
-                        results += string.Format("<td class=\"highlight\">{0,8:#.000}</td>", run.Time);
+                        results += string.Format("<td class=\"highlight\">{0,8:#.000}</td>", run.time);
                     }
                     else
                     {
-                        results += string.Format("<td class=\"data2\">{0,8:#.000}{1,-4}</td>", run.Time, "    ");
+                        results += string.Format("<td class=\"data2\">{0,8:#.000}{1,-4}</td>", run.time, "    ");
                     }
                 }
                 else
                 {
-                    if (run == setData.BestRun)
+                    if (run == setData.bestRun)
                     {
-                        results += string.Format("<td class=\"data2\">{0,8: (#.000}{1,-4}</td>", run.Time, "+" + run.Penalty + ")");
+                        results += string.Format("<td class=\"data2\">{0,8: (#.000}{1,-4}</td>", run.time, "+" + run.penalty + ")");
                     }
                     else
                     {
-                        results += string.Format("<td class=\"data2\">{0,8:#.000}{1,-4}</td>", run.Time, "+" + run.Penalty);
+                        results += string.Format("<td class=\"data2\">{0,8:#.000}{1,-4}</td>", run.time, "+" + run.penalty);
                     }
                 }
             }
-            if (!hasRuns)
+            if (hasRuns == false)
             {
                 results += string.Format("<td class=\"data2\">{0,8:#.000}{1,-4}</td>", "DNS   ", "    ");
             }
@@ -591,7 +591,7 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        public static string ClassTimes(ScoreArgs args)
+        public static string ClassTimes(scoreArgs args)
         {
             string results = htmlTableHeader;
             results = results.Replace("%TABLENAME%", "Overall ranking by Group");
@@ -600,46 +600,46 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
             rookieResults = rookieResults.Replace("%TABLENAME%", "Rookie ranking by Group");
 
             // Sort drivers by PAX time
-            var myList = new List<KeyValuePair<string, ScoreCalcs.DriverScoreData>>(scores);
+            var myList = new List<KeyValuePair<string, scoreCalcs.driverScoreData>>(scores);
             myList
                 .Sort(delegate (
-                    KeyValuePair<string, ScoreCalcs.DriverScoreData> firstPair,
-                    KeyValuePair<string, ScoreCalcs.DriverScoreData> nextPair)
+                    KeyValuePair<string, scoreCalcs.driverScoreData> firstPair,
+                    KeyValuePair<string, scoreCalcs.driverScoreData> nextPair)
                 {
-                    return firstPair.Value.ScoreData.BestPAX.CompareTo(nextPair.Value.ScoreData.BestPAX);
+                    return firstPair.Value.scoreData.bestPAX.CompareTo(nextPair.Value.scoreData.bestPAX);
                 });
 
-            foreach (KeyValuePair<int, ScoreCalcs.PaxInfo> classInfo in sortedClassList)
+            foreach (KeyValuePair<int, scoreCalcs.paxInfo> classInfo in sortedClassList)
             {
                 var curClass = classInfo.Value;
-                string curClassGroup = curClass.Group;
+                string curClassGroup = curClass.group;
 
                 double bestTime = 0.0;
 
-                foreach (KeyValuePair<string, ScoreCalcs.DriverScoreData> driver in myList)
+                foreach (KeyValuePair<string, scoreCalcs.driverScoreData> driver in myList)
                 {
-                    string origXgrps = driver.Value.CarXGroup;
-                    origXgrps += ";" + driver.Value.CarGroup;
+                    string origXgrps = driver.Value.carXGroup;
+                    origXgrps += ";" + driver.Value.carGroup;
 
                     string[] xgroups = origXgrps.Split(';');
                     bool driverIsInXgroup = false;
 
                     foreach (string xg in xgroups)
                     {
-                        if (xg == curClass.CarClass)
+                        if (xg == curClass.carClass)
                         {
                             driverIsInXgroup = true;
                             break;
                         }
                     }
-                    if (!driverIsInXgroup)
+                    if (driverIsInXgroup == false)
                     {
                         continue;
                     }
-                    ScoreCalcs.Groupscore grpPtr = null;
-                    foreach (ScoreCalcs.Groupscore grp in driver.Value.ScoreData.GroupScores)
+                    scoreCalcs.groupscore grpPtr = null;
+                    foreach (scoreCalcs.groupscore grp in driver.Value.scoreData.groupScores)
                     {
-                        if (grp.GroupName == curClass.CarClass)
+                        if (grp.groupName == curClass.carClass)
                         {
                             grpPtr = grp;
                             break;
@@ -653,102 +653,94 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                     string line = "";
 
 
-                    line += string.Format("<tr class=\"hdr3\" nowrap align=\"center\"><td colspan=\"999\">" + curClass.CarClass + " (" + curClass.Description + ")</td></tr>\r\n");
+                    line += string.Format("<tr class=\"hdr3\" nowrap align=\"center\"><td colspan=\"999\">" + curClass.carClass + " (" + curClass.description + ")</td></tr>\r\n");
                     line += @"<tr class=""hdr2""><td>Rank</td><td>Car#</td><td>Class</td><td>Driver</td><td>Car</td><td>Raw Time</td><td>PAX #</td><td>PAX time</td><td>Score</td>";
 
                     line += string.Format("</tr>\r\n");
 
-                    if (grpPtr.GroupRank == 1)
+                    if (grpPtr.groupRank == 1)
                     {
                         results += line;
                     }
-                    if ((grpPtr.GroupRookieRank == 1) && (driver.Value.Rookie))
+                    if ((grpPtr.groupRookieRank == 1) && (driver.Value.rookie))
                     {
                         rookieResults += line;
                     }
 
-                    if (driver.Value.LastName == "")
+                    if (driver.Value.lastName == "")
                     {
-                        driver.Value.LastName = "Unknown";
+                        driver.Value.lastName = "Unknown";
                     }
-                    if (grpPtr.GroupRank == 1)
+                    if (grpPtr.groupRank == 1)
                     {
-                        bestTime = driver.Value.ScoreData.BestPAX;
+                        bestTime = driver.Value.scoreData.bestPAX;
                     }
 
                     string driverRAW;
-                    driverRAW = driver.Value.ScoreData.BestRAW.ToString("#0.000");
-                    if (driver.Value.ScoreData.BestRAW >= ScoreCalcs.DNFvalue)
+                    driverRAW = driver.Value.scoreData.bestRAW.ToString("#0.000");
+                    if (driver.Value.scoreData.bestRAW >= scoreCalcs.DNFvalue)
                     {
                         driverRAW = "DNS";
                     }
 
                     string driverPAX;
-                    driverPAX = driver.Value.ScoreData.BestPAX.ToString("#0.000");
+                    driverPAX = driver.Value.scoreData.bestPAX.ToString("#0.000");
 
-                    if (driver.Value.ScoreData.BestRAW >= ScoreCalcs.DNFvalue)
+                    if (driver.Value.scoreData.bestRAW >= scoreCalcs.DNFvalue)
                     {
                         driverPAX = "DNS";
                     }
 
                     string trophyIndicator = "T";
                     string rookieTrophyIndicator = "T";
-                    if (grpPtr.GroupTrophy)
-                    {
+                    if (grpPtr.groupTrophy == true)
                         trophyIndicator = "T";
-                    }
                     else
-                    {
                         trophyIndicator = "";
-                    }
 
-                    if (grpPtr.GroupRookieTrophy)
-                    {
+                    if (grpPtr.groupRookieTrophy == true)
                         rookieTrophyIndicator = "T";
-                    }
                     else
-                    {
                         rookieTrophyIndicator = "";
-                    }
 
-                    string driverName = driver.Value.FirstName + " " + driver.Value.LastName.Substring(0, 1);
+                    string driverName = driver.Value.firstName + " " + driver.Value.lastName.Substring(0, 1);
                     if (showLastName)
                     {
-                        driverName = driver.Value.FirstName + " " + driver.Value.LastName;
+                        driverName = driver.Value.firstName + " " + driver.Value.lastName;
                     }
                     results += string
                         .Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,8:#.000}</td><td>{6,9:#.000}</td><td>{7,9:#.000}</td><td>{8,7:#0.000}</td>\r\n",
-                            trophyIndicator + grpPtr.GroupRank,
-                            driver.Value.Number,
-                            driver.Value.CarClass,
+                            trophyIndicator + grpPtr.groupRank,
+                            driver.Value.number,
+                            driver.Value.carClass,
                             driverName,
-                            driver.Value.CarDescription,
+                            driver.Value.carDescription,
                             driverRAW,
-                            driver.Value.Pax,
+                            driver.Value.pax,
                             driverPAX,
-                            grpPtr.GroupScore);
+                            grpPtr.groupScore);
 
                     results += string.Format("\r\n");
 
-                    if (driver.Value.Rookie)
+                    if (driver.Value.rookie)
                     {
                         rookieResults += string
                             .Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,3}</td><td>{3,3}</td><td>{4,5}</td><td>{5,8:#.000}</td><td>{6,9:#.000}</td><td>{7,9:#.000}</td><td>{8,7:#0.000}</td>\r\n",
-                                rookieTrophyIndicator + grpPtr.GroupRookieRank,
-                                driver.Value.Number,
-                                driver.Value.CarClass,
+                                rookieTrophyIndicator + grpPtr.groupRookieRank,
+                                driver.Value.number,
+                                driver.Value.carClass,
                                 driverName,
-                                driver.Value.CarDescription,
+                                driver.Value.carDescription,
                                 driverRAW,
-                                driver.Value.Pax,
+                                driver.Value.pax,
                                 driverPAX,
-                                grpPtr.GroupRookieScore);
+                                grpPtr.groupRookieScore);
 
                         rookieResults += string.Format("\r\n");
                     }
                 }
             }
-            if (args.ShowRookie)
+            if (args.showRookie)
             {
                 return results + rookieResults;
             }
@@ -763,7 +755,7 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        public static string ConeCounts(ScoreArgs args)
+        public static string ConeCounts(scoreArgs args)
         {
             string results = htmlTableHeader;
             results = results.Replace("%TABLENAME%", "Cone counts");
@@ -771,24 +763,24 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
             {
                 return "";
             }
-            var myList = new List<KeyValuePair<string, ScoreCalcs.DriverScoreData>>(scores);
+            var myList = new List<KeyValuePair<string, scoreCalcs.driverScoreData>>(scores);
             // Sort by cone counts
             myList
                 .Sort(delegate (
-                    KeyValuePair<string, ScoreCalcs.DriverScoreData> firstPair,
-                    KeyValuePair<string, ScoreCalcs.DriverScoreData> nextPair)
+                    KeyValuePair<string, scoreCalcs.driverScoreData> firstPair,
+                    KeyValuePair<string, scoreCalcs.driverScoreData> nextPair)
                 {
-                    return nextPair.Value.ConeCount.CompareTo(firstPair.Value.ConeCount);
+                    return nextPair.Value.coneCount.CompareTo(firstPair.Value.coneCount);
                 });
 
             results += @"<tr class=""hdr2""><td>Rank</td><td>Car#</td><td>Driver</td><td>Cones</td></tr>";
 
             int rank = 0;
             int lastCount = 9999;
-            foreach (KeyValuePair<string, ScoreCalcs.DriverScoreData> driver in myList)
+            foreach (KeyValuePair<string, scoreCalcs.driverScoreData> driver in myList)
             {
                 int tcones = 0;
-                tcones = driver.Value.ConeCount;
+                tcones = driver.Value.coneCount;
 
                 if (tcones <= 0)
                 {
@@ -798,15 +790,15 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 {
                     rank += 1;
                 }
-                string driverName = driver.Value.FirstName + " " + driver.Value.LastName.Substring(0, 1);
+                string driverName = driver.Value.firstName + " " + driver.Value.lastName.Substring(0, 1);
                 if (showLastName)
                 {
-                    driverName = driver.Value.FirstName + " " + driver.Value.LastName;
+                    driverName = driver.Value.firstName + " " + driver.Value.lastName;
                 }
                 results += string
                     .Format("<tr class=data><td>{0,4}</td><td>{1,4}</td><td>{2,35}</td><td>{3,4}</td></tr>\r\n",
                         rank,
-                        driver.Value.Number,
+                        driver.Value.number,
                         driverName,
                         tcones.ToString());
 
@@ -822,7 +814,7 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        public static string TeamTimes(ScoreArgs args)
+        public static string TeamTimes(scoreArgs args)
         {
             if (args == null)
             {
@@ -837,19 +829,19 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
             // We sort our teams by raw time
             teamScores
                 .Sort(delegate (
-                    ScoreCalcs.TeamData first,
-                    ScoreCalcs.TeamData next)
+                    scoreCalcs.teamData first,
+                    scoreCalcs.teamData next)
                 {
                     // disable ConvertToLambdaExpression
-                    return first.RawTotal.CompareTo(next.RawTotal);
+                    return first.rawTotal.CompareTo(next.rawTotal);
                 });
 
             // now go through the sorted list and print out raw team results
             RAWresults += @"<tr class=""hdr2""><td>Rank</td><td>Team</td><td>Total RAW</td><td>Total PAX</td><td>Cones</td></tr>";
             int rank = 1;
-            foreach (ScoreCalcs.TeamData tm in teamScores)
+            foreach (scoreCalcs.teamData tm in teamScores)
             {
-                if (tm.TeamType.StartsWith("PAX"))
+                if (tm.teamType.StartsWith("PAX") == true)
                 {
                     continue;
                 }
@@ -857,26 +849,26 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 RAWresults += string
                     .Format("\r\n<tr class=data><td class=hdr2>{0,4}</td><td>{1,6}</td><td>RAW:{2,8:#.000}</td><td>PAX:{3,8:#.000}</td><td>Cones: {4}</td></tr>\r\n",
                         rank.ToString(),
-                        tm.Team,
-                        TimeOrDNS(tm.RawTotal),
-                        TimeOrDNS(tm.PaxTotal),
-                        tm.ConeTotal);
+                        tm.team,
+                        TimeOrDNS(tm.rawTotal),
+                        TimeOrDNS(tm.paxTotal),
+                        tm.coneTotal);
 
                 RAWresults += "<td colspan=\"1\"></td><td colspan=\"99\"><table width=\"100%\" cellpadding=\"2\" style=\"border-collapse: collapse\" border=\"1\" align=\"left\">";
                 rank += 1;
-                foreach (ScoreCalcs.DriverScoreData driver in tm.TeamDrivers)
+                foreach (scoreCalcs.driverScoreData driver in tm.teamDrivers)
                 {
-                    string driverName = driver.FirstName + " " + driver.LastName.Substring(0, 1);
+                    string driverName = driver.firstName + " " + driver.lastName.Substring(0, 1);
                     if (showLastName)
                     {
-                        driverName = driver.FirstName + " " + driver.LastName;
+                        driverName = driver.firstName + " " + driver.lastName;
                     }
                     RAWresults += string
                         .Format("<tr class=data2><td>Driver {0,3}</td><td>{1,-14}</td><td>RAW:{2, 8:#.000}</td><td>PAX:{3, 8:#.000}</td></tr>\r\n",
-                            driver.Number,
+                            driver.number,
                             driverName,
-                            TimeOrDNS(driver.ScoreData.BestRAW),
-                            TimeOrDNS(driver.ScoreData.BestPAX));
+                            TimeOrDNS(driver.scoreData.bestRAW),
+                            TimeOrDNS(driver.scoreData.bestPAX));
                 }
                 RAWresults += "</table>";
             }
@@ -885,18 +877,18 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
             // Now we sort our teams by PAX time
             teamScores
                 .Sort(delegate (
-                    ScoreCalcs.TeamData first,
-                    ScoreCalcs.TeamData next)
+                    scoreCalcs.teamData first,
+                    scoreCalcs.teamData next)
                 {
-                    return first.PaxTotal.CompareTo(next.PaxTotal);
+                    return first.paxTotal.CompareTo(next.paxTotal);
                 });
 
             PAXresults += @"<tr class=""hdr2""><td>Rank</td><td>Team</td><td>Total RAW</td><td>Total PAX</td><td>Cones</td></tr>";
 
             rank = 1;
-            foreach (ScoreCalcs.TeamData tm in teamScores)
+            foreach (scoreCalcs.teamData tm in teamScores)
             {
-                if (tm.TeamType.StartsWith("RAW"))
+                if (tm.teamType.StartsWith("RAW") == true)
                 {
                     continue;
                 }
@@ -904,26 +896,26 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 PAXresults += string
                     .Format("\r\n<tr class=data><td class=hdr2>{0,4}</td><td>{1,6}</td><td>RAW:{2,8:#.000}</td><td>PAX:{3,8:#.000}</td><td>Cones: {4}</td></tr>\r\n",
                         rank.ToString(),
-                        tm.Team,
-                        TimeOrDNS(tm.RawTotal),
-                        TimeOrDNS(tm.PaxTotal),
-                        tm.ConeTotal);
+                        tm.team,
+                        TimeOrDNS(tm.rawTotal),
+                        TimeOrDNS(tm.paxTotal),
+                        tm.coneTotal);
 
                 PAXresults += "<td colspan=\"1\"></td><td colspan=\"99\"><table width=\"100%\" cellpadding=\"2\" style=\"border-collapse: collapse\" border=\"1\" align=\"left\">";
                 rank += 1;
-                foreach (ScoreCalcs.DriverScoreData driver in tm.TeamDrivers)
+                foreach (scoreCalcs.driverScoreData driver in tm.teamDrivers)
                 {
-                    string driverName = driver.FirstName + " " + driver.LastName.Substring(0, 1);
+                    string driverName = driver.firstName + " " + driver.lastName.Substring(0, 1);
                     if (showLastName)
                     {
-                        driverName = driver.FirstName + " " + driver.LastName;
+                        driverName = driver.firstName + " " + driver.lastName;
                     }
                     PAXresults += string
                         .Format("<tr class=data2><td>Driver {0,3}</td><td>{1,-14}</td><td>RAW:{2, 8:#.000}</td><td>PAX:{3, 8:#.000}</td></tr>\r\n",
-                            driver.Number,
+                            driver.number,
                             driverName,
-                            TimeOrDNS(driver.ScoreData.BestRAW),
-                            TimeOrDNS(driver.ScoreData.BestPAX));
+                            TimeOrDNS(driver.scoreData.bestRAW),
+                            TimeOrDNS(driver.scoreData.bestPAX));
                 }
                 PAXresults += "</table>";
             }
@@ -931,64 +923,64 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
             return RAWresults + PAXresults;
         }
 
-        public static string Statistics(ScoreArgs args)
+        public static string Statistics(scoreArgs args)
         {
             string results = htmlTableHeader;
             results = results.Replace("%TABLENAME%", "Statistics");
-            if (stats.Day1.Set1NumberOfRuns > 0)
+            if (stats.day1.set1NumberOfRuns > 0)
             {
                 results += string
                     .Format("<tr class=data><td>Day1, Set1: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
-                        stats.Day1.Set1TimeOfFirstRun,
-                        stats.Day1.Set1TimeOfLastRun,
-                        stats.Day1.Set1NumberOfRuns,
-                        stats.Day1.Set1TotalTime / stats.Day1.Set1NumberOfRuns);
+                        stats.day1.set1TimeOfFirstRun,
+                        stats.day1.set1TimeOfLastRun,
+                        stats.day1.set1NumberOfRuns,
+                        stats.day1.set1TotalTime / stats.day1.set1NumberOfRuns);
             }
-            if (stats.Day1.Set2NumberOfRuns > 0)
+            if (stats.day1.set2NumberOfRuns > 0)
             {
                 results += string
                     .Format("<tr class=data><td>Day1, Set2: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
-                        stats.Day1.Set2TimeOfFirstRun,
-                        stats.Day1.Set2TimeOfLastRun,
-                        stats.Day1.Set2NumberOfRuns,
-                        stats.Day1.Set2TotalTime / stats.Day1.Set2NumberOfRuns);
+                        stats.day1.set2TimeOfFirstRun,
+                        stats.day1.set2TimeOfLastRun,
+                        stats.day1.set2NumberOfRuns,
+                        stats.day1.set2TotalTime / stats.day1.set2NumberOfRuns);
             }
-            if (stats.Day1.Set3NumberOfRuns > 0)
+            if (stats.day1.set3NumberOfRuns > 0)
             {
                 results += string
                     .Format("<tr class=data><td>Day1, Fun runs: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
-                        stats.Day1.Set3TimeOfFirstRun,
-                        stats.Day1.Set3TimeOfLastRun,
-                        stats.Day1.Set3NumberOfRuns,
-                        stats.Day1.Set3TotalTime / stats.Day1.Set3NumberOfRuns);
+                        stats.day1.set3TimeOfFirstRun,
+                        stats.day1.set3TimeOfLastRun,
+                        stats.day1.set3NumberOfRuns,
+                        stats.day1.set3TotalTime / stats.day1.set3NumberOfRuns);
             }
             // Day 2 if we have one
-            if (stats.Day2.Set1NumberOfRuns > 0)
+            if (stats.day2.set1NumberOfRuns > 0)
             {
                 results += string
                     .Format("<tr class=data><td>Day2, Set1: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
-                        stats.Day2.Set1TimeOfFirstRun,
-                        stats.Day2.Set1TimeOfLastRun,
-                        stats.Day2.Set1NumberOfRuns,
-                        stats.Day2.Set1TotalTime / stats.Day2.Set1NumberOfRuns);
+                        stats.day2.set1TimeOfFirstRun,
+                        stats.day2.set1TimeOfLastRun,
+                        stats.day2.set1NumberOfRuns,
+                        stats.day2.set1TotalTime / stats.day2.set1NumberOfRuns);
             }
-            if (stats.Day2.Set2NumberOfRuns > 0)
+            if (stats.day2.set2NumberOfRuns > 0)
             {
                 results += string
                     .Format("<tr class=data><td>Day2, Set2: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
-                        stats.Day2.Set2TimeOfFirstRun,
-                        stats.Day2.Set2TimeOfLastRun,
-                        stats.Day2.Set2NumberOfRuns,
-                        stats.Day2.Set2TotalTime / stats.Day2.Set2NumberOfRuns);
+                        stats.day2.set2TimeOfFirstRun,
+                        stats.day2.set2TimeOfLastRun,
+                        stats.day2.set2NumberOfRuns,
+                        stats.day2.set2TotalTime / stats.day2.set2NumberOfRuns);
             }
-            if (stats.Day2.Set3NumberOfRuns > 0)
+            if (stats.day2.set3NumberOfRuns > 0)
             {
                 results += string
                     .Format("<tr class=data><td>Day2, Fun runs: </td><td>First run: {0} </td><td>Last run: {1} </td><td>Number of runs: {2} </td><td>Avg run time: {3,5:#0.00}</td>\r\n",
-                        stats.Day2.Set3TimeOfFirstRun,
-                        stats.Day2.Set3TimeOfLastRun,
-                        stats.Day2.Set3NumberOfRuns,
-                        stats.Day2.Set3TotalTime / stats.Day2.Set3NumberOfRuns);
+                        stats.day2.set3TimeOfFirstRun,
+                        stats.day2.set3TimeOfLastRun,
+                        stats.day2.set3NumberOfRuns,
+                        stats.day2.set3TotalTime / stats.day2.set3NumberOfRuns);
             }
             return results;
         }
@@ -1000,7 +992,7 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
         /// <returns></returns>
         public static string TimeOrDNS(double time)
         {
-            if (time >= ScoreCalcs.DNFvalue)
+            if (time >= scoreCalcs.DNFvalue)
             {
                 // didn't even run
                 return "DNS   ";

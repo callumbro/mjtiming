@@ -13,39 +13,39 @@ namespace RaceBeam
         public string mjFolder;
         public CSVData configData = new CSVData();
         string configFilename = "";
-        public void LoadConfig()
+        public void load_config()
         {
             mjFolder = Process.GetCurrentProcess().MainModule.FileName;
             mjFolder = Path.GetDirectoryName(mjFolder);
+            mjFolder += "\\..";
             configFilename = mjFolder + "\\config\\configData.csv";
             configFolder = Path.GetDirectoryName(configFilename);
 
             // First see if we need to copy our template files for a new install
-            if (!Directory.Exists(configFolder))
+            if (Directory.Exists(configFolder) == false)
             {
                 Directory.CreateDirectory(configFolder);
             }
-            string templateFolder = mjFolder;
-            templateFolder += "\\config_templates";
-            if (!File.Exists(configFilename))
+            string templateFolder = mjFolder + "\\config_templates";
+            if (File.Exists(configFilename) == false)
             {
                 File.Copy(templateFolder + "\\configData.csv", configFolder + "\\configData.csv", false);
             }
             // Copy the others too
-            if (!File.Exists(configFolder + "\\_driverData.csv"))
+            if (File.Exists(configFolder + "\\_driverData.csv") == false)
             {
                 File.Copy(templateFolder + "\\_driverData.csv", configFolder + "\\_driverData.csv", false);
             }
-            if (!File.Exists(configFolder + "\\_classData.csv"))
+            if (File.Exists(configFolder + "\\_classData.csv") == false)
             {
                 File.Copy(templateFolder + "\\_classData.csv", configFolder + "\\_classData.csv", false);
             }
-            if (!File.Exists(configFolder + "\\_webStyle.css"))
+            if (File.Exists(configFolder + "\\_webStyle.css") == false)
             {
                 File.Copy(templateFolder + "\\_webStyle.css", configFolder + "\\_webStyle.css", false);
             }
             // Check for scoring style file
-            if (!File.Exists(configFolder + "\\_scoreStyles.css"))
+            if (File.Exists(configFolder + "\\_scoreStyles.css") == false)
             {
                 File.Copy(templateFolder + "\\_scoreStyles.css", configFolder + "\\_scoreStyles.css", false);
             }
@@ -60,7 +60,7 @@ namespace RaceBeam
             List<string> columns = configData.GetHeaders();
             foreach (string col in columns)
             {
-                if (configurationDataGridView.Columns.Contains(col))
+                if (configurationDataGridView.Columns.Contains(col) == true)
                 {
                     continue;
                 }
@@ -73,9 +73,9 @@ namespace RaceBeam
             configurationDataGridView.Columns["Value"].Width = 300;
             configurationDataGridView.Columns["Description"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             configurationDataGridView.Columns["Description"].MinimumWidth = 10;
-            configurationDataGridView.CellValidating += new DataGridViewCellValidatingEventHandler(ConfigCellValidating);
-            configurationDataGridView.CellDoubleClick += new DataGridViewCellEventHandler(ConfigCellContentClick);
-            List<string> parameters = configData.GetKeys();
+            configurationDataGridView.CellValidating += new DataGridViewCellValidatingEventHandler(Config_CellValidating);
+            configurationDataGridView.CellDoubleClick += new DataGridViewCellEventHandler(Config_CellContentClick);
+            List<string> parameters = configData.getKeys();
             foreach (string parm in parameters)
             {
                 var record = new string[columns.Count];
@@ -102,7 +102,7 @@ namespace RaceBeam
             }
         }
 
-        public void SaveConfig()
+        public void Save_config()
         {
             try
             {
@@ -120,7 +120,7 @@ namespace RaceBeam
                     }
                     row = "";
                     row = configurationDataGridView["Parameter", rowindex].Value.ToString();
-                    if (string.IsNullOrEmpty(row))
+                    if (string.IsNullOrEmpty(row) == true)
                     {
                         continue;
                     }
@@ -145,7 +145,7 @@ namespace RaceBeam
                 tw.Close();
                 // now re-load all the data
                 configurationDataGridView.Rows.Clear();
-                LoadConfig();
+                load_config();
             }
             catch (Exception ex)
             {
@@ -153,7 +153,7 @@ namespace RaceBeam
             }
         }
 
-        private void ConfigCellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void Config_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
             string headerText = configurationDataGridView.Columns[e.ColumnIndex].HeaderText;
@@ -170,7 +170,7 @@ namespace RaceBeam
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ConfigCellValidating(object sender, DataGridViewCellValidatingEventArgs e)
+        private void Config_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
         {
             dataModified = true;  // may not be true, but could be true
             string headerText = configurationDataGridView.Columns[e.ColumnIndex].HeaderText;
@@ -183,7 +183,7 @@ namespace RaceBeam
             }
 
             // Abort edit if cell is not in the Value column.
-            if (!headerText.Equals("Value"))
+            if (headerText.Equals("Value") == false)
             {
                 //e.Cancel = true;
                 return;
@@ -194,7 +194,7 @@ namespace RaceBeam
             // Confirm that the value is valid if it is a path
             if ((param == "driverDataFile") || (param == "classDataFile"))
             {
-                if (!File.Exists(data))
+                if (File.Exists(data) == false)
                 {
                     MessageBox.Show("No such file");
                     e.Cancel = true;
@@ -215,7 +215,7 @@ namespace RaceBeam
             // Confirm that the value is valid if it is a folder
             if ((param == "eventDataFolder") || (param == "backupDataFolder"))
             {
-                if (!Directory.Exists(data))
+                if (Directory.Exists(data) == false)
                 {
                     MessageBox.Show("No such folder");
                     e.Cancel = true;

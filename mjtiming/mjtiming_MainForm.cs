@@ -25,7 +25,7 @@ namespace RaceBeam
         private readonly RunData timingData;
 
         private readonly BindingSource timergridBindingSource = new BindingSource();
-        // -------------------------------------------------------------------
+
         public MainForm()
         {
 
@@ -33,13 +33,14 @@ namespace RaceBeam
             // The InitializeComponent() call is required for Windows Forms designer support.
             //
             InitializeComponent();
-            LoadConfig();
+            load_config();
             InitClasses();
-            timingData = new RunData(new logMsg(ShowMsg),
-                                     configData.GetField("driverDataFile", "Value"),
-                                     configData.GetField("backupDataFolder", "Value"),
-                                     configData
-                                    );
+            timingData = new RunData(
+                new logMsg(ShowMsg),
+                configData.GetField("driverDataFile", "Value"),
+                configData.GetField("backupDataFolder", "Value"),
+                configData);
+
             timer = new SerialIO(new logMsg(ShowMsg), new InvokeTimeEvent(TimeEvent), configData);
 
             SetComboBox.SelectedIndex = 0; // Make Set 1 the starting selection
@@ -97,11 +98,11 @@ namespace RaceBeam
             Day1TextBox.Text = DateTime.Now.ToString("yyyy_MM_dd");
 
             // Create data folders if necessary
-            if (!Directory.Exists(configData.GetField("eventDataFolder", "Value")))
+            if (Directory.Exists(configData.GetField("eventDataFolder", "Value")) == false)
             {
                 Directory.CreateDirectory(configData.GetField("eventDataFolder", "Value"));
             }
-            if (!Directory.Exists(configData.GetField("backupDataFolder", "Value")))
+            if (Directory.Exists(configData.GetField("backupDataFolder", "Value")) == false)
             {
                 Directory.CreateDirectory(configData.GetField("backupDataFolder", "Value"));
             }
@@ -153,7 +154,6 @@ namespace RaceBeam
             InitClasses();
         }
 
-        // -------------------------------------------------------------------
         [STAThread]
         public static void Main()
         {
@@ -166,7 +166,7 @@ namespace RaceBeam
             }
             Application.Run(new MainForm());
         }
-        // -------------------------------------------------------------------
+
         /// <summary>
         /// Trap the keystrokes so we can use the function keys
         /// </summary>
@@ -240,14 +240,15 @@ namespace RaceBeam
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        // ----------------------------------------------------------------------
-        // Update the datagrid view and reset the column ordering and visibility
+        /// <summary>
+        /// Update the datagrid view and reset the column ordering and visibility
+        /// </summary>
         public void RefreshView()
         {
             timergrid.Refresh();
             return;
         }
-        // ----------------------------------------------------------------------
+
         public delegate void InvokeshowMsg(string msg);
         public void ShowMsg(string msg)
         {
@@ -262,17 +263,17 @@ namespace RaceBeam
                 msgTextBox.Clear();
             }
 
-            if (msg.StartsWith("Input data:") ||
-                msg.StartsWith("SS:") ||
-                msg.StartsWith("FE:") ||
-                msg.StartsWith("FS:") ||
-                msg.StartsWith("FSync:") ||
-                msg.StartsWith("SSync:") ||
-                msg.StartsWith("FInit:") ||
-                msg.StartsWith("SInit:") ||
-                msg.StartsWith("FTrip:") ||
-                msg.StartsWith("STrip:") ||
-                msg.StartsWith("Q"))
+            if ((msg.StartsWith("Input data:") == true) ||
+                (msg.StartsWith("SS:") == true) ||
+                (msg.StartsWith("FE:") == true) ||
+                (msg.StartsWith("FS:") == true) ||
+                (msg.StartsWith("FSync:") == true) ||
+                (msg.StartsWith("SSync:") == true) ||
+                (msg.StartsWith("FInit:") == true) ||
+                (msg.StartsWith("SInit:") == true) ||
+                (msg.StartsWith("FTrip:") == true) ||
+                (msg.StartsWith("STrip:") == true) ||
+                (msg.StartsWith("Q") == true))
             {
                 if (configData.GetField("logTimingMessages", "Value").Contains("Y"))
                 {
@@ -287,7 +288,7 @@ namespace RaceBeam
             msgTextBox.SelectionStart = msgTextBox.Text.Length;
             //timergrid.Focus();
         }
-        // ----------------------------------------------------------------------
+
         public void TimeEvent(string type, string time)
         {
             // Do the invoke here to save everyone else the bother
@@ -311,7 +312,7 @@ namespace RaceBeam
                 for (int i = 0; i < timingData._data.Count; i++)
                 {
                     var r = (Runtime)(timingData._data[i]);
-                    if (string.IsNullOrEmpty(r._car_number) && (r.Penalty != "RRN"))
+                    if ((string.IsNullOrEmpty(r._car_number) == true) && (r.Penalty != "RRN"))
                     {
                         // Do not move focus away from user input
                         // timergrid.CurrentCell = timergrid[0,i];
@@ -387,7 +388,7 @@ namespace RaceBeam
                 bool AC4Protocol = false;  // weird device that only sends finish triggers
                 string AC4proto = configData.GetField("AC4Protocol", "Value");
                 AC4proto = AC4proto.ToUpperInvariant();
-                if (!string.IsNullOrEmpty(AC4proto) && AC4proto.StartsWith("Y"))
+                if ((string.IsNullOrEmpty(AC4proto) == false) && (AC4proto.StartsWith("Y") == true))
                 {
                     AC4Protocol = true;
                 }
@@ -395,17 +396,17 @@ namespace RaceBeam
                 {
                     AC4Protocol = false;
                 }
-                if (AC4Protocol)
+                if (AC4Protocol == true)
                 {
                     timingData.TimingEvent("A", "000000");  // Generate a false start trigger with time 0
                     type = "B";  // Convert event to a finish trigger
-                    if (!string.IsNullOrEmpty(time))
+                    if (string.IsNullOrEmpty(time) == false)
                     {
                         char[] charArray = time.ToCharArray();
                         Array.Reverse(charArray);
                         string revTime = new string(charArray);
                         PenaltyAndTime revmsg = timingData.TimingEvent(type, revTime);
-                        if (double.TryParse(revTime, out double dval))
+                        if (double.TryParse(revTime, out double dval) == true)
                         {
                             timer.DisplayTime(revmsg);
                         }
@@ -416,9 +417,9 @@ namespace RaceBeam
                 {
                     // normal time event (not AC4)
                     PenaltyAndTime msg = timingData.TimingEvent(type, time);
-                    if (!string.IsNullOrEmpty(msg.time))
+                    if (string.IsNullOrEmpty(msg.time) == false)
                     {
-                        if (double.TryParse(msg.time, out double dval))
+                        if (double.TryParse(msg.time, out double dval) == true)
                         {
                             timer.DisplayTime(msg);
                         }
@@ -427,8 +428,8 @@ namespace RaceBeam
                 }
             }
         }
-        // ----------------------------------------------------------------------
-        private void TabControl1_Selected(Object sender, TabControlEventArgs e)
+
+        private void TabControl1_Selected(object sender, TabControlEventArgs e)
         {
 
             if (e.TabPage.Name == "scoringTabPage")
@@ -437,7 +438,7 @@ namespace RaceBeam
             }
             else if (e.TabPage.Name == "HeatsTabPage")
             {
-                string heatInfo = Heats.DoHeatCalcs();
+                string heatInfo = Heats.doHeatCalcs();
                 HeatsTextBox.Clear();
                 HeatsTextBox.AppendText(heatInfo);
             }
@@ -467,12 +468,12 @@ namespace RaceBeam
 
             }
         }
-        // ----------------------------------------------------------------------
+
         void TimerPortButtonClick(object sender, EventArgs e)
         {
             // Check if we have a date rollover
             string today = DateTime.Now.ToString("yyyy_MM_dd");
-            if (!timingFileName.Contains(today))
+            if (timingFileName.Contains(today) == false)
             {
                 MessageBox.Show("You must exit and restart MJTiming -- date has changed!", "MJ Timing", MessageBoxButtons.OK);
                 return;
@@ -480,7 +481,7 @@ namespace RaceBeam
 
             if (TimerPortButton.Text.Contains("Stopped"))
             {
-                if (!timer.StartTiming())
+                if (timer.StartTiming() == false)
                 {
                     string timerPortName = configData.GetField("timerPort", "Value");
                     MessageBox.Show("Unable to open timer port " + timerPortName);
@@ -507,12 +508,11 @@ namespace RaceBeam
             }
         }
 
-        // ----------------------------------------------------------------------
         private void TimergridCellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             //showMsg("Click " + e.ColumnIndex.ToString() + " Row: " + e.RowIndex.ToString());
         }
-        // ----------------------------------------------------------------------
+
         void TimergridKeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == 12)
@@ -534,33 +534,45 @@ namespace RaceBeam
             }
 
         }
-        // ----------------------------------------------------------------------
+
         void GotoLastRow()
         {
             // ctrl-L (go to first empty row)
             for (int i = 0; i < timingData._data.Count; i++)
             {
                 var r = (Runtime)(timingData._data[i]);
-                if (string.IsNullOrEmpty(r._car_number) && (r.Penalty != "RRN"))
+                if ((string.IsNullOrEmpty(r._car_number) == true) && (r.Penalty != "RRN"))
                 {
                     timergrid.CurrentCell = timergrid[0, i];
                     break;
                 }
             }
         }
-        // ----------------------------------------------------------------------
-        // twiddle current column (cannot change row or we call here recursively)
+
+        /// <summary>
+        /// twiddle current column (cannot change row or we call here recursively)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void Timergrid_RowEnter(object sender, DataGridViewCellEventArgs e)
         {
         }
-        // ----------------------------------------------------------------------
-        // twiddle current column (cannot change row or we call here recursively)
+
+        /// <summary>
+        /// twiddle current column (cannot change row or we call here recursively)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void Timergrid_RowLeave(object sender, DataGridViewCellEventArgs e)
         {
         }
-        // ----------------------------------------------------------------------
-        // Validate user input
-        // Also, add a new row if this is the last row in the data array
+
+        /// <summary>
+        /// Validate user input
+        /// Also, add a new row if this is the last row in the data array
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void Timergrid_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             string headerText = timergrid.Columns[e.ColumnIndex].HeaderText;
@@ -592,12 +604,12 @@ namespace RaceBeam
             else if (headerText.Equals("Time"))
             {
                 // ensure that it has a decimal part
-                if (!x.Time.Contains("."))
+                if (x.Time.Contains(".") == false)
                 {
                     x.Time += ".000";
                 }
 
-                if (!double.TryParse(x.Time, out double fval))
+                if (double.TryParse(x.Time, out double fval) == false)
                 {
                     x.Time = "999.999";
                     fval = 999.999;
@@ -617,7 +629,7 @@ namespace RaceBeam
             RefreshView();
 
         }
-        // -------------------------------------------------------------------
+
         void Form_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             DialogResult d = MessageBox.Show("Do you really wish to exit?", "MJ Timing", MessageBoxButtons.YesNo);
@@ -628,23 +640,23 @@ namespace RaceBeam
                 timingData.StopSaveThread();
                 System.Threading.Thread.Sleep(500);
                 SaveRegData();
-                SaveConfig();
+                Save_config();
                 SaveClassData();
                 // delete driver data and timing data files if no timing data exists
                 //TODO don't delete anything until we can do it reliably!
                 var r = (Runtime)(timingData._data[0]);
-                if (string.IsNullOrEmpty(r._car_number) &&
-                    string.IsNullOrEmpty(r.Penalty) &&
-                    string.IsNullOrEmpty(r._run_time))
+                if ((string.IsNullOrEmpty(r._car_number) == true) &&
+                    (string.IsNullOrEmpty(r.Penalty) == true) &&
+                    (string.IsNullOrEmpty(r._run_time) == true))
                 {
                     string today = DateTime.Now.ToString("yyyy_MM_dd");
                     string eventDriverDataFile = configData.GetField("eventDataFolder", "Value") + "\\" + today + "_driverData.csv";
-                    if (File.Exists(eventDriverDataFile))
+                    if (File.Exists(eventDriverDataFile) == true)
                     {
                         //File.Delete(eventDriverDataFile);
                     }
                     string timingDataFile = configData.GetField("eventDataFolder", "Value") + "\\" + today + "_timingData.csv";
-                    if (File.Exists(timingDataFile))
+                    if (File.Exists(timingDataFile) == true)
                     {
                         //File.Delete(timingDataFile);
                     }
@@ -654,7 +666,6 @@ namespace RaceBeam
                 e.Cancel = true;
         }
 
-        // -------------------------------------------------------------------
         void TriggerStartButtonClick(object sender, EventArgs e)
         {
             DialogResult r = MessageBox.Show("Force a start trigger?", "Trigger Start", MessageBoxButtons.YesNo);
@@ -664,7 +675,7 @@ namespace RaceBeam
                 RefreshView();
             }
         }
-        // -------------------------------------------------------------------
+
         void TriggerStopButtonClick(object sender, EventArgs e)
         {
             DialogResult r = MessageBox.Show("Force a finish trigger?", "Trigger Finish", MessageBoxButtons.YesNo);
@@ -674,7 +685,7 @@ namespace RaceBeam
                 RefreshView();
             }
         }
-        // ----------------------------------------------------------------------
+
         void StartResetButtonClick(object sender, EventArgs e)
         {
             DialogResult r = MessageBox.Show("Reset (cancel) the last start trigger?", "Cancel Start", MessageBoxButtons.YesNo);
@@ -684,7 +695,7 @@ namespace RaceBeam
                 RefreshView();
             }
         }
-        // ----------------------------------------------------------------------
+
         void StopResetButtonClick(object sender, EventArgs e)
         {
             DialogResult r = MessageBox.Show("Reset (cancel) the last finish trigger?", "Cancel Finish", MessageBoxButtons.YesNo);
@@ -694,7 +705,7 @@ namespace RaceBeam
                 RefreshView();
             }
         }
-        // -------------------------------------------------------------------
+
         void SetComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (SetComboBox.SelectedIndex == 0)
@@ -710,35 +721,42 @@ namespace RaceBeam
                 timingData.RunDay = "3";
             }
         }
-        // -------------------------------------------------------------------
+
         void ScoringListSelectedIndexChanged(object sender, EventArgs e)
         {
             GenScores(false);
         }
+
         void ScoreModifiersSelectedIndexChanged(object sender, EventArgs e)
         {
             GenScores(false);
         }
+
         void OneDayCheckBoxCheckedChanged(object sender, EventArgs e)
         {
             GenScores(false);
         }
+
         void Set1RadioButtonCheckedChanged(object sender, EventArgs e)
         {
             GenScores(false);
         }
+
         void Day2RadioButtonCheckedChanged(object sender, EventArgs e)
         {
             GenScores(false);
         }
+
         void Day1PlusDay2RadioButtonCheckedChanged(object sender, EventArgs e)
         {
             GenScores(false);
         }
+
         void BestRunRadioButtonCheckedChanged(object sender, EventArgs e)
         {
             GenScores(false);
         }
+
         void TabControl1Deselecting(object sender, TabControlCancelEventArgs e)
         {
             if (e.TabPage.Name == "registrationTabPage")
@@ -747,7 +765,7 @@ namespace RaceBeam
             }
             else if (e.TabPage.Name == "configurationTabPage")
             {
-                SaveConfig();
+                Save_config();
                 LoadRegData();      // might have changed!
                 InitClasses();
             }
@@ -757,85 +775,86 @@ namespace RaceBeam
                 InitClasses();
             }
         }
-        // ----------------------------------------------------------------------
+
         void ScoreButtonClick(object sender, EventArgs e)
         {
             GenScores(true);
         }
+
         void GenScores(bool createFiles)
         {
-            var args = new ScoreArgs();
+            var args = new scoreArgs();
 
             if (Day1TextBox.Text == "")
             {
                 Day1TextBox.Text = DateTime.Now.ToString("yyyy_MM_dd");
             }
-            args.Day1 = Day1TextBox.Text;
-            args.Day2 = Day2TextBox.Text;
+            args.day1 = Day1TextBox.Text;
+            args.day2 = Day2TextBox.Text;
 
-            if (!int.TryParse(OfficialRunsTextBox.Text, out args.MaxOfficialRuns))
+            if (int.TryParse(OfficialRunsTextBox.Text, out args.maxOfficialRuns) == false)
             {
-                args.MaxOfficialRuns = 999;
+                args.maxOfficialRuns = 999;
             }
-            args.WriteCSV = false;
-            args.EventFolder = "";
+            args.writeCSV = false;
+            args.eventFolder = "";
 
             foreach (string item in scoringList.CheckedItems)
             {
                 if (item.Contains("Run Times"))
-                    args.ShowRunTimes = true;
+                    args.showRunTimes = true;
                 else if (item.Contains("Raw Times"))
-                    args.ShowRawTimes = true;
+                    args.showRawTimes = true;
                 else if (item.Contains("Class Times"))
-                    args.ShowClassTimes = true;
+                    args.showClassTimes = true;
                 else if (item.Contains("PAX Times"))
-                    args.ShowPaxTimes = true;
+                    args.showPaxTimes = true;
                 else if (item.Contains("Cone"))
-                    args.ShowConeCounts = true;
+                    args.showConeCounts = true;
                 else if (item.Contains("Team"))
-                    args.ShowTeams = true;
+                    args.showTeams = true;
             }
             foreach (string item in scoreModifiers.CheckedItems)
             {
                 if (item.Contains("Rookie"))
-                    args.ShowRookie = true;
+                    args.showRookie = true;
             }
 
-            if (bestRunRadioButton.Checked)
+            if (bestRunRadioButton.Checked == true)
             {
-                args.BestSingleRun = true;
+                args.bestSingleRun = true;
             }
-            else if (set1PlusSet2RadioButton.Checked)
+            else if (set1PlusSet2RadioButton.Checked == true)
             {
-                args.Set1PlusSet2 = true;   // score as recorded
+                args.set1PlusSet2 = true;   // score as recorded
             }
-            else if (set1RadioButton.Checked)
+            else if (set1RadioButton.Checked == true)
             {
-                args.Set1Only = true;
+                args.set1Only = true;
             }
-            if (set2RadioButton.Checked)
+            if (set2RadioButton.Checked == true)
             {
-                args.Set2Only = true;
+                args.set2Only = true;
             }
 
-            if (timingData.IsSaveInProgress())
+            if (timingData.IsSaveInProgress() == true)
             {
                 scoresTextBox.Clear();
                 scoresTextBox.AppendText("Save data is in progress -- please try again later\n");
             }
             else
             {
-                if (createFiles)
+                if (createFiles == true)
                 {
-                    args.WriteCSV = true;
+                    args.writeCSV = true;
                 }
                 //var tmpArgs = new scoreArgs(args);
-                string results = TextScores.TextScore(args);
+                string results = textScores.textScore(args);
                 scoresTextBox.Clear();
                 scoresTextBox.AppendText(results);
                 scoresTextBox.SelectionStart = 0;
                 scoresTextBox.ScrollToCaret();
-                if (createFiles)
+                if (createFiles == true)
                 {
                     string eventFolder = configData.GetField("eventDataFolder", "Value");
 
@@ -851,53 +870,53 @@ namespace RaceBeam
                     {
                         cmd += " -day2 " + Day2TextBox.Text;
                     }
-                    if (args.ShowRunTimes)
+                    if (args.showRunTimes == true)
                     {
                         cmd += " -runtimes";
                     }
-                    if (args.ShowRawTimes)
+                    if (args.showRawTimes == true)
                     {
                         cmd += " -rawtimes";
                     }
-                    if (args.ShowPaxTimes)
+                    if (args.showPaxTimes == true)
                     {
                         cmd += " -paxtimes";
                     }
-                    if (args.ShowClassTimes)
+                    if (args.showClassTimes == true)
                     {
                         cmd += " -classtimes";
                     }
-                    if (args.ShowTeams)
+                    if (args.showTeams == true)
                     {
                         cmd += " -teams";
                     }
-                    if (args.ShowConeCounts)
+                    if (args.showConeCounts == true)
                     {
                         cmd += " -conecounts";
                     }
-                    if (args.ShowRookie)
+                    if (args.showRookie == true)
                     {
                         cmd += " -rookie";
                     }
-                    if (args.Set1Only)
+                    if (args.set1Only == true)
                     {
                         cmd += " -set1only";
                     }
-                    if (args.Set2Only)
+                    if (args.set2Only == true)
                     {
                         cmd += " -set2only";
                     }
-                    if (args.BestSingleRun)
+                    if (args.bestSingleRun == true)
                     {
                         cmd += " -bestsinglerun";
                     }
-                    if (args.Set1PlusSet2)
+                    if (args.set1PlusSet2 == true)
                     {
                         cmd += " -set1plusset2";
                     }
-                    if (args.MaxOfficialRuns < 99)
+                    if (args.maxOfficialRuns < 99)
                     {
-                        cmd += " -maxofficialruns " + args.MaxOfficialRuns.ToString();
+                        cmd += " -maxofficialruns " + args.maxOfficialRuns.ToString();
                     }
                     if (titleTextBox.Text != "")
                     {
@@ -910,13 +929,13 @@ namespace RaceBeam
                     string cmdfileName;
                     if (Day2TextBox.Text != "")
                     {
-                        cmd += " -out " + args.Day2 + "__2-day" + "__scores.txt";
-                        cmdfileName = eventFolder + "\\" + args.Day2 + "_2-day" + "__scoreCMD.bat";
+                        cmd += " -out " + args.day2 + "__2-day" + "__scores.txt";
+                        cmdfileName = eventFolder + "\\" + args.day2 + "_2-day" + "__scoreCMD.bat";
                     }
                     else
                     {
-                        cmd += " -out " + args.Day1 + "__scores.txt";
-                        cmdfileName = eventFolder + "\\" + args.Day1 + "__scoreCMD.bat";
+                        cmd += " -out " + args.day1 + "__scores.txt";
+                        cmdfileName = eventFolder + "\\" + args.day1 + "__scoreCMD.bat";
                     }
                     try
                     {
@@ -939,6 +958,8 @@ namespace RaceBeam
             }
         }
     }
+
     public delegate void logMsg(string msg);
+
     public delegate void InvokeTimeEvent(string type, string time);
 }

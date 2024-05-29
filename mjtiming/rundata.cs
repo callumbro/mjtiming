@@ -206,8 +206,8 @@ namespace RaceBeam
             {
 
             }
-            while (!exitDone)
-                System.Threading.Thread.Sleep(10);
+            while (exitDone == false)
+                Thread.Sleep(10);
         }
         // -------------------------------------------------------------------
         public bool IsSaveInProgress()
@@ -228,12 +228,12 @@ namespace RaceBeam
                 };
                 SaveData.Add(x);
             }
-            while (!exitRequested)
+            while (exitRequested == false)
             {
                 // Wait for trigger to start saving
                 saveInProgress = false;
                 TriggerSema.WaitOne();
-                if (exitRequested)
+                if (exitRequested == true)
                 {
                     exitDone = true;
                     return;
@@ -279,7 +279,7 @@ namespace RaceBeam
                     for (int i = 0; i < SaveData.Count; i++)
                     {
                         var x = (Runtime)(SaveData[i]);
-                        if (string.IsNullOrEmpty(x._run_time) && (x._penalty != "RRN"))
+                        if ((string.IsNullOrEmpty(x._run_time) == true) && (x._penalty != "RRN"))
                         {
                             break;
                         }
@@ -359,17 +359,17 @@ namespace RaceBeam
                 x._car_number = rdata.GetField(indexS, "car_number");
 
                 sval = rdata.GetField(indexS, "start_time");
-                if (uint.TryParse(sval, out _))
+                if (uint.TryParse(sval, out _) == true)
                 {
                     x._start_time = sval;
                 }
                 sval = rdata.GetField(indexS, "split_time");
-                if (uint.TryParse(sval, out _))
+                if (uint.TryParse(sval, out _) == true)
                 {
                     x._split_time = sval;
                 }
                 sval = rdata.GetField(indexS, "stop_time");
-                if (uint.TryParse(sval, out _))
+                if (uint.TryParse(sval, out _) == true)
                 {
                     x._stop_time = sval;
                 }
@@ -378,7 +378,7 @@ namespace RaceBeam
                 if (sval != "")
                 {
                     double tm;
-                    if (!double.TryParse(sval, out tm))
+                    if (double.TryParse(sval, out tm) == false)
                     {
                         sval = "0";
                     }
@@ -397,7 +397,7 @@ namespace RaceBeam
                     x._penalty = "RRN";
                 }
                 _data.Add(x);
-                if (!string.IsNullOrEmpty(x._car_number))
+                if (string.IsNullOrEmpty(x._car_number) == false)
                 {
                     Carchange(x.index, true);
                 }
@@ -456,28 +456,28 @@ namespace RaceBeam
                 return noTime;
             }
 
-            if (!uint.TryParse(starthold, out uint startHoldoffMS))
+            if (uint.TryParse(starthold, out uint startHoldoffMS) == false)
             {
                 startHoldoffMS = 0;
             }
             // Do we allow more than one stop trigger before calling it a true finish?
-            if (!uint.TryParse(lapCount, out uint lapCountInt))
+            if (uint.TryParse(lapCount, out uint lapCountInt) == false)
             {
                 lapCountInt = 1;
             }
 
-            if (!uint.TryParse(stophold, out uint stopHoldoffMS))
+            if (uint.TryParse(stophold, out uint stopHoldoffMS) == false)
             {
                 stopHoldoffMS = 0;
             }
 
-            if (reverse.Contains("Y") || isReversed)
+            if ((reverse.Contains("Y") == true) || (isReversed == true))
             {
                 start = "B";
                 finish = "A";
             }
 
-            if (sounds.Contains("Y"))
+            if (sounds.Contains("Y") == true)
             {
                 playSounds = true;
             }
@@ -493,7 +493,7 @@ namespace RaceBeam
                         // Ensure holdoff delay has elapsed since last start
                         if ((index > 0) && (startHoldoffMS > 0))
                         {
-                            if (!uint.TryParse(time, out uint cur_time))
+                            if (uint.TryParse(time, out uint cur_time) == false)
                             {
                                 showMsg("Received invalid start time string: " + time + "\n");
                                 return noTime;
@@ -501,7 +501,7 @@ namespace RaceBeam
                             var prev = (Runtime)(_data[index - 1]);
                             if (prev._start_time != null)
                             {
-                                if (uint.TryParse(prev._start_time, out uint prev_start_time))
+                                if (uint.TryParse(prev._start_time, out uint prev_start_time) == true)
                                 {
                                     uint delaytime = unchecked(cur_time - prev_start_time);
                                     // handle rollover at 999999
@@ -520,16 +520,16 @@ namespace RaceBeam
                         x._start_time = time;
                         x._run_time = "Running";
                         x._datetime = DateTime.Now.ToString("dd-hh:mm:ss");
-                        if (playSounds)
+                        if (playSounds == true)
                         {
                             SystemSounds.Beep.Play();
                         }
                         return noTime;
                     }
                 }
-                if (!found)
+                if (found == false)
                 {
-                    if (playSounds)
+                    if (playSounds == true)
                     {
                         SystemSounds.Hand.Play();
                     }
@@ -548,7 +548,7 @@ namespace RaceBeam
                     var x = (Runtime)(_data[index]);
                     if ((x._start_time != null) && (x._stop_time == null))
                     {
-                        if (!uint.TryParse(time, out uint stop_time))
+                        if (uint.TryParse(time, out uint stop_time) == false)
                         {
                             showMsg("Received invalid stop time string: " + time + "\n");
                         }
@@ -559,7 +559,7 @@ namespace RaceBeam
                             var prev = (Runtime)(_data[index - 1]);
                             if (prev._stop_time != null)
                             {
-                                if (uint.TryParse(prev._stop_time, out uint prev_stop_time))
+                                if (uint.TryParse(prev._stop_time, out uint prev_stop_time) == true)
                                 {
                                     uint delaytime = unchecked(stop_time - prev_stop_time);
                                     // handle rollover at 999999
@@ -587,7 +587,7 @@ namespace RaceBeam
 
                         x._stop_time = time;        // valid -- put it into data record
 
-                        if (!uint.TryParse(x._start_time, out uint start_time))
+                        if (uint.TryParse(x._start_time, out uint start_time) == false)
                         {
                             showMsg("Invalid start time string: " + x._start_time + "\n");
                             x._start_time = "000000";
@@ -612,7 +612,7 @@ namespace RaceBeam
                         x._datetime_stop = DateTime.Now.ToString("dd-hh:mm:ss");
                         _data[index] = x;
                         WriteData();
-                        if (playSounds)
+                        if (playSounds == true)
                         {
                             SystemSounds.Hand.Play();
                         }
@@ -621,9 +621,9 @@ namespace RaceBeam
                         return returnTime;
                     }
                 }
-                if (!found)
+                if (found == false)
                 {
-                    if (playSounds)
+                    if (playSounds == true)
                     {
                         SystemSounds.Hand.Play();
                     }
@@ -643,7 +643,7 @@ namespace RaceBeam
                     {
                         x._split_time = time;
                         _data[index] = x;
-                        if (playSounds)
+                        if (playSounds == true)
                         {
                             SystemSounds.Beep.Play();
                         }
@@ -652,9 +652,9 @@ namespace RaceBeam
                         return returnTime;
                     }
                 }
-                if (!found)
+                if (found == false)
                 {
-                    if (playSounds)
+                    if (playSounds == true)
                     {
                         SystemSounds.Hand.Play();
                     }
@@ -700,7 +700,7 @@ namespace RaceBeam
             }
             else
             {
-                if (!int.TryParse(x.Penalty, out int result))
+                if (int.TryParse(x.Penalty, out int result) == false)
                 {
                     x.Penalty = null;
                 }
@@ -735,7 +735,7 @@ namespace RaceBeam
                 x._set = RunDay;
 
                 UpdateRunNumbers();
-                if ((x._stop_time != null) && !suppressWrite)
+                if ((x._stop_time != null) && (suppressWrite == false))
                 {
                     WriteData();
                 }
@@ -747,7 +747,7 @@ namespace RaceBeam
             x._car_description = driverData.GetField(x.Car, "Car Model");
             x._car_colour = driverData.GetField(x.Car, "Car Color");
             UpdateRunNumbers();
-            if (!suppressWrite && (x._stop_time != null)) WriteData();
+            if ((suppressWrite == false) && (x._stop_time != null)) WriteData();
         }
         // -------------------------------------------------------------------
         // Update run numbers for all cars
@@ -757,9 +757,9 @@ namespace RaceBeam
             for (int i = 0; i < _data.Count; i++)
             {
                 var r = (Runtime)(_data[i]);
-                if (!string.IsNullOrEmpty(r._car_number) && (r.Penalty != "RRN"))
+                if ((string.IsNullOrEmpty(r._car_number) == false) && (r.Penalty != "RRN"))
                 {
-                    if (!runs.ContainsKey(r._car_number))
+                    if (runs.ContainsKey(r._car_number) == false)
                     {
                         runs.Add(r._car_number, 1);
                         r._run_number = "1";
@@ -796,7 +796,7 @@ namespace RaceBeam
                     break;
                 }
             }
-            if (!found)
+            if (found == false)
             {
                 showMsg("No free slot found!\n");
                 return;
@@ -825,7 +825,7 @@ namespace RaceBeam
                     break;
                 }
             }
-            if (!found)
+            if (found == false)
             {
                 showMsg("No running timer found!\n");
                 return;

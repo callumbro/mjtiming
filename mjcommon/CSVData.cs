@@ -28,7 +28,7 @@ namespace RaceBeam
             return headers;
         }
         // Return a list of keys
-        public List<string> GetKeys()
+        public List<string> getKeys()
         {
             var list = new List<string>(_data.Keys);
             return list;

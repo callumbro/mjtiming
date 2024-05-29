@@ -10,7 +10,7 @@ namespace RaceBeam
     /// </summary>
     public partial class MainForm : Form
     {
-        private RaceBeam.CSVData classData;
+        private CSVData classData;
         string classDataFile = null;
         bool firstTime = true;
         void InitClasses()
@@ -31,14 +31,14 @@ namespace RaceBeam
             int i = 0;
             foreach (string col in columns)
             {
-                if (classDataGridView.Columns.Contains(col))
+                if (classDataGridView.Columns.Contains(col) == true)
                 {
                     continue;
                 }
                 classDataGridView.Columns.Add(col, col);
                 classDataGridView.Columns[i++].MinimumWidth = 50; //AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             }
-            List<string> classNames = classData.GetKeys();
+            List<string> classNames = classData.getKeys();
             foreach (string className in classNames)
             {
                 bool doesExist = false;
@@ -55,7 +55,7 @@ namespace RaceBeam
                         break;
                     }
                 }
-                if (doesExist)
+                if (doesExist == true)
                 {
                     continue;
                 }
@@ -67,7 +67,7 @@ namespace RaceBeam
                 }
                 classDataGridView.Rows.Add(record);
             }
-            if (firstTime)
+            if (firstTime == true)
             {
                 firstTime = false;
                 try
@@ -97,7 +97,7 @@ namespace RaceBeam
         private void ClassDataGridView_UserDeletingRow(object sender, System.Windows.Forms.DataGridViewRowCancelEventArgs e)
         {
             // Handles user Deleting Row
-            if (e.Row.IsNewRow)
+            if (e.Row.IsNewRow == true)
                 return;
             DataGridViewCell num = classDataGridView["Class", e.Row.Index];
             if (num.Value == null)
@@ -164,7 +164,7 @@ namespace RaceBeam
                 e.Cancel = true;
                 return;
             }
-            if (headerText.Equals("Class"))
+            if (headerText.Equals("Class") == true)
             {
                 // Confirm that the value is unique
                 string newClass = e.FormattedValue.ToString();
@@ -186,22 +186,22 @@ namespace RaceBeam
                     }
                 }
             }
-            else if (headerText.Equals("PAX"))
+            else if (headerText.Equals("PAX") == true)
             {
                 // Make sure that the PAX value can be parsed as a number
                 string newpax = e.FormattedValue.ToString();
-                if (!double.TryParse(newpax, out _))
+                if (double.TryParse(newpax, out _) == false)
                 {
                     MessageBox.Show("PAX value is not a valid number");
                     e.Cancel = true;
                     return;
                 }
             }
-            else if (headerText.Equals("Sort Order"))
+            else if (headerText.Equals("Sort Order") == true)
             {
                 // Make sure that the sort order is a valid number (floats are OK)
                 string newsort = e.FormattedValue.ToString();
-                if (!double.TryParse(newsort, out _))
+                if (double.TryParse(newsort, out _) == false)
                 {
                     MessageBox.Show("Sort value is not a valid number");
                     e.Cancel = true;
