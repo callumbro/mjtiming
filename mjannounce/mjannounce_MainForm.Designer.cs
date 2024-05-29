@@ -86,8 +86,9 @@ namespace RaceBeam
 			"PAX Times",
 			"Class Times",
 			"XGroup Times",
-			"Cone Counts",
-			"Teams"});
+            "Teams",
+            "Cone Counts"
+			});
 			this.scoringList.Location = new System.Drawing.Point(11, 12);
 			this.scoringList.Name = "scoringList";
 			this.scoringList.Size = new System.Drawing.Size(129, 132);
