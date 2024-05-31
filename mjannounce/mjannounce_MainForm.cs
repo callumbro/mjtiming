@@ -41,9 +41,9 @@ namespace RaceBeam
         private int queryCount = 0;
         private string compare_results = "";
         private string prev_results = "";
-        private string template = "<html><head><style type=\"text/css\">%{style}%</style></head><body><h3>M&J Solo Live Timing</h3><a href=\"/\">Home</a><div>%{content}%</div></body></html>";
+        private string template = "<html><head><style type=\"text/css\">%{STYLE}%</style></head><body><h3>M&J Solo Live Timing</h3><a href=\"/\">Home</a><div>%{CONTENT}%</div></body></html>";
         private string style = "";
-        private readonly static string links = "<ul>%{runs}%%{raw}%%{classes}%%{pax}%%{team}%%{cones}%</ul>";
+        private readonly static string links = "<ul>%{RUNS}%%{RAW}%%{CLASSES}%%{PAX}%%{TEAM}%%{CONES}%</ul>";
 
         HttpListener listener = null;
 
@@ -317,7 +317,7 @@ namespace RaceBeam
             folder += "\\..";
             string styleFilename = folder + "\\config\\_webStyle.css";
             style = File.ReadAllText(styleFilename);
-            template = template.Replace("%{style}%", style);
+            template = template.Replace("%{STYLE}%", style);
 
             listener.Prefixes.Add("http://+:80/");
             listener.Start();
@@ -345,60 +345,60 @@ namespace RaceBeam
                     foreach (string item in scoringList.CheckedItems)
                     {
                         if (item.Contains("Run Times"))
-                            currentLinks = currentLinks.Replace("%{runs}%", "<li><a href=\"runs\">Runs</a></li>");
+                            currentLinks = currentLinks.Replace("%{RUNS}%", "<li><a href=\"runs\">Runs</a></li>");
                         else if (item.Contains("Raw Times"))
-                            currentLinks = currentLinks.Replace("%{raw}%", "<li><a href=\"raw\">Raw</a></li>");
+                            currentLinks = currentLinks.Replace("%{RAW}%", "<li><a href=\"raw\">Raw</a></li>");
                         else if (item.Contains("PAX Times"))
-                            currentLinks = currentLinks.Replace("%{pax}%", "<li><a href=\"pax\">PAX</a></li>");
+                            currentLinks = currentLinks.Replace("%{PAX}%", "<li><a href=\"pax\">PAX</a></li>");
                         else if (item.Contains("Class Times"))
-                            currentLinks = currentLinks.Replace("%{classes}%", "<li><a href=\"classes\">Classes</a></li>");
+                            currentLinks = currentLinks.Replace("%{CLASSES}%", "<li><a href=\"classes\">Classes</a></li>");
                         else if (item.Contains("Cone"))
-                            currentLinks = currentLinks.Replace("%{cones}%", "<li><a href=\"cones\">Cones</a></li>");
+                            currentLinks = currentLinks.Replace("%{CONES}%", "<li><a href=\"cones\">Cones</a></li>");
                         else if (item.Contains("Team"))
-                            currentLinks = currentLinks.Replace("%{team}%", "<li><a href=\"team\">Team</a></li>");
+                            currentLinks = currentLinks.Replace("%{TEAM}%", "<li><a href=\"team\">Team</a></li>");
                     }
-                    response = template.Replace("%{content}%", currentLinks);
+                    response = template.Replace("%{CONTENT}%", currentLinks);
                 }
                 else if (request == "/runs")
                 {
                     lock (lockObject)
                     {
-                        response = template.Replace("%{content}%", "<pre>" + runTimes + "</pre>");
+                        response = template.Replace("%{CONTENT}%", "<pre>" + runTimes + "</pre>");
                     }
                 }
                 else if (request == "/raw")
                 {
                     lock (lockObject)
                     {
-                        response = template.Replace("%{content}%", "<pre>" + rawTimes + "</pre>");
+                        response = template.Replace("%{CONTENT}%", "<pre>" + rawTimes + "</pre>");
                     }
                 }
                 else if (request == "/pax")
                 {
                     lock (lockObject)
                     {
-                        response = template.Replace("%{content}%", "<pre>" + paxTimes + "</pre>");
+                        response = template.Replace("%{CONTENT}%", "<pre>" + paxTimes + "</pre>");
                     }
                 }
                 else if (request == "/classes")
                 {
                     lock (lockObject)
                     {
-                        response = template.Replace("%{content}%", "<pre>" + classtimes + "</pre>");
+                        response = template.Replace("%{CONTENT}%", "<pre>" + classtimes + "</pre>");
                     }
                 }
                 else if (request == "/team")
                 {
                     lock (lockObject)
                     {
-                        response = template.Replace("%{content}%", "<pre>" + teamtimes + "</pre>");
+                        response = template.Replace("%{CONTENT}%", "<pre>" + teamtimes + "</pre>");
                     }
                 }
                 else if (request == "/cones")
                 {
                     lock (lockObject)
                     {
-                        response = template.Replace("%{content}%", "<pre>" + coneCounts + "</pre>");
+                        response = template.Replace("%{CONTENT}%", "<pre>" + coneCounts + "</pre>");
                     }
                 }
 

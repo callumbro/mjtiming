@@ -41,6 +41,9 @@
         <DebugType>None</DebugType>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Remove="documentation\sample.cs" />
+    </ItemGroup>
+    <ItemGroup>
         <Reference Update="System.Core">
             <RequiredTargetFramework>3.5</RequiredTargetFramework>
         </Reference>
@@ -54,6 +57,11 @@
             <ProductName>.NET Framework 3.5 SP1</ProductName>
             <Install>true</Install>
         </BootstrapperPackage>
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="documentation\sample.cs">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
