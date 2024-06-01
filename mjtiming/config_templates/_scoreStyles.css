@@ -1,20 +1,26 @@
 body {
-    background-color: #90a3b9
+    background-color: #8f8f8f
 }
 
 button {
-    padding: 5px;
+    padding: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
     margin: 5px;
     border: 2px solid;
     border-radius: 5px;
+    cursor: pointer;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
+    border-radius: 25px;
+    margin-bottom: 15px;
 }
 
-td, th {
+td,
+th {
     padding: 5px;
     border: 2px solid;
     border-color: black;
@@ -23,18 +29,18 @@ td, th {
 th {
     font-weight: bold;
     font-size: 14pt;
+    background-color: #2847ad;
+    color: white
 }
 
 tr:nth-child(even) {
-    background-color: #2daadb;
+    background-color: #bbd3ff;
+    border-radius: 25px;
 }
 
 tr:nth-child(odd) {
-    background-color: #50c6f5;
-}
-
-thead th {
-    background-color: #21b987;
+    background-color: white;
+    border-radius: 25px;
 }
 
 .raw-results {
@@ -47,7 +53,23 @@ hr {
     margin-bottom: 20px;
 }
 
-/* highlighted run time or score */
+.statistics {
+    margin-bottom: 15px;
+    display: inline-block;
+    background-color: white;
+    padding: 10px;
+}
+
+.driving-set span {
+    padding-left: 10px;
+    padding-right: 5px;
+}
+
 .highlight {
     background-color: #fffb0069
+}
+
+.penalty {
+    margin-left: 2px;
+    color: indianred;
 }

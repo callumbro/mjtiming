@@ -27,8 +27,8 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
         private static string htmlStyle = "";
         private static string htmlHeader = "<head><style>%{STYLE}%</style><script type=\"text/javascript\">function showResults(id) { let allResults = document.getElementsByClassName('results'); for (const element of allResults) { element.setAttribute('style', 'display: none;'); } document.getElementById(id).setAttribute('style', 'display: block;'); }</script></head>";
         private static string htmlBody = "<body><h1>%{TITLE}%</h1>%{BUTTONS}%%{RESULTS}%</body>";
-        private static string htmlFooter = "<footer><hr><h3 margin-top=\"50px\">Statistics</h3>%{STATS}%</footer>";
-        private static string htmlFooterContent = "<div style=\"padding-bottom: 15px;\"><div>%{DAY}%, ${SET}%: </div><span style=\"padding-right: 20px;\">First run: %{FIRST}%</span><span style=\"padding-right: 20px;\">Last run: %{LAST}% </span><span style=\"padding-right: 20px;\">Number of runs: %{NUMRUNS}% </span><span style=\"padding-right: 20px;\">Avg run time: %{AVGTIME}%</span></div>";
+        private static string htmlFooter = "<hr><footer><h3 margin-top=\"50px\">Statistics</h3>%{STATS}%</footer>";
+        private static string htmlFooterContent = "<div style=\"padding-bottom: 15px;\"><div>%{DAY}%, ${SET}%: </div><span>First run: %{FIRST}%</span><span>Last run: %{LAST}% </span><span>Number of runs: %{NUMRUNS}% </span><span>Avg run time: %{AVGTIME}%</span></div>";
 
         public static void Usage()
         {
@@ -190,7 +190,6 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
             StringBuilder results = new();
             results.Append("<div id=\"class-ranking\" class=\"results\">");
             results.Append("<h2>Class Ranking</h2>");
-            results.Append("<table>");
 
             // Sort drivers by raw time
             var myList = new List<KeyValuePair<string, scoreCalcs.driverScoreData>>(scores);
@@ -213,6 +212,7 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                     continue;
                 }
 
+                results.Append("<table>");
                 results.Append("<thead>");
                 results.Append("<tr>");
                 results.Append($"<th colspan=\"9\">{curClass.carClass} ({curClass.description})</th>");
@@ -297,9 +297,9 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 }
 
                 results.Append("</tbody>");
+                results.Append("</table>");
             }
 
-            results.Append("</table>");
             results.Append("</div>");
             return results.ToString();
         }
@@ -404,24 +404,30 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
         {
             StringBuilder results = new();
 
-            results.Append("<div style=\"padding-bottom: 15px;\">");
+            results.Append("<div class=\"statistics\">");
 
             if (stats.day1.set1NumberOfRuns > 0)
             {
-                results.Append("<div>Day 1, Set 1</div>");
-                results.Append($"<span style=\"padding-right: 20px;\">First run: {stats.day1.set1TimeOfFirstRun}</span>");
-                results.Append($"<span style=\"padding-right: 20px;\">Last run: {stats.day1.set1TimeOfLastRun}</span>");
-                results.Append($"<span style=\"padding-right: 20px;\">Number of runs: {stats.day1.set1NumberOfRuns}</span>");
-                results.Append($"<span style=\"padding-right: 20px;\">Average run time: {(stats.day1.set1TotalTime / stats.day1.set1NumberOfRuns).ToString("#0.000")}</span>");
+                results.Append("<span class=\"driving-set-title\">Day 1, Set 1</span>");
+                results.Append("<br>");
+                results.Append("<span class=\"driving-set\">");
+                results.Append($"<span>First run: {stats.day1.set1TimeOfFirstRun}</span>");
+                results.Append($"<span>Last run: {stats.day1.set1TimeOfLastRun}</span>");
+                results.Append($"<span>Number of runs: {stats.day1.set1NumberOfRuns}</span>");
+                results.Append($"<span>Average run time: {(stats.day1.set1TotalTime / stats.day1.set1NumberOfRuns).ToString("#0.000")}</span>");
+                results.Append("</span>");
                 results.Append("</div>");
             }
             if (stats.day1.set2NumberOfRuns > 0)
             {
-                results.Append("<div>Day 1, Set 2</div>");
-                results.Append($"<span style=\"padding-right: 20px;\">First run: {stats.day1.set2TimeOfFirstRun}</span>");
-                results.Append($"<span style=\"padding-right: 20px;\">Last run: {stats.day1.set2TimeOfLastRun}</span>");
-                results.Append($"<span style=\"padding-right: 20px;\">Number of runs: {stats.day1.set2NumberOfRuns}</span>");
-                results.Append($"<span style=\"padding-right: 20px;\">Average run time: {(stats.day1.set2TotalTime / stats.day1.set2NumberOfRuns).ToString("#0.000")}</span>");
+                results.Append("<span class=\"driving-set-title\">Day 1, Set 2</span>");
+                results.Append("<br>");
+                results.Append("<span class=\"driving-set\">");
+                results.Append($"<span>First run: {stats.day1.set2TimeOfFirstRun}</span>");
+                results.Append($"<span>Last run: {stats.day1.set2TimeOfLastRun}</span>");
+                results.Append($"<span>Number of runs: {stats.day1.set2NumberOfRuns}</span>");
+                results.Append($"<span>Average run time: {(stats.day1.set2TotalTime / stats.day1.set2NumberOfRuns).ToString("#0.000")}</span>");
+                results.Append("</span>");
                 results.Append("</div>");
             }
 
@@ -456,11 +462,11 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                     if (run.time >= scoreCalcs.DNFvalue)
                     {
                         // didn't even run
-                        currentRun += "<span class=\"raw-time\">DNS</span>";
+                        currentRun += "<span class=\"raw-time penalty\">DNS</span>";
                     }
                     else
                     {
-                        currentRun += $"<span class=\"raw-time\">{run.time.ToString("#0.000")}+DNF</span>";
+                        currentRun += $"<span class=\"raw-time\">{run.time.ToString("#0.000")}<span class=\"penalty\">+DNF</span></span>";
                     }
                 }
                 else if (run.penalty == "")
@@ -478,11 +484,11 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
                 {
                     if (run == setData.bestRun)
                     {
-                        currentRun += $"<span class=\"highlight raw-time\">{run.time.ToString("#0.000")}+{run.penalty}</span>";
+                        currentRun += $"<span class=\"highlight raw-time\">{run.time.ToString("#0.000")}<span class=\"penalty\">+{run.penalty}</span></span>";
                     }
                     else
                     {
-                        currentRun += $"<span class=\"raw-time\">{run.time.ToString("#0.000")}+{run.penalty}</span>";
+                        currentRun += $"<span class=\"raw-time\">{run.time.ToString("#0.000")}<span class=\"penalty\">+{run.penalty}</span></span>";
                     }
                 }
 
@@ -490,7 +496,7 @@ namespace RaceBeam  // this is required to get easy reference to the datatypes
             }
             if (hasRuns == false)
             {
-                runs.Add("<span class=\"raw-time\">DNS</span>");
+                runs.Add("<span class=\"raw-time penalty\">DNS</span>");
             }
 
             return string.Join("", runs);
