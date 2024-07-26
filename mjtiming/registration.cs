@@ -759,18 +759,14 @@ namespace RaceBeam
                 int reportrow;
                 reportrow = dline;
                 string fname = report.GetField(reportrow.ToString(), "First Name");
-                if (string.IsNullOrEmpty(fname) == true)
+                string lname = report.GetField(reportrow.ToString(), "Last Name");
+                if (string.IsNullOrEmpty(fname) || string.IsNullOrEmpty(lname))
                 {
-                    continue; // Ignore entire row if first name is blank?
+                    continue; // Ignore entire row if name is incomplete or blank
                 }
                 fname = fname.Trim();
-
-                string lname = report.GetField(reportrow.ToString(), "Last Name");
-                if (string.IsNullOrEmpty(lname) == true)
-                {
-                    continue;
-                }
                 lname = lname.Trim();
+
                 try
                 {
                     bool driverFound = false;
@@ -838,8 +834,8 @@ namespace RaceBeam
                     }
 
                     // Old or new, update info
-                    drivers["Registered", index].Value = "Yes";
-                    drivers["Notes", index].Value = "";
+                    drivers["Registered", index].Value = "No";
+                    drivers["Notes", index].Value = "prereg";
 
                     string carclass = report.GetField(reportrow.ToString(), "Vehicle Class");
                     if (string.IsNullOrEmpty(carclass) == true)
@@ -848,7 +844,7 @@ namespace RaceBeam
                     }
                     if ((string.IsNullOrEmpty(carclass) == true) || (carclass.Contains("selected") == true))
                     {
-                        carclass = "AM";  // everyone into "AM" if nothing else
+                        carclass = "";  // keep class empty if nothing else
                     }
                     if (drivers["Class", index].Value == null)
                     {
@@ -874,7 +870,7 @@ namespace RaceBeam
                             }
                             if (classFound == false)
                             {
-                                drivers["Class", index].Value = "AM";
+                                drivers["Class", index].Value = "";
                             }
                         }
                         else
