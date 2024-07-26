@@ -1251,11 +1251,6 @@ namespace RaceBeam
                     drv.team = driverData.GetField(number, "Team");
                 }
 
-                if (drv.carDescription.Length > 20)
-                {
-                    drv.carDescription = drv.carDescription.Substring(0, 20);
-                }
-
                 string rookie = driverData.GetField(number, "Rookie");
                 if (rookie.ToUpperInvariant().Contains("Y") == true)
                 {
@@ -1705,10 +1700,6 @@ namespace RaceBeam
             {
                 if (driver.Value.lastName == "")
                     driver.Value.lastName = "Unknown";
-                if (driver.Value.carDescription.Length > 20)
-                {
-                    driver.Value.carDescription = driver.Value.carDescription.Substring(0, 20);
-                }
 
                 if (args.set1Only == true)
                 {

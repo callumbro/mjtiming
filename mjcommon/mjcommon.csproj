@@ -1,47 +1,46 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
-        <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-        <OutputType>Library</OutputType>
-        <RootNamespace>MJcommon</RootNamespace>
-        <SourceAnalysisOverrideSettingsFile>C:\Documents and Settings\murray\Application Data\ICSharpCode/SharpDevelop3.0\Settings.SourceAnalysis</SourceAnalysisOverrideSettingsFile>
-        <NoStdLib>False</NoStdLib>
-        <StartWorkingDirectory>..\bin\</StartWorkingDirectory>
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <AssemblyTitle>mjcommon</AssemblyTitle>
-        <Product>mjcommon</Product>
-        <Copyright>Copyright 2011</Copyright>
-        <AssemblyVersion>1.0.%2a</AssemblyVersion>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
-        <RegisterForComInterop>False</RegisterForComInterop>
-        <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-        <BaseAddress>4194304</BaseAddress>
-        <FileAlignment>4096</FileAlignment>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <OutputPath>..\bin\</OutputPath>
-        <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-        <StartAction>Project</StartAction>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <DebugType>None</DebugType>
-    </PropertyGroup>
-    <ItemGroup>
-        <Reference Update="System.Core">
-            <RequiredTargetFramework>3.5</RequiredTargetFramework>
-        </Reference>
-        <Reference Update="System.Xml.Linq">
-            <RequiredTargetFramework>3.5</RequiredTargetFramework>
-        </Reference>
-    </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="CsvHelper" Version="32.0.3" />
-        <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
-        <PackageReference Include="System.IO.Ports" Version="8.0.0" />
-        <PackageReference Include="System.Management" Version="8.0.0" />
-    </ItemGroup>
-    <ItemGroup>
-        <Folder Include="Properties\" />
-    </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <OutputType>Library</OutputType>
+    <RootNamespace>MJcommon</RootNamespace>
+    <SourceAnalysisOverrideSettingsFile>C:\Documents and Settings\murray\Application Data\ICSharpCode/SharpDevelop3.0\Settings.SourceAnalysis</SourceAnalysisOverrideSettingsFile>
+    <NoStdLib>False</NoStdLib>
+    <StartWorkingDirectory>..\bin\</StartWorkingDirectory>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyTitle>mjcommon</AssemblyTitle>
+    <Product>mjcommon</Product>
+    <Copyright>Copyright 2011</Copyright>
+    <AssemblyVersion>1.0.%2a</AssemblyVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <BaseAddress>4194304</BaseAddress>
+    <FileAlignment>4096</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>..\bin\</OutputPath>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <StartAction>Project</StartAction>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugType>None</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Update="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Update="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="32.0.3" />
+    <PackageReference Include="System.IO.Ports" Version="8.0.0" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
 </Project>

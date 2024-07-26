@@ -29,6 +29,7 @@ namespace RaceBeam
         private readonly CSVData configData = new CSVData();
         string configFilename = "";
         private readonly object lockObject = new object();
+        private FileSystemWatcher timingDataFileWatcher;
 
         private const string separator = "\r\n--------------------------------------------------------------------------------\r\n";
         private string runTimes;
@@ -38,6 +39,7 @@ namespace RaceBeam
         private string classtimes;
         private string teamtimes;
         private string statistics;
+        private string htmlResult;
         private int queryCount = 0;
         private string compare_results = "";
         private string prev_results = "";
@@ -104,13 +106,13 @@ namespace RaceBeam
                 File.Copy(templateFile, styleFile, false);
             }
             DataFolderTextBox.Text = timingFolder;
-            var watcher = new FileSystemWatcher(timingFolder, "*_timingData.csv");
-            watcher.Changed += new FileSystemEventHandler(OnChanged);
-            watcher.NotifyFilter = NotifyFilters.LastWrite;
+            timingDataFileWatcher = new FileSystemWatcher(timingFolder, "*_timingData.csv");
+            timingDataFileWatcher.Changed += new FileSystemEventHandler(OnChanged);
+            timingDataFileWatcher.NotifyFilter = NotifyFilters.LastWrite;
 
             prev_results = "";
             GenScores();
-            watcher.EnableRaisingEvents = true;
+            timingDataFileWatcher.EnableRaisingEvents = true;
         }
         public delegate void InvokeScoring();
 
@@ -274,7 +276,7 @@ namespace RaceBeam
                 if (string.IsNullOrEmpty(statistics) == false)
                     results += separator + statistics;
             }
-
+            
             // Only update display if results have changed
             // We get triggered when the timing file is zeroed out for the next save,
             // so we need to check for reducing size as well as changing content
@@ -287,7 +289,14 @@ namespace RaceBeam
                 scoresTextBox.SelectionStart = 0;
                 scoresTextBox.ScrollToCaret();
 
-                // TODO: Send generated html files to webserver, via ftp?.
+                lock (lockObject)
+                {
+                    htmlScores
+                        .htmlScore(args, out htmlResult);
+                }
+
+
+                // TODO: Send generated html file to webserver, via ftp?.
 
             }
         }
@@ -399,6 +408,14 @@ namespace RaceBeam
                     lock (lockObject)
                     {
                         response = template.Replace("%{CONTENT}%", "<pre>" + coneCounts + "</pre>");
+                    }
+                }
+
+                lock (lockObject)
+                {
+                    if (!string.IsNullOrWhiteSpace(htmlResult))
+                    {
+                        response = htmlResult;
                     }
                 }
 

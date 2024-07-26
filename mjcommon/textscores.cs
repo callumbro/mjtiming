@@ -1,7 +1,6 @@
 ﻿/*
  * Generates score output in text format
  */
-// disable CompareOfFloatsByEqualityOperator
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -315,13 +314,18 @@ namespace RaceBeam
                         driverName = driverName.Substring(0, 16);
                     }
                 }
+                string carDescription = driver.Value.carDescription;
+                if (carDescription.Length > 20)
+                {
+                    carDescription = carDescription.Substring(0, 20);
+                }
                 string line = string
                     .Format("{0,4} {1,8} {2,11} {3,-16} {4,-22} {5,8:#.000} {6,7:#0.000}\r\n",
                         driver.Value.scoreData.RAWrank,
                         driver.Value.number,
                         driver.Value.carClass,
                         driverName,
-                        driver.Value.carDescription,
+                        carDescription,
                         driverRAW,
                         driver.Value.scoreData.RAWscore);
 
@@ -334,7 +338,7 @@ namespace RaceBeam
                             driver.Value.number,
                             driver.Value.carClass,
                             driverName,
-                            driver.Value.carDescription,
+                            carDescription,
                             driverRAW,
                             driver.Value.scoreData.RAWrookieScore);
 
@@ -401,13 +405,18 @@ namespace RaceBeam
                         driverName = driverName.Substring(0, 16);
                     }
                 }
+                string carDescription = driver.Value.carDescription;
+                if (carDescription.Length > 20)
+                {
+                    carDescription = carDescription.Substring(0, 20);
+                }
                 results += string
                     .Format("{0,4} {1,8} {2,11} {3,-16} {4,-22} {5,8:#.000}  {6,5:#0.000} {7,9:#.000} {8,7:#0.000} {9,8:#.000} {10,11:#.000}\r\n",
                         driver.Value.scoreData.PAXrank,
                         driver.Value.number,
                         driver.Value.carClass,
                         driverName,
-                        driver.Value.carDescription,
+                        carDescription,
                         driver.Value.scoreData.bestRAW < scoreCalcs.DNFvalue ? driver.Value.scoreData.bestRAW.ToString("#.000") : "DNS",
                         driver.Value.pax,
                         driver.Value.scoreData.bestPAX < scoreCalcs.DNFvalue ? driver.Value.scoreData.bestPAX.ToString("#.000") : "DNS",
@@ -423,7 +432,7 @@ namespace RaceBeam
                             driver.Value.number,
                             driver.Value.carClass,
                             driverName,
-                            driver.Value.carDescription,
+                            carDescription,
                             driver.Value.scoreData.bestRAW < scoreCalcs.DNFvalue ? driver.Value.scoreData.bestRAW.ToString("#.000") : "DNS",
                             driver.Value.pax,
                             driver.Value.scoreData.bestPAX < scoreCalcs.DNFvalue ? driver.Value.scoreData.bestPAX.ToString("#.000") : "DNS",
@@ -532,10 +541,7 @@ namespace RaceBeam
                     {
                         driver.Value.lastName = "Unknown";
                     }
-                    if (driver.Value.carDescription.Length > 20)
-                    {
-                        driver.Value.carDescription = driver.Value.carDescription.Substring(0, 20);
-                    }
+
                     if (grpPtr.groupRank == 1)
                     {
                         bestTime = driver.Value.scoreData.bestPAX;
@@ -575,6 +581,11 @@ namespace RaceBeam
                             driverName = driverName.Substring(0, 16);
                         }
                     }
+                    string carDescription = driver.Value.carDescription;
+                    if (carDescription.Length > 20)
+                    {
+                        carDescription = carDescription.Substring(0, 20);
+                    }
                     results += string
                         .Format("{0,-1}{1,3} {2,8} {3,11} {4,-16} {5,-22} {6,8:#.000} {7,6:#.000} {8,9:#0.000} {9,8:#0.000} ",
                             trophyIndicator,
@@ -582,7 +593,7 @@ namespace RaceBeam
                             driver.Value.number,
                             driver.Value.carClass,
                             driverName,
-                            driver.Value.carDescription,
+                            carDescription,
                             driverRAW,
                             driver.Value.pax,
                             driverPAX,
@@ -599,7 +610,7 @@ namespace RaceBeam
                                 driver.Value.number,
                                 driver.Value.carClass,
                                 driverName,
-                                driver.Value.carDescription,
+                                carDescription,
                                 driverRAW,
                                 driver.Value.pax,
                                 driverPAX,
@@ -944,6 +955,11 @@ namespace RaceBeam
                         driverName = driverName.Substring(0, 16);
                     }
                 }
+                string carDescription = driver.Value.carDescription;
+                if (carDescription.Length > 20)
+                {
+                    carDescription = carDescription.Substring(0, 20);
+                }
                 string line = string
                     .Format("{0,8} {1,3} {2,3} {3,15} {4,-16} {5,-22} {6,-22}\r\n",
                         driver.Value.number,
@@ -951,7 +967,7 @@ namespace RaceBeam
                         driver.Value.rookie ? "Yes" : "No",
                         driver.Value.carClass,
                         driverName,
-                        driver.Value.carDescription,
+                        carDescription,
                         driver.Value.sponsor);
 
                 results += string.Format(line);
