@@ -14,18 +14,18 @@
 // Basically, 3,3,3,4,4,4,4,...
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
-
 
 // disable CompareOfFloatsByEqualityOperator
 namespace RaceBeam
 {
     class Champ
     {
-        // ---------------------------------------------------------------------------
-        // All the scores for a given event
+        /// <summary>
+        /// All the scores for a given event
+        /// </summary>
         public class EventScore
         {
             public string eventName = "";
@@ -37,17 +37,24 @@ namespace RaceBeam
             public double groupRookieScore;
             public int coneCount;
         }
-        // A group and the event scores withion that group
+
+        /// <summary>
+        /// A group and the event scores withion that group
+        /// </summary>
         public class GroupScore
         {
             public string groupName = "";
             public double totalPAX;
             public double totalRookiePAX;
+            public double bestPAX;
+            public double bestRookiePAX;
             public Dictionary<string, EventScore> eventScores = new Dictionary<string, EventScore>();
         }
 
-        // Info about a single driver (we use first name + last name as key) and overall raw/pax scores
-        class DriverData
+        /// <summary>
+        /// Info about a single driver (we use first name + last name as key) and overall raw/pax scores
+        /// </summary>
+        private class DriverData
         {
             public string number;
             public string driver;   // first name + last name
@@ -59,13 +66,19 @@ namespace RaceBeam
             public double totalRookiePAX;
             public double totalRAW;
             public double totalRookieRAW;
+            public double bestPAX;
+            public double bestRookiePAX;
+            public double bestRAW;
+            public double bestRookieRAW;
             public int totalCones;
             public int totalEvents;
+            public int totalDNF;
             // dictionary of overall pax and raw scores for each attended event
             public Dictionary<string, EventScore> overallScores = new Dictionary<string, EventScore>();
             // dictionary of groups in which this driver competed.  Each group contains a list of events where that group was used
             public Dictionary<string, GroupScore> groupScores = new Dictionary<string, GroupScore>();
         }
+
         public class PaxInfo
         {
             public string carClass;
@@ -74,27 +87,33 @@ namespace RaceBeam
             public string group;
             public string displayOrder;
         }
-        // ---------------------------------------------------------------------------
-        const string separator = "--------------------------------------------------------------------------------\r\n";
-        static string eventFolder = "";
-        static string classfile = "";
-        static string title = "";
-        static int numDays = 8;
-        static int numRookieDays = 7;
-        static bool doRookie = true;
-        static bool membersOnly = false;
-        static bool doAttendance = false;
-        static readonly Dictionary<string, DriverData> scores = new Dictionary<string, DriverData>();
-        static public List<string> eventNames = new List<string>();
-        static readonly CSVData classData = new CSVData();
-        static readonly CSVData configData = new CSVData();
-        // ---------------------------------------------------------------------------
+
+        private const string separator = "--------------------------------------------------------------------------------\r\n";
+        private static string eventFolder = "";
+        private static string classfile = "";
+        private static string title = "";
+        private static string year = DateTime.Now.Year.ToString();
+        private static int numDays = 8;
+        private static int numRookieDays = 7;
+        private static bool doRookie = true;
+        private static bool membersOnly = false;
+        private static bool doAttendance = false;
+        private static bool showLastName = false;
+        private static string htmlStyle = "";
+        private static string htmlHeader = "<head><style>%{STYLE}%</style><script type=\"text/javascript\">function showResults(id) { let allResults = document.getElementsByClassName('results'); for (const element of allResults) { element.setAttribute('style', 'display: none;'); } document.getElementById(id).setAttribute('style', 'display: block;'); }</script></head>";
+        private static string htmlBody = "<body><h1>%{TITLE}%</h1>%{BUTTONS}%%{RESULTS}%</body>";
+
+        private static readonly Dictionary<string, DriverData> scores = new Dictionary<string, DriverData>();
+        private static List<string> eventNames = new List<string>();
+        private static readonly CSVData classData = new CSVData();
+        private static readonly CSVData configData = new CSVData();
+
         public static void Usage()
         {
-            Console.WriteLine("Usage: overalls -title <title string> -norookie -membersonly -attendance -best <num> -rookiebest <num> -path <path to event data folder> -classfile <path to class.csv file>");
+            Console.WriteLine("Usage: overalls -title <title string> -year <season year (defaults to current year)> -norookie -membersonly -attendance -best <num> -rookiebest <num> -path <path to event data folder> -classfile <path to class.csv file>");
             Environment.Exit(0);
         }
-        // ---------------------------------------------------------------------------
+
         public static void Main(string[] args)
         {
             // parse command line arguments
@@ -136,6 +155,11 @@ namespace RaceBeam
                     title = args[i];
                     Console.WriteLine(title);
                 }
+                else if (args[i] == "-year")
+                {
+                    i += 1;
+                    year = args[i];
+                }
                 else if (args[i] == "-norookie")
                 {
                     doRookie = false;       // no rookie scores
@@ -158,14 +182,21 @@ namespace RaceBeam
                 Usage();
             }
 
-            string configFolder = Process.GetCurrentProcess().MainModule.FileName;
+            string configFolder = Environment.ProcessPath;
             configFolder = Path.GetDirectoryName(configFolder);
-            string configFilename = configFolder + "\\..\\config\\configData.csv";
+            configFolder += "\\..\\config";
+
+            string configFilename = configFolder + "\\configData.csv";
             string err = configData.LoadData(configFilename, ',', "Parameter");
             if (err != "")
             {
                 Console.Error.WriteLine("Unable to load config file: " + err);
                 Usage();
+            }
+
+            if (configData.GetField("ShowLastName", "Value").Contains("Y"))
+            {
+                showLastName = true;
             }
 
             string classDataFile = configData.GetField("classDataFile", "Value");
@@ -185,6 +216,8 @@ namespace RaceBeam
                 Console.Error.WriteLine(err);
             }
 
+            StringBuilder textFile = new();
+
             ReadData();
             eventNames
                 .Sort(delegate (
@@ -198,52 +231,107 @@ namespace RaceBeam
 
             // raw data, everyone
             CalcData(false, false);
-            PrintData(false, false);
+            string rawPrint = PrintData(false, false);
+            textFile.AppendLine(rawPrint);
 
             // raw data, rookie
             if (doRookie == true)
             {
-
                 CalcData(false, true);
                 Console.WriteLine("");
-                PrintData(false, true);
+                string rookieRawPrint = PrintData(false, true);
+                textFile.AppendLine(rookieRawPrint);
             }
 
-            // pax data, everyone
-            Console.WriteLine("");
-            CalcData(true, false);
-            Console.WriteLine("");
-            PrintData(true, false);
+            //// pax data, everyone
+            //Console.WriteLine();
+            //CalcData(true, false);
+            //Console.WriteLine();
+            //string paxPrint = PrintData(true, false);
+            //textFile.AppendLine(paxPrint);
 
-            // pax data, rookie
-            if (doRookie == true)
-            {
-                CalcData(true, true);
-                Console.WriteLine("");
-                PrintData(true, true);
-            }
-            Console.WriteLine("");
+            //// pax data, rookie
+            //if (doRookie == true)
+            //{
+            //    CalcData(true, true);
+            //    Console.WriteLine();
+            //    string rookiePaxPrint = PrintData(true, true);
+            //    textFile.AppendLine(rookiePaxPrint);
+            //}
+
+            textFile.AppendLine();
+
             // class scores
             CalcData(true, false);
-            Console.WriteLine(ClassScores(false)); // everyone
+            string classScoresPrint = ClassScores(false); // everyone
+            textFile.AppendLine(classScoresPrint);
             if (doRookie == true)
             {
                 CalcData(true, true);
-                Console.WriteLine(ClassScores(true)); // rookie
+                string rookieClassScoresPrint = ClassScores(true); // rookie
+                textFile.AppendLine(rookieClassScoresPrint);
             }
-            Console.WriteLine("");
+            textFile.AppendLine();
 
-            PrintCones();
+            string conesPrint = PrintCones();
+            textFile.AppendLine(conesPrint);
+
+            string dnfPrint = PrintDNF();
+            textFile.AppendLine(dnfPrint);
+
             if (doAttendance)
             {
-                Attendance();
+                string attendancePrint = Attendance();
+                textFile.AppendLine(attendancePrint);
             }
 
+            Console.WriteLine(textFile.ToString());
+            string textPath = eventFolder + $"\\{year}__seasonResults.txt";
+            File.WriteAllText(textPath, textFile.ToString());
+
+
+            // Generate HTML file
+            CalcData(false, false);
+            string styleFilename = configFolder + "\\_scoreStyles.css";
+            try
+            {
+                htmlStyle = File.ReadAllText(styleFilename);
+            }
+            catch
+            {
+                // No style sheet there, so don't use style sheet
+                htmlStyle = "";
+            }
+
+            htmlHeader = htmlHeader.Replace("%{STYLE}%", htmlStyle);
+
+            string htmlButtons = "";
+            string htmlResults = "";
+
+            htmlButtons += "<button class=\"button\" onclick=\"showResults('class-ranking');\">Class</button>";
+            htmlButtons += "<button class=\"button\" onclick=\"showResults('overall-ranking');\">Overall</button>";
+
+            htmlResults += HtmlClassResults();
+            htmlResults += HtmlOverallResults();
+
+            htmlBody = htmlBody.Replace("%{TITLE}%", title);
+            htmlBody = htmlBody.Replace("%{BUTTONS}%", htmlButtons);
+            htmlBody = htmlBody.Replace("%{RESULTS}%", htmlResults);
+
+            string htmlAllResults = $"<html><title>{title}</title>" + htmlHeader + htmlBody + "</html>";
+
+            string path = eventFolder + $"\\{year}__seasonResults.html";
+            File.WriteAllText(path, htmlAllResults);
         }
-        // ---------------------------------------------------------------------------
-        // print out cone counts
-        public static void PrintCones()
+
+        /// <summary>
+        /// Print out cone counts
+        /// </summary>
+        /// <returns>Formatted string</returns>
+        public static string PrintCones()
         {
+            StringBuilder cones = new();
+
             var myList = new List<KeyValuePair<string, DriverData>>(scores);
             // Sort drivers by cone count
             myList
@@ -255,9 +343,10 @@ namespace RaceBeam
                 });
 
             // print header line
-            Console.WriteLine(separator + "Overall cone count");
-            Console.Write("Pos Driver        ");
-            Console.WriteLine("    Total cones");
+            cones.Append(separator);
+            cones.AppendLine("Overall cone count");
+            cones.Append("Pos Driver        ");
+            cones.AppendLine("    Total cones");
 
             // Now print out drivers, their event scores and their total
             int position = 1;
@@ -276,22 +365,82 @@ namespace RaceBeam
                                             position++,
                                             driver.Value.driver
                                            );
-                Console.Write(line);
+                cones.Append(line);
                 line = string.Format("  {0,10:#0}", driver.Value.totalCones);
-                Console.WriteLine(line);
+                totCones += driver.Value.totalCones;
+                cones.AppendLine(line);
             }
-            Console.WriteLine("Total cones: " + totCones);
+
+            cones.AppendLine("Total cones: " + totCones);
+
+            return cones.ToString();
         }
-        // ---------------------------------------------------------------------------
-        // print out attendance stats
-        public static void Attendance()
+
+        /// <summary>
+        /// print out DNF counts
+        /// </summary>
+        /// <returns>Formatted string</returns>
+        public static string PrintDNF()
         {
+            StringBuilder dnf = new();
+
+            var myList = new List<KeyValuePair<string, DriverData>>(scores);
+            // Sort drivers by DNF count
+            myList
+                .Sort(delegate (
+                    KeyValuePair<string, DriverData> firstPair,
+                    KeyValuePair<string, DriverData> nextPair)
+                {
+                    return nextPair.Value.totalDNF.CompareTo(firstPair.Value.totalDNF);
+                });
+
+            // print header line
+            dnf.AppendLine(separator + "Overall DNF count");
+            dnf.Append("Pos Driver        ");
+            dnf.AppendLine("    Total DNF");
+
+            // Now print out drivers, their event scores and their total
+            int position = 1;
+            int totalDNF = 0;
+            foreach (KeyValuePair<string, DriverData> driver in myList)
+            {
+                if (driver.Value.totalDNF <= 0)
+                {
+                    break;
+                }
+                if ((membersOnly == true) && (driver.Value.member.ToUpperInvariant().Contains("Y") == false))
+                {
+                    continue;
+                }
+                string line = string.Format("{0,3} {1,-14}",
+                                            position++,
+                                            driver.Value.driver
+                                           );
+                dnf.Append(line);
+                line = string.Format("  {0,10:#0}", driver.Value.totalDNF);
+                totalDNF += driver.Value.totalDNF;
+                dnf.AppendLine(line);
+            }
+            dnf.AppendLine("Total DNF: " + totalDNF);
+
+            return dnf.ToString();
+        }
+
+        /// <summary>
+        /// print out attendance stats
+        /// </summary>
+        /// <returns>Formatted string</returns>
+        public static string Attendance()
+        {
+            StringBuilder attendance = new();
+
             var myList = new List<KeyValuePair<string, DriverData>>(scores);
             var attend = new SortedDictionary<int, int>();
             var rookieattend = new SortedDictionary<int, int>();
 
             // print header line
-            Console.WriteLine(separator + "Attendance");
+            attendance.Append(separator);
+            attendance.AppendLine("Attendance");
 
             for (int i = 1; i <= eventNames.Count; i++)
             {
@@ -310,38 +459,50 @@ namespace RaceBeam
             }
 
             // Print out results
-            Console.WriteLine(separator);
-            Console.WriteLine("{0,8} {1,8}", "Events", "Drivers");
+            attendance.AppendLine(string.Format("{0,8} {1,8}", "# Events", "# Drivers"));
             int totalDrivers = 0;
             foreach (int n in attend.Keys)
             {
-                string line = string.Format("{0,8} {1,8}\r\n",
+                string line = string.Format("{0,8} {1,8}",
                                             n,
                                             attend[n]
                                            );
                 totalDrivers += attend[n];
-                Console.Write(line);
+                attendance.AppendLine(line);
             }
-            Console.WriteLine("Total drivers: " + totalDrivers.ToString());
+            attendance.AppendLine("Total drivers: " + totalDrivers.ToString());
 
-
-            int totalRookieDrivers = 0;
-            Console.WriteLine("\r\nRookie-only:");
-            Console.WriteLine("{0,8} {1,8}", "Events", "Drivers");
-            foreach (int n in rookieattend.Keys)
+            if (doRookie)
             {
-                string line = string.Format("{0,8} {1,8}\r\n",
-                                            n,
-                                            rookieattend[n]
-                                           );
-                totalRookieDrivers += rookieattend[n];
-                Console.Write(line);
+                int totalRookieDrivers = 0;
+                attendance.AppendLine();
+                attendance.AppendLine("Rookie-only:");
+                attendance.AppendLine(string.Format("{0,8} {1,8}", "Events", "Drivers"));
+                foreach (int n in rookieattend.Keys)
+                {
+                    string line = string.Format("{0,8} {1,8}",
+                                                n,
+                                                rookieattend[n]
+                                               );
+                    totalRookieDrivers += rookieattend[n];
+                    attendance.AppendLine(line);
+                }
+                attendance.AppendLine("Total rookie drivers: " + totalRookieDrivers.ToString());
             }
-            Console.WriteLine("Total rookie drivers: " + totalRookieDrivers.ToString());
+
+            return attendance.ToString();
         }
-        // ---------------------------------------------------------------------------
-        public static void PrintData(bool isPAX, bool isRookie)
+
+        /// <summary>
+        /// print out all driver data
+        /// </summary>
+        /// <param name="isPAX">true to print pax data, false to print raw data</param>
+        /// <param name="isRookie">true to print rookie data</param>
+        /// <returns>Formatted string</returns>
+        public static string PrintData(bool isPAX, bool isRookie)
         {
+            StringBuilder print = new();
+
             var myList = new List<KeyValuePair<string, DriverData>>(scores);
 
             // Sort drivers by PAX or RAW
@@ -354,60 +515,60 @@ namespace RaceBeam
                     {
                         if (isRookie == true)
                         {
-                            return nextPair.Value.totalRookiePAX.CompareTo(firstPair.Value.totalRookiePAX);
+                            return nextPair.Value.bestRookiePAX.CompareTo(firstPair.Value.bestRookiePAX);
                         }
                         else
                         {
-                            return nextPair.Value.totalPAX.CompareTo(firstPair.Value.totalPAX);
+                            return nextPair.Value.bestPAX.CompareTo(firstPair.Value.bestPAX);
                         }
                     }
                     else
                     {
                         if (isRookie == true)
                         {
-                            return nextPair.Value.totalRookieRAW.CompareTo(firstPair.Value.totalRookieRAW);
+                            return nextPair.Value.bestRookieRAW.CompareTo(firstPair.Value.bestRookieRAW);
                         }
                         else
                         {
-                            return nextPair.Value.totalRAW.CompareTo(firstPair.Value.totalRAW);
+                            return nextPair.Value.bestRAW.CompareTo(firstPair.Value.bestRAW);
                         }
                     }
                 });
 
             // print header line
-            Console.Write(separator);
+            print.Append(separator);
             if (isPAX == true)
             {
                 if (isRookie == true)
                 {
-                    Console.WriteLine("Rookie-only PAX scores");
+                    print.AppendLine("Rookie-only PAX scores");
                 }
                 else
                 {
-                    Console.WriteLine("Overall PAX scores");
+                    print.AppendLine("Overall PAX scores");
                 }
             }
             else
             {
                 if (isRookie == true)
                 {
-                    Console.WriteLine("Rookie-only RAW scores");
+                    print.AppendLine("Rookie-only scores");
                 }
                 else
                 {
-                    Console.WriteLine("Overall RAW scores");
+                    print.AppendLine("Overall scores");
                 }
             }
-            Console.Write("Pos Driver        ");
+            print.Append("Pos Driver        ");
 
             foreach (string name in eventNames)
             {
-                Console.Write("{0,10} ", name);
+                print.Append(string.Format("{0,10} ", name));
             }
             if (isRookie == true)
-                Console.WriteLine("    Best {0}", numRookieDays.ToString());
+                print.AppendLine($"    Best {numRookieDays}");
             else
-                Console.WriteLine("    Best {0}", numDays.ToString());
+                print.AppendLine($"    Best {numDays}");
 
             // Now print out drivers, their event scores and their total
             int position = 1;
@@ -446,7 +607,7 @@ namespace RaceBeam
                                             position++,
                                             driver.Value.driver
                                            );
-                Console.Write(line);
+                print.Append(line);
 
                 foreach (string eventName in eventNames)
                 {
@@ -480,35 +641,267 @@ namespace RaceBeam
                             }
                         }
                     }
-                    Console.Write(line);
+                    print.Append(line);
                 }
                 if (isPAX == true)
                 {
                     if (isRookie == true)
                     {
-                        line = string.Format("  {0,10:#0.000}", driver.Value.totalRookiePAX);
+                        line = string.Format("  {0,10:#0.000}", driver.Value.bestRookiePAX);
                     }
                     else
                     {
-                        line = string.Format("  {0,10:#0.000}", driver.Value.totalPAX);
+                        line = string.Format("  {0,10:#0.000}", driver.Value.bestPAX);
                     }
                 }
                 else
                 {
                     if (isRookie == true)
                     {
-                        line = string.Format("  {0,10:#0.000}", driver.Value.totalRookieRAW);
+                        line = string.Format("  {0,10:#0.000}", driver.Value.bestRookieRAW);
                     }
                     else
                     {
-                        line = string.Format("  {0,10:#0.000}", driver.Value.totalRAW);
+                        line = string.Format("  {0,10:#0.000}", driver.Value.bestRAW);
                     }
                 }
 
-                Console.WriteLine(line);
+                print.AppendLine($"{line}");
             }
+
+            return print.ToString();
         }
-        // ---------------------------------------------------------------------------
+
+        /// <summary>
+        /// print out results by class in html format
+        /// </summary>
+        /// <returns>Formatted string</returns>
+        public static string HtmlClassResults()
+        {
+            StringBuilder classResults = new();
+
+            classResults.Append("<div id=\"class-ranking\" class=\"results\">");
+            classResults.Append("<h2>Class Ranking</h2>");
+
+            // First build a sorted class list
+            // Sort order is given in the csv file
+            var sortedClassList = new SortedDictionary<int, PaxInfo>();
+            List<string> classList = classData.getKeys();
+            foreach (string className in classList)
+            {
+                var p = new PaxInfo
+                {
+                    carClass = className,
+                    pax = classData.GetField(className, "PAX"),
+                    description = classData.GetField(className, "Description"),
+                    group = classData.GetField(className, "Group"),
+                    displayOrder = classData.GetField(className, "Display Order")
+                };
+                if (int.TryParse(p.displayOrder, out int orderVal))
+                {
+                    try
+                    {
+                        sortedClassList.Add(orderVal, p);
+                    }
+                    catch { }
+                }
+            }
+
+            // Each driver has a list of event scores, with each event possibly in a different class
+            // For each class, we need to make a new driver list, with all drivers that ever ran in that class
+            // If they didn't run in that class, then the event score (raw) is 0.0
+            // Then sort by score totals for each driver
+
+            foreach (KeyValuePair<int, PaxInfo> classInfo in sortedClassList)
+            {
+                PaxInfo curClass = classInfo.Value;
+                int rank = 1;
+
+                // make a new driver list, with all drivers that ever ran in this class
+                var drvList = new List<DriverData>();
+                foreach (string driverName in scores.Keys)
+                {
+                    DriverData driver = scores[driverName];
+                    if (driver.groupScores.ContainsKey(curClass.carClass))
+                    {
+                        drvList.Add(driver);
+                    }
+                }
+                // skip group if nobody competed there
+                if (drvList.Count == 0)
+                {
+                    continue;
+                }
+
+                // Now sort drivers by their overall score in this group
+                drvList
+                    .Sort(delegate (
+                        DriverData first,
+                        DriverData next)
+                    {
+                        return next.groupScores[curClass.carClass].bestPAX.CompareTo(first.groupScores[curClass.carClass].bestPAX);
+                    });
+
+                classResults.Append("<table>");
+                classResults.Append("<table>");
+                classResults.Append("<thead>");
+                classResults.Append("<tr>");
+                classResults.Append($"<th colspan=\"{4 + eventNames.Count}\">{curClass.carClass} ({curClass.description})</th>");
+                classResults.Append("</tr>");
+                classResults.Append("<th>Rank</th>");
+                classResults.Append("<th>Driver</th>");
+                classResults.Append("<th>Total</th>");
+                classResults.Append($"<th>Best {numDays}</th>");
+
+                foreach (string eventName in eventNames)
+                {
+                    classResults.Append($"<th>{eventName}</th>");
+                }
+
+                classResults.Append("</tr>");
+                classResults.Append("</thead>");
+                classResults.Append("<tbody>");
+
+                foreach (DriverData driver in drvList)
+                {
+                    string driverName = driver.firstName + " " + driver.lastName.Substring(0, 1);
+                    if (configData.GetField("ShowLastName", "Value").Contains("Y"))
+                    {
+                        driverName = driver.firstName + " " + driver.lastName;
+                    }
+
+                    string total = driver.groupScores[curClass.carClass].totalPAX.ToString("#0.000");
+                    string bestTotal = driver.groupScores[curClass.carClass].bestPAX.ToString("#0.000");
+
+                    classResults.Append("<tr>");
+                    classResults.Append($"<td>{rank}</td>");
+                    classResults.Append($"<td>{driverName}</td>");
+                    classResults.Append($"<td>{total}</td>");
+                    classResults.Append($"<td>{bestTotal}</td>");
+
+                    // Driver score dict has gaps -- not all events attended
+                    foreach (string eventName in eventNames)
+                    {
+                        if (driver.groupScores[curClass.carClass].eventScores.ContainsKey(eventName) == false)
+                        {
+                            classResults.Append($"<td>0.000</td>");
+                        }
+                        else
+                        {
+                            classResults.Append($"<td>{driver.groupScores[curClass.carClass].eventScores[eventName].groupScore.ToString("#0.000")}</td>");
+                        }
+                    }
+
+                    classResults.Append("</tr>");
+                    rank++;
+                }
+
+                classResults.Append("</tbody>");
+                classResults.Append("</table>");
+            }
+
+            classResults.Append("</div>");
+
+            return classResults.ToString();
+        }
+
+        /// <summary>
+        /// print out overall raw results in html format
+        /// </summary>
+        /// <returns>Formatted string</returns>
+        public static string HtmlOverallResults()
+        {
+            StringBuilder overallResults = new();
+
+            overallResults.Append("<div id=\"overall-ranking\" class=\"results\" style=\"display: none;\">");
+            overallResults.Append("<h2>Overall Ranking</h2>");
+
+            var myList = new List<KeyValuePair<string, DriverData>>(scores);
+
+            // Sort drivers by RAW
+            myList
+                .Sort(delegate (
+                    KeyValuePair<string, DriverData> firstPair,
+                    KeyValuePair<string, DriverData> nextPair)
+                {
+                    return nextPair.Value.bestRAW.CompareTo(firstPair.Value.bestRAW);
+                });
+
+            overallResults.Append("<table>");
+            overallResults.Append("<thead>");
+            overallResults.Append("<tr>");
+            overallResults.Append($"<th colspan=\"{4 + eventNames.Count}\">Overall Scores</th>");
+            overallResults.Append("</tr>");
+            overallResults.Append("<tr>");
+            overallResults.Append("<th>Rank</th>");
+            overallResults.Append("<th>Driver</th>");
+            overallResults.Append("<th>Total</th>");
+            overallResults.Append($"<th>Best {numDays}</th>");
+
+            foreach (string eventName in eventNames)
+            {
+                overallResults.Append($"<th>{eventName}</th>");
+            }
+
+            overallResults.Append("</tr>");
+            overallResults.Append("</thead>");
+            overallResults.Append("<tbody>");
+
+            // Now print out drivers, their event scores and their total
+            int rank = 1;
+            foreach (KeyValuePair<string, DriverData> driver in myList)
+            {
+                // don't print out people with 0 scores (say 1 event with a DNS)
+                if (driver.Value.totalRAW <= 0.0)
+                {
+                    break;
+                }
+
+                string driverName = driver.Value.firstName + " " + driver.Value.lastName.Substring(0, 1);
+                if (configData.GetField("ShowLastName", "Value").Contains("Y"))
+                {
+                    driverName = driver.Value.firstName + " " + driver.Value.lastName;
+                }
+
+                string total = driver.Value.totalPAX.ToString("#0.000");
+                string bestTotal = driver.Value.bestPAX.ToString("#0.000");
+
+                overallResults.Append("<tr>");
+                overallResults.Append($"<td>{rank}</td>");
+                overallResults.Append($"<td>{driverName}</td>");
+                overallResults.Append($"<td>{total}</td>");
+                overallResults.Append($"<td>{bestTotal}</td>");
+
+                foreach (string eventName in eventNames)
+                {
+                    if (driver.Value.overallScores.ContainsKey(eventName) == false)
+                    {
+                        // never attended
+                        overallResults.Append($"<td>0.000</td>");
+                    }
+                    else
+                    {
+                        overallResults.Append($"<td>{driver.Value.overallScores[eventName].RAWScore.ToString("#0.000")}</td>");
+                    }
+                }
+
+                overallResults.Append("</tr>");
+                rank++;
+            }
+
+            overallResults.Append("</tbody>");
+            overallResults.Append("</table>");
+
+            overallResults.Append("</div>");
+
+            return overallResults.ToString();
+        }
+
+        /// <summary>
+        /// Calculate the scores from the season data
+        /// </summary>
+        /// <param name="isPAX">true to print pax data, false to print raw data</param>
+        /// <param name="isRookie">true to print rookie data</param>
         public static void CalcData(bool isPAX, bool isRookie)
         {
             // First go through and calculate best total scores
@@ -519,6 +912,10 @@ namespace RaceBeam
                 driver.totalRookiePAX = 0.0;
                 driver.totalRAW = 0.0;
                 driver.totalRookieRAW = 0.0;
+                driver.bestPAX = 0.0;
+                driver.bestRookiePAX = 0.0;
+                driver.bestRAW = 0.0;
+                driver.bestRookieRAW = 0.0;
 
                 // Sort by PAX score, descending order
                 var myList = new List<EventScore>(driver.overallScores.Values);
@@ -566,9 +963,12 @@ namespace RaceBeam
                     driver.totalRookiePAX += evScore.rookiePAXScore;
                     driver.totalRookieRAW += evScore.rookieRAWScore;
                     bestCount -= 1;
-                    if (bestCount <= 0)
+                    if (bestCount >= 0)
                     {
-                        break;
+                        driver.bestPAX += evScore.PAXScore;
+                        driver.bestRAW += evScore.RAWScore;
+                        driver.bestRookiePAX += evScore.rookiePAXScore;
+                        driver.bestRookieRAW += evScore.rookieRAWScore;
                     }
                 }
 
@@ -607,6 +1007,7 @@ namespace RaceBeam
                     {
                         bestCount = numDays;
                         driver.groupScores[grp].totalPAX = 0.0;
+                        driver.groupScores[grp].bestPAX = 0.0;
                     }
                     foreach (EventScore evScore in myList)
                     {
@@ -620,15 +1021,25 @@ namespace RaceBeam
                         }
 
                         bestCount -= 1;
-                        if (bestCount <= 0)
+                        if (bestCount >= 0)
                         {
-                            break;
+                            if (isRookie == true)
+                            {
+                                driver.groupScores[grp].bestRookiePAX += evScore.groupRookieScore;
+                            }
+                            else
+                            {
+                                driver.groupScores[grp].bestPAX += evScore.groupScore;
+                            }
                         }
                     }
                 }
             }
         }
-        // ---------------------------------------------------------------------------
+
+        /// <summary>
+        /// Read in the data files from the season
+        /// </summary>
         public static string ReadData()
         {
             string[] filePaths = Directory.GetFiles(eventFolder, "*_CSVData.csv");
@@ -639,7 +1050,7 @@ namespace RaceBeam
 
                 // parse out the event name from something like c:\blah\12_02_23_CSVData.csv
                 //Regex reg = new Regex(@".*(event[0-9]+).*");
-                var reg = new Regex(@".*(\d\d_\d\d_\d\d.*)_CSVData.csv");
+                var reg = new Regex(@"^.*[\\/](.*)_CSVData.csv$");
                 Match m;
                 m = reg.Match(scorefile);
                 if (m.Success == false)
@@ -744,13 +1155,22 @@ namespace RaceBeam
                     // Add to total cone count for this driver
                     driver.totalCones += evScores.coneCount;
 
+                    // Add to total DNF count for this driver
+                    string runs = ev.GetField(carnum, "Day1Set1 Runs");
+                    int dnfCount = Regex.Matches(runs, "DNF").Count;
+                    driver.totalDNF += dnfCount;
+                    runs = ev.GetField(carnum, "Day1Set2 Runs");
+                    dnfCount = Regex.Matches(runs, "DNF").Count;
+                    driver.totalDNF += dnfCount;
+
+
                     // multiple groups, so go through and parse each one
                     for (int grpnum = 1; grpnum < 1000; grpnum++)
                     {
                         string hdr = string.Format("Xgroup-{0}:Name", grpnum);
 
                         string grpname = ev.GetField(carnum, hdr);
-                        if (String.IsNullOrEmpty(grpname))
+                        if (string.IsNullOrEmpty(grpname))
                         {
                             break;
                         }
@@ -788,7 +1208,12 @@ namespace RaceBeam
 
             return "";
         }
-        // ---------------------------------------------------------------------------
+
+        /// <summary>
+        /// print out the driver ranking based on each class
+        /// </summary>
+        /// <param name="isRookie">true to generate rookie results</param>
+        /// <returns>Formatted string</returns>
         public static string ClassScores(bool isRookie)
         {
             string results = separator;
@@ -871,11 +1296,11 @@ namespace RaceBeam
                     {
                         if (isRookie == true)
                         {
-                            return next.groupScores[curClass.carClass].totalRookiePAX.CompareTo(first.groupScores[curClass.carClass].totalRookiePAX);
+                            return next.groupScores[curClass.carClass].bestRookiePAX.CompareTo(first.groupScores[curClass.carClass].bestRookiePAX);
                         }
                         else
                         {
-                            return next.groupScores[curClass.carClass].totalPAX.CompareTo(first.groupScores[curClass.carClass].totalPAX);
+                            return next.groupScores[curClass.carClass].bestPAX.CompareTo(first.groupScores[curClass.carClass].bestPAX);
                         }
                     });
 
@@ -937,11 +1362,11 @@ namespace RaceBeam
                     // Now the best N event total
                     if (isRookie == true)
                     {
-                        results += string.Format(" {0,10:#0.000}", driver.groupScores[curClass.carClass].totalRookiePAX);
+                        results += string.Format(" {0,10:#0.000}", driver.groupScores[curClass.carClass].bestRookiePAX);
                     }
                     else
                     {
-                        results += string.Format(" {0,10:#0.000}", driver.groupScores[curClass.carClass].totalPAX);
+                        results += string.Format(" {0,10:#0.000}", driver.groupScores[curClass.carClass].bestPAX);
                     }
                     results += "\r\n";
                 }

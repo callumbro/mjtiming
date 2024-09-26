@@ -834,7 +834,7 @@ namespace RaceBeam
                     }
 
                     // Old or new, update info
-                    drivers["Registered", index].Value = "No";
+                    //drivers["Registered", index].Value = "Yes";
                     drivers["Notes", index].Value = "prereg";
 
                     string carclass = report.GetField(reportrow.ToString(), "Vehicle Class");
@@ -846,10 +846,7 @@ namespace RaceBeam
                     {
                         carclass = "";  // keep class empty if nothing else
                     }
-                    if (drivers["Class", index].Value == null)
-                    {
-                        drivers["Class", index].Value = "";
-                    }
+                    
                     // look up in class data and verify it exists
                     if (classData.GetField(carclass, "PAX") == "")
                     {
@@ -868,10 +865,6 @@ namespace RaceBeam
                                     break;
                                 }
                             }
-                            if (classFound == false)
-                            {
-                                drivers["Class", index].Value = "";
-                            }
                         }
                         else
                         {
@@ -883,7 +876,16 @@ namespace RaceBeam
                         // it exists, so use the given class
                         drivers["Class", index].Value = carclass;
                     }
-
+                    
+                    if (!string.IsNullOrEmpty(carclass))
+                    {
+                        drivers["Class", index].Value = carclass.ToUpperInvariant();
+                    }
+                    else if (drivers["Class", index].Value == null)
+                    {
+                        drivers["Class", index].Value = "";
+                    }
+                    
                     string year = report.GetField(reportrow.ToString(), "Year");
                     if (string.IsNullOrEmpty(year) == true)
                     {
