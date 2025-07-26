@@ -925,41 +925,41 @@ namespace RaceBeam
                     }
                     drivers["Car Color", index].Value = colour;
 
-                    if (drivers.Columns.Contains("Member") == true)
-                    {
-                        if ((drivers["Member", index].Value == null) ||
-                            (string.IsNullOrEmpty(drivers["Member", index].Value.ToString()) == true))
-                        {
-                            drivers["Member", index].Value = "No";
-                            string fee = report.GetField(reportrow.ToString(), "Fee");
-                            if (fee == "Members")
-                            {
-                                drivers["Member", index].Value = "Yes";
-                            }
-                        }
-                    }
+                    //if (drivers.Columns.Contains("Member") == true)
+                    //{
+                    //    if ((drivers["Member", index].Value == null) ||
+                    //        (string.IsNullOrEmpty(drivers["Member", index].Value.ToString()) == true))
+                    //    {
+                    //        drivers["Member", index].Value = "No";
+                    //        string fee = report.GetField(reportrow.ToString(), "Fee");
+                    //        if (fee == "Members")
+                    //        {
+                    //            drivers["Member", index].Value = "Yes";
+                    //        }
+                    //    }
+                    //}
 
-                    if (drivers.Columns.Contains("Rookie") == true)
-                    {
-                        string novice = report.GetField(reportrow.ToString(), "Novice");
-                        if (novice == "")
-                        {
-                            novice = report.GetField(reportrow.ToString(), "Rookie");
-                        }
-                        if ((string.IsNullOrEmpty(novice) == true) || novice.Contains("1"))
-                        {
-                            drivers["Rookie", index].Value = "Yes";
-                        }
-                        else if (novice.Contains("0"))
-                        {
-                            drivers["Rookie", index].Value = "No";
-                        }
-                        if ((drivers["Rookie", index].Value == null) ||
-                            (string.IsNullOrEmpty(drivers["Rookie", index].Value.ToString()) == true))
-                        {
-                            drivers["Rookie", index].Value = "Yes";
-                        }
-                    }
+                    //if (drivers.Columns.Contains("Rookie") == true)
+                    //{
+                    //    string novice = report.GetField(reportrow.ToString(), "Novice");
+                    //    if (novice == "")
+                    //    {
+                    //        novice = report.GetField(reportrow.ToString(), "Rookie");
+                    //    }
+                    //    if ((string.IsNullOrEmpty(novice) == true) || novice.Contains("1"))
+                    //    {
+                    //        drivers["Rookie", index].Value = "Yes";
+                    //    }
+                    //    else if (novice.Contains("0"))
+                    //    {
+                    //        drivers["Rookie", index].Value = "No";
+                    //    }
+                    //    if ((drivers["Rookie", index].Value == null) ||
+                    //        (string.IsNullOrEmpty(drivers["Rookie", index].Value.ToString()) == true))
+                    //    {
+                    //        drivers["Rookie", index].Value = "Yes";
+                    //    }
+                    //}
                     // special case for LADIES group
                     string lady = report.GetField(reportrow.ToString(), "Ladies");
                     if (lady.Contains("1"))
