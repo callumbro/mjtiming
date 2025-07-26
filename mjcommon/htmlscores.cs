@@ -176,28 +176,59 @@ namespace RaceBeam
             results.Append("<table>");
             results.Append("<thead>");
             results.Append("<tr>");
-            results.Append("<th colspan=\"8\">Run Times (ordered by quickest)</th>");
+            results.Append("<th colspan=\"10\">Run Times (ordered by quickest)</th>");
             results.Append("</tr>");
             results.Append("<tr>");
             results.Append("<th>Rank</th>");
             results.Append("<th>Class</th>");
             results.Append("<th>Driver</th>");
             results.Append("<th>Car</th>");
-            results.Append("<th>Best Time</th>");
+            if (args.set1PlusSet2)
+            {
+                results.Append("<th>Set 1 Best Time</th>");
+                results.Append("<th>Set 2 Best Time</th>");
+                results.Append("<th>Total Time</th>");
+            }
+            else
+            {
+                results.Append("<th colspan=\"3\">Best Time</th>");
+            }
             results.Append("<th>Diff.</th>");
             results.Append("<th>Diff. Prev.</th>");
-            results.Append("<th>Raw Times</th>");
+            if (args.set1PlusSet2)
+            {
+                results.Append("<th>Set 2 Raw Times</th>");
+            }
+            else
+            {
+                results.Append("<th>Raw Times</th>");
+            }
             results.Append("</tr>");
             results.Append("</thead>");
             results.Append("<tbody>");
 
-            var myList = new List<KeyValuePair<string, scoreCalcs.driverScoreData>>(scores);
             // Sort by raw time
+            var myList = new List<KeyValuePair<string, scoreCalcs.driverScoreData>>(scores);
             myList
                 .Sort(delegate (
                     KeyValuePair<string, scoreCalcs.driverScoreData> firstPair,
                     KeyValuePair<string, scoreCalcs.driverScoreData> nextPair)
                 {
+                    if (args.set1Only)
+                    {
+                        return firstPair.Value.Day1Set1.bestRAW.CompareTo(nextPair.Value.Day1Set1.bestRAW);
+                    }
+                    else if (args.set2Only)
+                    {
+                        return firstPair.Value.Day1Set2.bestRAW.CompareTo(nextPair.Value.Day1Set2.bestRAW);
+                    }
+                    else if (args.set1PlusSet2)
+                    {
+                        double bestSet1PlusSet2 = firstPair.Value.Day1Set1.bestRAW + firstPair.Value.Day1Set2.bestRAW;
+                        double nextSet1PlusSet2 = nextPair.Value.Day1Set1.bestRAW + nextPair.Value.Day1Set2.bestRAW;
+                        return bestSet1PlusSet2.CompareTo(nextSet1PlusSet2);
+                    }
+
                     return firstPair.Value.scoreData.bestRAW.CompareTo(nextPair.Value.scoreData.bestRAW);
                 });
 
@@ -209,8 +240,26 @@ namespace RaceBeam
                 if (rank == 1)
                 {
                     // Initialize for time difference calculations.
-                    classLeadTime = driver.Value.scoreData.bestRAW;
-                    classPrevTime = driver.Value.scoreData.bestRAW;
+                    if (args.set1Only)
+                    {
+                        classLeadTime = driver.Value.Day1Set1.bestRAW;
+                        classPrevTime = driver.Value.Day1Set1.bestRAW;
+                    }
+                    else if (args.set2Only)
+                    {
+                        classLeadTime = driver.Value.Day1Set2.bestRAW;
+                        classPrevTime = driver.Value.Day1Set2.bestRAW;
+                    }
+                    else if (args.set1PlusSet2)
+                    {
+                        classLeadTime = driver.Value.Day1Set1.bestRAW + driver.Value.Day1Set2.bestRAW;
+                        classPrevTime = driver.Value.Day1Set1.bestRAW + driver.Value.Day1Set2.bestRAW;
+                    }
+                    else
+                    {
+                        classLeadTime = driver.Value.scoreData.bestRAW;
+                        classPrevTime = driver.Value.scoreData.bestRAW;
+                    }
                 }
 
                 string driverName = driver.Value.firstName + " " + driver.Value.lastName.Substring(0, 1);
@@ -219,37 +268,106 @@ namespace RaceBeam
                     driverName = driver.Value.firstName + " " + driver.Value.lastName;
                 }
 
-                string driverRAW;
+                string driverBestRAW;
                 string driverDiff = "";
                 string driverDiffPrev = "";
-                driverRAW = driver.Value.scoreData.bestRAW.ToString("#0.000");
-                if (driver.Value.scoreData.bestRAW >= scoreCalcs.DNFvalue)
+                if (args.set1Only)
                 {
-                    driverRAW = "DNS";
+                    if (driver.Value.Day1Set1.bestRAW >= scoreCalcs.DNFvalue)
+                    {
+                        driverBestRAW = "DNS";
+                    }
+                    else
+                    {
+                        driverBestRAW = driver.Value.Day1Set1.bestRAW.ToString("#0.000");
+                    }
+                    driverDiff = (driver.Value.Day1Set1.bestRAW - classLeadTime).ToString("#0.000");
+                    driverDiffPrev = (driver.Value.Day1Set1.bestRAW - classPrevTime).ToString("#0.000");
+                }
+                else if (args.set2Only)
+                {
+                    if (driver.Value.Day1Set2.bestRAW >= scoreCalcs.DNFvalue)
+                    {
+                        driverBestRAW = "DNS";
+                    }
+                    else
+                    {
+                        driverBestRAW = driver.Value.Day1Set2.bestRAW.ToString("#0.000");
+                    }
+                    driverDiff = (driver.Value.Day1Set2.bestRAW - classLeadTime).ToString("#0.000");
+                    driverDiffPrev = (driver.Value.Day1Set2.bestRAW - classPrevTime).ToString("#0.000");
+                }
+                else if (args.set1PlusSet2)
+                {
+                    if (driver.Value.Day1Set1.bestRAW >= scoreCalcs.DNFvalue ||
+                        driver.Value.Day1Set2.bestRAW >= scoreCalcs.DNFvalue)
+                    {
+                        driverBestRAW = "DNS";
+                    }
+                    else
+                    {
+                        driverBestRAW = (driver.Value.Day1Set1.bestRAW + driver.Value.Day1Set2.bestRAW).ToString("#0.000");
+                    }
+                    double bestSet1PlusSet2 = driver.Value.Day1Set1.bestRAW + driver.Value.Day1Set2.bestRAW;
+                    double leadSet1PlusSet2 = classLeadTime;
+                    double prevSet1PlusSet2 = classPrevTime;
+                    driverDiff = (bestSet1PlusSet2 - leadSet1PlusSet2).ToString("#0.000");
+                    driverDiffPrev = (bestSet1PlusSet2 - prevSet1PlusSet2).ToString("#0.000");
                 }
                 else
                 {
+                    driverBestRAW = driver.Value.scoreData.bestRAW.ToString("#0.000");
                     driverDiff = (driver.Value.scoreData.bestRAW - classLeadTime).ToString("#0.000");
                     driverDiffPrev = (driver.Value.scoreData.bestRAW - classPrevTime).ToString("#0.000");
                 }
 
+                var set = driver.Value.Day1Set1;
+                if (args.set2Only || args.set1PlusSet2)
+                {
+                    set = driver.Value.Day1Set2;
+                }
+                
                 results.Append("<tr>");
                 results.Append($"<td>{rank}</td>");
                 results.Append($"<td>{driver.Value.carClass}</td>");
                 results.Append($"<td>{driverName}</td>");
                 results.Append($"<td>{driver.Value.carDescription}</td>");
-                results.Append($"<td>{driverRAW}</td>");
+                if (args.set1PlusSet2)
+                {
+                    results.Append($"<td>{driver.Value.Day1Set1.bestRAW.ToString("#0.000")}</td>");
+                    results.Append($"<td>{driver.Value.Day1Set2.bestRAW.ToString("#0.000")}</td>");
+                    results.Append($"<td>{driverBestRAW}</td>");
+                }
+                else
+                {
+                    results.Append($"<td colspan=\"3\">{driverBestRAW}</td>");
+                }
                 results.Append($"<td>{driverDiff}</td>");
                 results.Append($"<td>{driverDiffPrev}</td>");
                 results.Append("<td>");
                 results.Append("<div class=\"raw-results\">");
-                results.Append(printSet(driver.Value.Day1Set1, 1, 1));
+                results.Append(printSet(set, 1, 1));
                 results.Append("</div>");
                 results.Append("</td>");
                 results.Append("</tr>");
 
                 // Update the previous time for the next driver's time difference calculation.
-                classPrevTime = driver.Value.scoreData.bestRAW;
+                if (args.set1Only)
+                {
+                    classPrevTime = driver.Value.Day1Set1.bestRAW;
+                }
+                else if (args.set2Only)
+                {
+                    classPrevTime = driver.Value.Day1Set2.bestRAW;
+                }
+                else if (args.set1PlusSet2)
+                {
+                    classPrevTime = driver.Value.Day1Set1.bestRAW + driver.Value.Day1Set2.bestRAW;
+                }
+                else
+                {
+                    classPrevTime = driver.Value.scoreData.bestRAW;
+                }
                 rank++;
             }
 
@@ -287,6 +405,21 @@ namespace RaceBeam
                     KeyValuePair<string, scoreCalcs.driverScoreData> firstPair,
                     KeyValuePair<string, scoreCalcs.driverScoreData> nextPair)
                 {
+                    if (args.set1Only)
+                    {
+                        return firstPair.Value.Day1Set1.bestRAW.CompareTo(nextPair.Value.Day1Set1.bestRAW);
+                    }
+                    else if (args.set2Only)
+                    {
+                        return firstPair.Value.Day1Set2.bestRAW.CompareTo(nextPair.Value.Day1Set2.bestRAW);
+                    }
+                    else if (args.set1PlusSet2)
+                    {
+                        double bestSet1PlusSet2 = firstPair.Value.Day1Set1.bestRAW + firstPair.Value.Day1Set2.bestRAW;
+                        double nextSet1PlusSet2 = nextPair.Value.Day1Set1.bestRAW + nextPair.Value.Day1Set2.bestRAW;
+                        return bestSet1PlusSet2.CompareTo(nextSet1PlusSet2);
+                    }
+
                     return firstPair.Value.scoreData.bestRAW.CompareTo(nextPair.Value.scoreData.bestRAW);
                 });
 
@@ -304,18 +437,34 @@ namespace RaceBeam
                 results.Append("<table>");
                 results.Append("<thead>");
                 results.Append("<tr>");
-                results.Append($"<th colspan=\"9\">{curClass.carClass} ({curClass.description})</th>");
+                results.Append($"<th colspan=\"11\">{curClass.carClass} ({curClass.description})</th>");
                 results.Append("</tr>");
                 results.Append("<tr>");
                 results.Append("<th>Rank</th>");
                 results.Append("<th>Class</th>");
                 results.Append("<th>Driver</th>");
                 results.Append("<th>Car</th>");
-                results.Append("<th>Best Time</th>");
+                if (args.set1PlusSet2)
+                {
+                    results.Append("<th>Set 1 Best Time</th>");
+                    results.Append("<th>Set 2 Best Time</th>");
+                    results.Append("<th>Total Time</th>");
+                }
+                else
+                {
+                    results.Append("<th colspan=\"3\">Best Time</th>");
+                }
                 results.Append("<th>Diff.</th>");
                 results.Append("<th>Diff. Prev.</th>");
                 results.Append("<th>Score</th>");
-                results.Append("<th>Raw Times</th>");
+                if (args.set1PlusSet2)
+                {
+                    results.Append("<th>Set 2 Raw Times</th>");
+                }
+                else
+                {
+                    results.Append("<th>Raw Times</th>");
+                }
                 results.Append("</tr>");
                 results.Append("</thead>");
                 results.Append("<tbody>");
@@ -341,8 +490,26 @@ namespace RaceBeam
                     if (grpPtr.groupRank == 1)
                     {
                         // Initialize for time difference calculations.
-                        classLeadTime = driver.Value.scoreData.bestRAW;
-                        classPrevTime = driver.Value.scoreData.bestRAW;
+                        if (args.set1Only)
+                        {
+                            classLeadTime = driver.Value.Day1Set1.bestRAW;
+                            classPrevTime = driver.Value.Day1Set1.bestRAW;
+                        }
+                        else if (args.set2Only)
+                        {
+                            classLeadTime = driver.Value.Day1Set2.bestRAW;
+                            classPrevTime = driver.Value.Day1Set2.bestRAW;
+                        }
+                        else if (args.set1PlusSet2)
+                        {
+                            classLeadTime = driver.Value.Day1Set1.bestRAW + driver.Value.Day1Set2.bestRAW;
+                            classPrevTime = driver.Value.Day1Set1.bestRAW + driver.Value.Day1Set2.bestRAW;
+                        }
+                        else
+                        {
+                            classLeadTime = driver.Value.scoreData.bestRAW;
+                            classPrevTime = driver.Value.scoreData.bestRAW;
+                        }
                     }
 
                     string driverName = driver.Value.firstName + " " + driver.Value.lastName.Substring(0, 1);
@@ -351,18 +518,63 @@ namespace RaceBeam
                         driverName = driver.Value.firstName + " " + driver.Value.lastName;
                     }
 
-                    string driverRAW;
+                    string driverBestRAW;
                     string driverDiff = "";
                     string driverDiffPrev = "";
-                    driverRAW = driver.Value.scoreData.bestRAW.ToString("#0.000");
-                    if (driver.Value.scoreData.bestRAW >= scoreCalcs.DNFvalue)
+                    if (args.set1Only)
                     {
-                        driverRAW = "DNS";
+                        if (driver.Value.Day1Set1.bestRAW >= scoreCalcs.DNFvalue)
+                        {
+                            driverBestRAW = "DNS";
+                        }
+                        else
+                        {
+                            driverBestRAW = driver.Value.Day1Set1.bestRAW.ToString("#0.000");
+                        }
+                        driverDiff = (driver.Value.Day1Set1.bestRAW - classLeadTime).ToString("#0.000");
+                        driverDiffPrev = (driver.Value.Day1Set1.bestRAW - classPrevTime).ToString("#0.000");
+                    }
+                    else if (args.set2Only)
+                    {
+                        if (driver.Value.Day1Set2.bestRAW >= scoreCalcs.DNFvalue)
+                        {
+                            driverBestRAW = "DNS";
+                        }
+                        else
+                        {
+                            driverBestRAW = driver.Value.Day1Set2.bestRAW.ToString("#0.000");
+                        }
+                        driverDiff = (driver.Value.Day1Set2.bestRAW - classLeadTime).ToString("#0.000");
+                        driverDiffPrev = (driver.Value.Day1Set2.bestRAW - classPrevTime).ToString("#0.000");
+                    }
+                    else if (args.set1PlusSet2)
+                    {
+                        if (driver.Value.Day1Set1.bestRAW >= scoreCalcs.DNFvalue ||
+                            driver.Value.Day1Set2.bestRAW >= scoreCalcs.DNFvalue)
+                        {
+                            driverBestRAW = "DNS";
+                        }
+                        else
+                        {
+                            driverBestRAW = (driver.Value.Day1Set1.bestRAW + driver.Value.Day1Set2.bestRAW).ToString("#0.000");
+                        }
+                        double bestSet1PlusSet2 = driver.Value.Day1Set1.bestRAW + driver.Value.Day1Set2.bestRAW;
+                        double leadSet1PlusSet2 = classLeadTime;
+                        double prevSet1PlusSet2 = classPrevTime;
+                        driverDiff = (bestSet1PlusSet2 - leadSet1PlusSet2).ToString("#0.000");
+                        driverDiffPrev = (bestSet1PlusSet2 - prevSet1PlusSet2).ToString("#0.000");
                     }
                     else
                     {
+                        driverBestRAW = driver.Value.scoreData.bestRAW.ToString("#0.000");
                         driverDiff = (driver.Value.scoreData.bestRAW - classLeadTime).ToString("#0.000");
                         driverDiffPrev = (driver.Value.scoreData.bestRAW - classPrevTime).ToString("#0.000");
+                    }
+
+                    var set = driver.Value.Day1Set1;
+                    if (args.set2Only || args.set1PlusSet2)
+                    {
+                        set = driver.Value.Day1Set2;
                     }
 
                     results.Append("<tr>");
@@ -370,19 +582,43 @@ namespace RaceBeam
                     results.Append($"<td>{driver.Value.carClass}</td>");
                     results.Append($"<td>{driverName}</td>");
                     results.Append($"<td>{driver.Value.carDescription}</td>");
-                    results.Append($"<td>{driverRAW}</td>");
+                    if (args.set1PlusSet2)
+                    {
+                        results.Append($"<td>{driver.Value.Day1Set1.bestRAW.ToString("#0.000")}</td>");
+                        results.Append($"<td>{driver.Value.Day1Set2.bestRAW.ToString("#0.000")}</td>");
+                        results.Append($"<td>{driverBestRAW}</td>");
+                    }
+                    else
+                    {
+                        results.Append($"<td colspan=\"3\">{driverBestRAW}</td>");
+                    }
                     results.Append($"<td>{driverDiff}</td>");
                     results.Append($"<td>{driverDiffPrev}</td>");
                     results.Append($"<td>{grpPtr.groupScore.ToString("#0.000")}</td>");
                     results.Append("<td>");
                     results.Append("<div class=\"raw-results\">");
-                    results.Append(printSet(driver.Value.Day1Set1, 1, 1));
+                    results.Append(printSet(set, 1, 1));
                     results.Append("</div>");
                     results.Append($"</td>");
                     results.Append("</tr>");
 
                     // Update the previous time for the next driver's time difference calculation.
-                    classPrevTime = driver.Value.scoreData.bestRAW;
+                    if (args.set1Only)
+                    {
+                        classPrevTime = driver.Value.Day1Set1.bestRAW;
+                    }
+                    else if (args.set2Only)
+                    {
+                        classPrevTime = driver.Value.Day1Set2.bestRAW;
+                    }
+                    else if (args.set1PlusSet2)
+                    {
+                        classPrevTime = driver.Value.Day1Set1.bestRAW + driver.Value.Day1Set2.bestRAW;
+                    }
+                    else
+                    {
+                        classPrevTime = driver.Value.scoreData.bestRAW;
+                    }
                 }
 
                 results.Append("</tbody>");
