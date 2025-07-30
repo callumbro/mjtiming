@@ -25,7 +25,7 @@ namespace RaceBeam
         public static CSVData configData = new CSVData();
         public static bool showLastName = false;
         private static string htmlStyleTemplate = "";
-        private static string htmlHeaderTemplate = "<head><style>%{STYLE}%</style><script type=\"text/javascript\">function showResults(id) { let allResults = document.getElementsByClassName('results'); for (const element of allResults) { element.setAttribute('style', 'display: none;'); } document.getElementById(id).setAttribute('style', 'display: block;'); }</script></head>";
+        private static string htmlHeaderTemplate = "<head><style>%{STYLE}%</style><script type=\"text/javascript\">function showResults(className, name) { let allResults = document.getElementsByClassName(className); for (const element of allResults) { element.setAttribute('style', 'display: none;'); } let namedElements = document.getElementsByName(name); for (const element of namedElements) { element.setAttribute('style', ''); } }</script></head>";
         private static string htmlBodyTemplate = "<body><h1>%{TITLE}%</h1>%{BUTTONS}%%{RESULTS}%</body>";
         private static string htmlFooterTemplate = "<hr><footer><h3 margin-top=\"50px\">Statistics</h3>%{STATS}%</footer>";
         private static string htmlFooterContentTemplate = "<div style=\"padding-bottom: 15px;\"><div>%{DAY}%, ${SET}%: </div><span>First run: %{FIRST}%</span><span>Last run: %{LAST}% </span><span>Number of runs: %{NUMRUNS}% </span><span>Avg run time: %{AVGTIME}%</span></div>";
@@ -197,7 +197,16 @@ namespace RaceBeam
             results.Append("<th>Diff. Prev.</th>");
             if (args.set1PlusSet2)
             {
-                results.Append("<th>Set 2 Raw Times</th>");
+                results.Append("<th>");
+                results.Append("<span name=\"set-1-raw-times\" class=\"raw-times\" style=\"display: none;\">");
+                results.Append("<button class=\"button\" onclick=\"showResults('raw-times', 'set-2-raw-times');\">View Set 2</button>");
+                results.Append("Set 1 Raw Times");
+                results.Append("</span>");
+                results.Append("<span name=\"set-2-raw-times\" class=\"raw-times\">");
+                results.Append("<button class=\"button\" onclick=\"showResults('raw-times', 'set-1-raw-times');\">View Set 1</button>");
+                results.Append("Set 2 Raw Times");
+                results.Append("</span>");
+                results.Append("</th>");
             }
             else
             {
@@ -321,12 +330,6 @@ namespace RaceBeam
                     driverDiffPrev = (driver.Value.scoreData.bestRAW - classPrevTime).ToString("#0.000");
                 }
 
-                var set = driver.Value.Day1Set1;
-                if (args.set2Only || args.set1PlusSet2)
-                {
-                    set = driver.Value.Day1Set2;
-                }
-                
                 results.Append("<tr>");
                 results.Append($"<td>{rank}</td>");
                 results.Append($"<td>{driver.Value.carClass}</td>");
@@ -346,7 +349,27 @@ namespace RaceBeam
                 results.Append($"<td>{driverDiffPrev}</td>");
                 results.Append("<td>");
                 results.Append("<div class=\"raw-results\">");
-                results.Append(printSet(set, 1, 1));
+                if (args.set1PlusSet2)
+                {
+                    results.Append("<span name=\"set-1-raw-times\" class=\"raw-times raw-results\" style=\"display: none;\">");
+                    results.Append(printSet(driver.Value.Day1Set1));
+                    results.Append("</span>");
+                    results.Append("<span name=\"set-2-raw-times\" class=\"raw-times raw-results\">");
+                    results.Append(printSet(driver.Value.Day1Set2));
+                    results.Append("</span>");
+                }
+                else if (args.set2Only)
+                {
+                    results.Append("<span class=\"raw-results\">");
+                    results.Append(printSet(driver.Value.Day1Set2));
+                    results.Append("</span>");
+                }
+                else
+                {
+                    results.Append("<span class=\"raw-results\">");
+                    results.Append(printSet(driver.Value.Day1Set1));
+                    results.Append("</span>");
+                }
                 results.Append("</div>");
                 results.Append("</td>");
                 results.Append("</tr>");
@@ -459,7 +482,16 @@ namespace RaceBeam
                 results.Append("<th>Score</th>");
                 if (args.set1PlusSet2)
                 {
-                    results.Append("<th>Set 2 Raw Times</th>");
+                    results.Append("<th>");
+                    results.Append("<span name=\"set-1-raw-times\" class=\"raw-times\" style=\"display: none;\">");
+                    results.Append("<button class=\"button\" onclick=\"showResults('raw-times', 'set-2-raw-times');\">View Set 2</button>");
+                    results.Append("Set 1 Raw Times");
+                    results.Append("</span>");
+                    results.Append("<span name=\"set-2-raw-times\" class=\"raw-times\">");
+                    results.Append("<button class=\"button\" onclick=\"showResults('raw-times', 'set-1-raw-times');\">View Set 1</button>");
+                    results.Append("Set 2 Raw Times");
+                    results.Append("</span>");
+                    results.Append("</th>");
                 }
                 else
                 {
@@ -571,12 +603,6 @@ namespace RaceBeam
                         driverDiffPrev = (driver.Value.scoreData.bestRAW - classPrevTime).ToString("#0.000");
                     }
 
-                    var set = driver.Value.Day1Set1;
-                    if (args.set2Only || args.set1PlusSet2)
-                    {
-                        set = driver.Value.Day1Set2;
-                    }
-
                     results.Append("<tr>");
                     results.Append($"<td>{grpPtr.groupRank}</td>");
                     results.Append($"<td>{driver.Value.carClass}</td>");
@@ -596,9 +622,27 @@ namespace RaceBeam
                     results.Append($"<td>{driverDiffPrev}</td>");
                     results.Append($"<td>{grpPtr.groupScore.ToString("#0.000")}</td>");
                     results.Append("<td>");
-                    results.Append("<div class=\"raw-results\">");
-                    results.Append(printSet(set, 1, 1));
-                    results.Append("</div>");
+                    if (args.set1PlusSet2)
+                    {
+                        results.Append("<span name=\"set-1-raw-times\" class=\"raw-times raw-results\" style=\"display: none;\">");
+                        results.Append(printSet(driver.Value.Day1Set1));
+                        results.Append("</span>");
+                        results.Append("<span name=\"set-2-raw-times\" class=\"raw-times raw-results\">");
+                        results.Append(printSet(driver.Value.Day1Set2));
+                        results.Append("</span>");
+                    }
+                    else if (args.set2Only)
+                    {
+                        results.Append("<span class=\"raw-results\">");
+                        results.Append(printSet(driver.Value.Day1Set2));
+                        results.Append("</span>");
+                    }
+                    else
+                    {
+                        results.Append("<span class=\"raw-results\">");
+                        results.Append(printSet(driver.Value.Day1Set1));
+                        results.Append("</span>");
+                    }
                     results.Append($"</td>");
                     results.Append("</tr>");
 
@@ -669,7 +713,7 @@ namespace RaceBeam
                     results.Append($"<span>Number of runs: {stats.day1.set1NumberOfRuns}</span>");
                     results.Append($"<span>Average run time: {(stats.day1.set1TotalTime / stats.day1.set1NumberOfRuns).ToString("#0.000")}</span>");
                     results.Append("</span>");
-                    results.Append("</div>");
+                    results.Append("<br>");
                 }
                 if (stats.day1.set2NumberOfRuns > 0)
                 {
@@ -681,7 +725,7 @@ namespace RaceBeam
                     results.Append($"<span>Number of runs: {stats.day1.set2NumberOfRuns}</span>");
                     results.Append($"<span>Average run time: {(stats.day1.set2TotalTime / stats.day1.set2NumberOfRuns).ToString("#0.000")}</span>");
                     results.Append("</span>");
-                    results.Append("</div>");
+                    results.Append("<br>");
                 }
                 if (stats.day1.set3NumberOfRuns > 0)
                 {
@@ -693,7 +737,7 @@ namespace RaceBeam
                     results.Append($"<span>Number of runs: {stats.day1.set3NumberOfRuns}</span>");
                     results.Append($"<span>Average run time: {(stats.day1.set3TotalTime / stats.day1.set3NumberOfRuns).ToString("#0.000")}</span>");
                     results.Append("</span>");
-                    results.Append("</div>");
+                    results.Append("<br>");
                 }
             }
 
@@ -710,7 +754,7 @@ namespace RaceBeam
                     results.Append($"<span>Number of runs: {stats.day2.set1NumberOfRuns}</span>");
                     results.Append($"<span>Average run time: {(stats.day2.set1TotalTime / stats.day2.set1NumberOfRuns).ToString("#0.000")}</span>");
                     results.Append("</span>");
-                    results.Append("</div>");
+                    results.Append("<br>");
                 }
                 if (stats.day2.set2NumberOfRuns > 0)
                 {
@@ -722,7 +766,7 @@ namespace RaceBeam
                     results.Append($"<span>Number of runs: {stats.day2.set2NumberOfRuns}</span>");
                     results.Append($"<span>Average run time: {(stats.day2.set2TotalTime / stats.day2.set2NumberOfRuns).ToString("#0.000")}</span>");
                     results.Append("</span>");
-                    results.Append("</div>");
+                    results.Append("<br>");
                 }
                 if (stats.day2.set3NumberOfRuns > 0)
                 {
@@ -734,7 +778,7 @@ namespace RaceBeam
                     results.Append($"<span>Number of runs: {stats.day2.set3NumberOfRuns}</span>");
                     results.Append($"<span>Average run time: {(stats.day2.set3TotalTime / stats.day2.set3NumberOfRuns).ToString("#0.000")}</span>");
                     results.Append("</span>");
-                    results.Append("</div>");
+                    results.Append("<br>");
                 }
             }
 
@@ -745,7 +789,7 @@ namespace RaceBeam
 
         #region Private Helpers
 
-        private static string printSet(scoreCalcs.singleSetData setData, int dayNumber, int setNumber)
+        private static string printSet(scoreCalcs.singleSetData setData)
         {
             List<string> runs = new List<string>();
 
