@@ -746,7 +746,7 @@ namespace RaceBeam
             {
                 if (stats.day2.set1NumberOfRuns > 0)
                 {
-                    results.Append("<span class=\"driving-set-title\">Day 1, Set 1</span>");
+                    results.Append("<span class=\"driving-set-title\">Day 2, Set 1</span>");
                     results.Append("<br>");
                     results.Append("<span class=\"driving-set\">");
                     results.Append($"<span>First run: {stats.day2.set1TimeOfFirstRun}</span>");
@@ -758,7 +758,7 @@ namespace RaceBeam
                 }
                 if (stats.day2.set2NumberOfRuns > 0)
                 {
-                    results.Append("<span class=\"driving-set-title\">Day 1, Set 2</span>");
+                    results.Append("<span class=\"driving-set-title\">Day 2, Set 2</span>");
                     results.Append("<br>");
                     results.Append("<span class=\"driving-set\">");
                     results.Append($"<span>First run: {stats.day2.set2TimeOfFirstRun}</span>");
@@ -770,7 +770,7 @@ namespace RaceBeam
                 }
                 if (stats.day2.set3NumberOfRuns > 0)
                 {
-                    results.Append("<span class=\"driving-set-title\">Day 1, Fun Runs (Set 3)</span>");
+                    results.Append("<span class=\"driving-set-title\">Day 2, Fun Runs (Set 3)</span>");
                     results.Append("<br>");
                     results.Append("<span class=\"driving-set\">");
                     results.Append($"<span>First run: {stats.day2.set3TimeOfFirstRun}</span>");

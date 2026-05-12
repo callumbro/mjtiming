@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <OutputType>WinExe</OutputType>
+        <NoWin32Manifest>False</NoWin32Manifest>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <UseWindowsForms>true</UseWindowsForms>
+        <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+        <RootNamespace>RaceBeam</RootNamespace>
+        <AssemblyName>mjgooglesheets</AssemblyName>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+        <OutputPath>..\bin\</OutputPath>
+        <Optimize>True</Optimize>
+        <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DebugType>None</DebugType>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Google.Apis.Auth" Version="1.70.0" />
+        <PackageReference Include="Google.Apis.Sheets.v4" Version="1.70.0.3806" />
+        <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\mjcommon\mjcommon.csproj" />
+    </ItemGroup>
+</Project>
